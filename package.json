@@ -1,0 +1,20 @@
+{
+	"name": "vi-messenger",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"workspaces": [
+		"apps/*",
+		"packages/utils"
+	],
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "concurrently \"npm run dev -w apps/web\" \"npm run dev -w apps/server\""
+	},
+	"keywords": [],
+	"author": "Varadarajan M",
+	"license": "ISC",
+	"devDependencies": {
+		"concurrently": "^8.2.2"
+	}
+}
