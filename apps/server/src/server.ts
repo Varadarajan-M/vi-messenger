@@ -2,17 +2,19 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import http from 'http';
-import { Server } from 'socket.io';
 import dotenv from 'dotenv';
+import SocketIO from 'socket.io';
 
-dotenv?.config();
+import authRouter from './routes/auth';
 
-export const createServer = () => {
+const createServer = () => {
+	dotenv?.config();
+
 	const app = express();
 
 	const server = http.createServer(app);
 
-	const io = new Server(server);
+	const io = new SocketIO.Server(server);
 
 	app
 		.disable('x-powered-by')
@@ -21,13 +23,13 @@ export const createServer = () => {
 		.use(express.json())
 		.use(cors());
 
-	app.get('/health', (req, res) =>
-		res.json({ ok: true, environment: process.env.NODE_ENV }),
-	);
+	app.use('/api/auth', authRouter);
 
-	app.get('/message/:name', (req, res) =>
-		res.json({ message: `hello ${req.params.name}` }),
+	app.get('/api/health', (_, res) =>
+		res.json({ ok: true, environment: process.env.NODE_ENV }),
 	);
 
 	return { app, io };
 };
+
+export default createServer;
