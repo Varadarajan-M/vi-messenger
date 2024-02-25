@@ -1,6 +1,6 @@
+import connectDb from './db/connection';
 import createServer from './server';
 import logger from './utils/logger';
-import connectDb from './db/connection';
 
 const { app } = createServer();
 

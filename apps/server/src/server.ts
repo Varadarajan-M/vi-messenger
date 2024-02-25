@@ -1,11 +1,11 @@
-import express from 'express';
-import morgan from 'morgan';
 import cors from 'cors';
-import http from 'http';
 import dotenv from 'dotenv';
+import express from 'express';
+import http from 'http';
+import morgan from 'morgan';
 import SocketIO from 'socket.io';
 
-import authRouter from './routes/auth';
+import routes from './routes';
 
 const createServer = () => {
 	dotenv?.config();
@@ -23,7 +23,7 @@ const createServer = () => {
 		.use(express.json())
 		.use(cors());
 
-	app.use('/api/auth', authRouter);
+	app.use('/api', routes);
 
 	app.get('/api/health', (_, res) =>
 		res.json({ ok: true, environment: process.env.NODE_ENV }),

@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema(
 		picture: {
 			type: String,
 		},
-		isActive: {
-			type: Boolean,
-			default: false,
-		},
 		lastSeen: {
 			type: String,
 		},

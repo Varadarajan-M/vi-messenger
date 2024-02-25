@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
 import { compare, hash } from 'bcrypt';
+import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 
 import User from '../models/user';
+
 import logger from '../utils/logger';
 
 export const registerController = async (req: Request, res: Response) => {
