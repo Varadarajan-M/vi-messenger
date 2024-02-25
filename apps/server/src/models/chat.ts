@@ -1,4 +1,4 @@
-import { InferSchemaType, Schema, model, Types } from 'mongoose';
+import { InferSchemaType, Schema, Types, model } from 'mongoose';
 
 const chatSchema = new Schema({
 	name: {
@@ -14,7 +14,6 @@ const chatSchema = new Schema({
 	admin: {
 		type: Types.ObjectId,
 		ref: 'User',
-		required: true,
 	},
 });
 

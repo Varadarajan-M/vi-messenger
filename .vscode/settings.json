@@ -1,0 +1,15 @@
+{
+	"javascript.preferences.quoteStyle": "single",
+	"typescript.preferences.quoteStyle": "single",
+	"editor.formatOnSave": true,
+
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "explicit",
+		"source.organizeImports": "explicit"
+	},
+
+	"prettier.jsxSingleQuote": true,
+	"prettier.printWidth": 80,
+	"prettier.singleQuote": true,
+	"prettier.tabWidth": 4
+}

@@ -1,4 +1,5 @@
 import { Response } from 'express';
+
 import Chat from '../models/chat';
 import User from '../models/user';
 
@@ -34,6 +35,16 @@ export const searchController = async (req: RequestWithUser, res: Response) => {
 			},
 		};
 	} catch (error: any) {
-		res.json({ ok: false, error: error?.message });
+		if (!res.statusCode) res.status(500);
+
+		const msg =
+			res?.statusCode === 500
+				? 'Internal server error'
+				: error?.message || 'No results found';
+
+		res.json({
+			ok: false,
+			error: msg,
+		});
 	}
 };
