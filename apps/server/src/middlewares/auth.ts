@@ -1,8 +1,16 @@
-import { Response, NextFunction } from 'express';
+import { NextFunction, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 
 import { RequestWithUser } from '../types';
 
+/**
+ * Authorizes the user by checking the authorization token in the request headers.
+ *
+ * @param {RequestWithUser} req - the request object with user information
+ * @param {Response} res - the response object
+ * @param {NextFunction} next - the next function in the middleware chain
+ * @return {Promise<void>} Promise that resolves when the authorization is successful, or rejects with an error message
+ */
 const authorize = async (
 	req: RequestWithUser,
 	res: Response,
