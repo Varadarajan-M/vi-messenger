@@ -19,9 +19,7 @@ export const registerController = async (req: Request, res: Response) => {
 			});
 			const resp = await newUser.save();
 
-			logger.log(
-				`NEW USER Registration: - u: ${newUser?.username} e: ${newUser?.email}`,
-			);
+			logger.log(`NEW USER Registration: - u: ${newUser?.username} e: ${newUser?.email}`);
 
 			res.status(201).json({
 				ok: true,
@@ -49,9 +47,7 @@ export const loginController = async (req: Request, res: Response) => {
 
 		if (!matchingUser) {
 			res.status(400);
-			throw new Error(
-				"That Email doesn't exist in our records, Please signup to continue.",
-			);
+			throw new Error("That Email doesn't exist in our records, Please signup to continue.");
 		}
 
 		const isPasswordMatched = await compare(password, matchingUser?.password!);
@@ -59,9 +55,7 @@ export const loginController = async (req: Request, res: Response) => {
 		if (!isPasswordMatched) {
 			res.status(401);
 
-			logger.log(
-				`USER Login FAIL: - u: ${matchingUser?.username} e: ${matchingUser?.email}`,
-			);
+			logger.log(`USER Login FAIL: - u: ${matchingUser?.username} e: ${matchingUser?.email}`);
 			throw new Error('Invalid credentials');
 		}
 
@@ -70,14 +64,16 @@ export const loginController = async (req: Request, res: Response) => {
 			process.env.JWT_SECRET!,
 		);
 
-		logger.log(
-			`USER Login SUCCESS: - u: ${matchingUser?.username} e: ${matchingUser?.email}`,
-		);
+		logger.log(`USER Login SUCCESS: - u: ${matchingUser?.username} e: ${matchingUser?.email}`);
 
 		res.status(200).json({
 			ok: true,
 			message: 'Login Successful',
 			payload: {
+				_id: matchingUser?._id,
+				email: matchingUser?.email,
+				username: matchingUser?.username,
+				picture: matchingUser?.picture,
 				token,
 			},
 		});

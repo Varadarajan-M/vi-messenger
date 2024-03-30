@@ -9,6 +9,5 @@ export interface User {
 	username: string;
 	email: string;
 	picture: string;
-	lastSeen: string;
 	token: string;
 }

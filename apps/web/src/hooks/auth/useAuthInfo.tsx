@@ -10,7 +10,7 @@ const useAuthInfo = () => {
 	}
 
 	return {
-		isAuthenticated: ctx?.user?._id ? true : false,
+		isAuthenticated: ctx?.user?.token && ctx?.user?._id ? true : false,
 		user: ctx?.user,
 	};
 };
