@@ -1,3 +1,4 @@
+import { getPrivateChatName } from '@/lib/chat';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'react-router-dom';
 import ChatAvatar from './chat-avatar';
@@ -9,7 +10,8 @@ type ChatPreviewProps = {
 		lastMessage: string;
 		_id: string | number;
 		avatar: string;
-		time: string;
+		time?: string;
+		admin?: string;
 	};
 	isActive: boolean;
 };
@@ -46,10 +48,12 @@ const ChatPreview = ({ chat, isActive }: ChatPreviewProps) => {
 			aria-label={`Chat with ${chat.name}`}
 			aria-describedby={`lastMessage-${chat._id}`}
 		>
-			<ChatAvatar img={chat.avatar} variant='block' />
+			<ChatAvatar img={chat.avatar ?? 'https://i.pravatar.cc/300'} variant='block' size='md' />
 			<div className='flex justify-between gap-3 flex-1 '>
 				<div>
-					<h3 className='text-white font-medium ellipsis-1'>{chat.name}</h3>
+					<h3 className='text-white font-medium ellipsis-1'>
+						{!chat?.admin ? getPrivateChatName(chat.members as any) : chat.name}
+					</h3>
 					<p className='ellipsis-1 text-gray-500' title={chat.lastMessage}>
 						{chat.lastMessage}
 					</p>

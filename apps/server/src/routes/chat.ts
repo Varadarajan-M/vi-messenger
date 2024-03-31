@@ -10,19 +10,27 @@ import {
 	getOrCreatePrivateChatController,
 	removeMembersFromGroupChatController,
 	updateGroupChatController,
+	getUserChatsController,
 } from '../controllers/chat';
 
 import { authorize, checkAdminPrivilege, checkMembership } from '../middlewares';
 
 const router = express.Router();
 
+
+
+// ----------------------- ALL CHATS ----------------------
+
+
+router.route('/all').get(authorize, getUserChatsController);
+
 // --------------------- PRIVATE CHATS ----------------------
 
 router
 	.route('/private/:id')
-	.all(authorize, checkMembership)
+	.all(authorize)
 	.post(getOrCreatePrivateChatController)
-	.delete(deletePrivateChatController);
+	.delete(checkMembership, deletePrivateChatController);
 
 // ----------------------- GROUP CHATS ----------------------
 

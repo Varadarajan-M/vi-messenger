@@ -1,5 +1,5 @@
+import ChatSearch from '../chat-search/chat-search';
 import ChatList from './chat-list';
-import ChatSearch from './chat-search';
 
 const ChatListingPane = () => {
 	return (

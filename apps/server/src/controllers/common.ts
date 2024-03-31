@@ -17,23 +17,39 @@ export const searchController = async (req: RequestWithUser, res: Response) => {
 			throw new Error('Invalid Query');
 		}
 
-		const [users, groups] = await Promise.all([
+		let [users, groups] = await Promise.all([
 			User.find({
-				$or: [{ username: { $search: q } }, { email: { $search: q } }],
+				$or: [
+					{
+						email: {
+							$regex: new RegExp(q, 'i'),
+							$not: { $eq: req?.user?.email },
+						},
+					},
+					{
+						username: {
+							$regex: new RegExp(q, 'i'),
+							$not: { $eq: req?.user?.username },
+						},
+					},
+				],
 			}).select('-password'),
+
 			Chat.find({
-				name: { $search: q },
+				name: { $regex: new RegExp(q, 'i') },
 				members: { $in: req?.user?._id },
 			}),
 		]);
 
-		return {
+
+
+		return res.status(200).json({
 			ok: true,
 			payload: {
 				users,
 				groups,
 			},
-		};
+		});
 	} catch (error: any) {
 		if (!res.statusCode) res.status(500);
 

@@ -60,7 +60,11 @@ export const loginController = async (req: Request, res: Response) => {
 		}
 
 		const token = sign(
-			{ _id: matchingUser?._id, email: matchingUser?.email },
+			{
+				_id: matchingUser?._id,
+				email: matchingUser?.email,
+				username: matchingUser?.username,
+			},
 			process.env.JWT_SECRET!,
 		);
 

@@ -5,6 +5,41 @@ import User from '../models/user';
 
 import { RequestWithChat, RequestWithUser } from '../types';
 
+// ----------------------- ALL CHATS ----------------------
+
+export const getUserChatsController = async (req: RequestWithUser, res: Response) => {
+	try {
+		const userId = req?.user?._id;
+
+		const chats = await Chat.find({
+			members: {
+				$in: [userId],
+			},
+		})
+			.sort({ updatedAt: -1 })
+			.lean()
+			.populate('members', '-password');
+
+		return res.status(200).json({
+			ok: true,
+			payload: {
+				chats,
+			},
+		});
+	} catch (error: any) {
+		if (!res.statusCode) res.status(500);
+		const msg =
+			res?.statusCode === 500
+				? 'Internal server error'
+				: error?.message || 'Failed to get chats';
+
+		return res.json({
+			ok: false,
+			error: msg,
+		});
+	}
+};
+
 // ----------------------- PRIVATE CHATS ----------------------
 
 export const getOrCreatePrivateChatController = async (req: RequestWithUser, res: Response) => {

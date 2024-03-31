@@ -3,12 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 
 import ChatPreview from './chat-preview';
 
-import { DUMMY_CHATS } from '../data';
+import useFetchChats from '@/hooks/chat/useFetchChats';
 
 const ChatList = () => {
 	const [searchParams] = useSearchParams();
-
 	const activeChat = searchParams.get('chat') ?? '';
+
+	const chats = useFetchChats();
 
 	useEffect(() => {
 		if (activeChat?.trim().length) {
@@ -19,10 +20,10 @@ const ChatList = () => {
 
 	return (
 		<div className='flex flex-col gap-3 overflow-auto scroll-smooth'>
-			{DUMMY_CHATS.map((chat) => (
+			{chats.map((chat) => (
 				<ChatPreview
 					key={chat._id}
-					chat={chat}
+					chat={chat as any}
 					isActive={activeChat === chat._id?.toString()}
 				/>
 			))}
