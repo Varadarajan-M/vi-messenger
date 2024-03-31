@@ -1,4 +1,4 @@
-import { getPrivateChatName } from '@/lib/chat';
+import { getMessageSenderText, getPrivateChatName } from '@/lib/chat';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'react-router-dom';
 import ChatAvatar from './chat-avatar';
@@ -7,7 +7,7 @@ type ChatPreviewProps = {
 	chat: {
 		name: string;
 		members: string[];
-		lastMessage: string;
+		lastMessage: any;
 		_id: string | number;
 		avatar: string;
 		time?: string;
@@ -48,15 +48,22 @@ const ChatPreview = ({ chat, isActive }: ChatPreviewProps) => {
 			aria-label={`Chat with ${chat.name}`}
 			aria-describedby={`lastMessage-${chat._id}`}
 		>
-			<ChatAvatar img={chat.avatar ?? 'https://i.pravatar.cc/300'} variant='block' size='md' />
+			<ChatAvatar
+				img={chat.avatar ?? 'https://i.pravatar.cc/300'}
+				variant='block'
+				size='md'
+			/>
 			<div className='flex justify-between gap-3 flex-1 '>
 				<div>
 					<h3 className='text-white font-medium ellipsis-1'>
 						{!chat?.admin ? getPrivateChatName(chat.members as any) : chat.name}
 					</h3>
-					<p className='ellipsis-1 text-gray-500' title={chat.lastMessage}>
-						{chat.lastMessage}
-					</p>
+					{chat.lastMessage && (
+						<p className='ellipsis-1 text-gray-500' title={chat.lastMessage}>
+							{getMessageSenderText(chat.lastMessage?.sender)}:
+							{chat.lastMessage?.content}
+						</p>
+					)}
 				</div>
 				<span className='text-gray-400 text-xs tracking-tighter justify-end -ml-6'>
 					<time className='ellipsis-1'>{chat.time} am</time>

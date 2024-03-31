@@ -15,10 +15,12 @@ export const getUserChatsController = async (req: RequestWithUser, res: Response
 			members: {
 				$in: [userId],
 			},
+			lastMessage: { $exists: true },
 		})
 			.sort({ updatedAt: -1 })
 			.lean()
-			.populate('members', '-password');
+			.populate('members', '-password')
+			.populate({ path: 'lastMessage', populate: { path: 'sender', select: '-password' } });
 
 		return res.status(200).json({
 			ok: true,
