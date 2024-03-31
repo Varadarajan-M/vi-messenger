@@ -43,7 +43,7 @@ const SidebarMenu = () => {
 						isMenuActive(item.key)
 							? 'text-gray-400 after:w-full'
 							: 'text-white hover:text-gray-200'
-					}focus:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`}
+					} focus-visible:outline-none focus-visible:font-semibold`}
 					data-menuid={item.key}
 					key={item.label}
 					onClick={() => handleMenuItemClick(item.key)}
