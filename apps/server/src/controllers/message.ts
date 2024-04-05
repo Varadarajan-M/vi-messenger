@@ -10,7 +10,7 @@ export const getChatMessagesController = async (req: RequestWithChat, res: Respo
 		}
 
 		const messages = await Message.find({ chatId: req?.chat?._id })
-			.sort({ createdAt: -1 })
+			.sort({ createdAt: 1 })
 			.populate('sender', '-password')
 			.populate('seenBy', '-password');
 
@@ -38,14 +38,16 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 		const { _id: chatId } = req?.chat;
 		const { _id: userId } = req?.user;
 
-		const newMessage = new Message({
+		let newMessage = new Message({
 			chatId,
 			sender: userId,
 			type,
 			content,
 		});
 
-		(await newMessage.save()).populate('sender', '-password');
+		await newMessage.save();
+
+		await newMessage.populate('sender', '-password');
 
 		await req.chat.updateOne({ lastMessage: newMessage._id });
 

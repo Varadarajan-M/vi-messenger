@@ -1,11 +1,11 @@
-import ChatWindow from './chat-detail-pane/chat-window';
 import ChatListingPane from './chat-listing-pane/chat-listing-pane';
+import ChatMessagePane from './chat-message-pane/chat-message-pane';
 
 const ChatsContainer = () => {
 	return (
-		<main className='flex items-stretch h-full flex-1 bg-dark-grey border-l-0 border-l-gray-300 rounded-l-3xl'>
+		<main className='flex items-stretch h-full flex-1 bg-gradient-dark border-l-0 border-l-gray-300 rounded-l-3xl'>
 			<ChatListingPane />
-			<ChatWindow />
+			<ChatMessagePane />
 		</main>
 	);
 };

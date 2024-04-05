@@ -32,7 +32,7 @@ const LoginForm = () => {
 	};
 
 	const getInputClasses = (name: keyof Omit<AuthFormData, 'username'>) => {
-		return clsx('text-gray-300 shadow-lg border-light-grey focus-visible:border-gray-600', {
+		return clsx('text-gray-300 shadow-lg border-dark-grey focus-visible:border-gray-600', {
 			'border-red-900 focus-visible:border-red-800': errors?.[name],
 		});
 	};

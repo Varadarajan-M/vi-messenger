@@ -94,6 +94,9 @@ html,
 	.ellipsis-1 {
 		@apply overflow-hidden text-ellipsis line-clamp-1;
 	}
+	.bg-gradient-dark {
+		background: linear-gradient(45deg, #050a0f, #130505);
+	}
 }
 
 ::-webkit-scrollbar {
@@ -101,11 +104,11 @@ html,
 }
 
 ::-webkit-scrollbar-track {
-	@apply bg-black bg-opacity-50 rounded-md;
+	@apply bg-black bg-opacity-50;
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply bg-light-grey bg-opacity-70 rounded-md hover:bg-opacity-55;
+	@apply bg-dark-grey bg-opacity-70 rounded-md hover:bg-opacity-55;
 }
 
 .loader {
@@ -122,4 +125,22 @@ html,
 	100% {
 		transform: rotate(1turn);
 	}
+}
+
+.message-bubble::before {
+	content: '';
+	background-color: inherit;
+	height: 30px;
+	width: 30%;
+	-webkit-clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+	clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+	position: absolute;
+	bottom: 0;
+}
+
+.message-bubble__other::before {
+	left: -9px;
+}
+.message-bubble__self::before {
+	right: -9px;
 }

@@ -20,7 +20,7 @@ const ChatList = () => {
 
 	return (
 		<div className='flex flex-col gap-3 overflow-auto scroll-smooth'>
-			{chats.map((chat) => (
+			{chats?.map((chat) => (
 				<ChatPreview
 					key={chat._id}
 					chat={chat as any}

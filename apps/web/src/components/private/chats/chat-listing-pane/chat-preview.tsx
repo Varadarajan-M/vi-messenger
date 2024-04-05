@@ -1,4 +1,5 @@
 import { getMessageSenderText, getPrivateChatName } from '@/lib/chat';
+import { getTimeFromNow } from '@/lib/datetime';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'react-router-dom';
 import ChatAvatar from './chat-avatar';
@@ -32,13 +33,18 @@ const ChatPreview = ({ chat, isActive }: ChatPreviewProps) => {
 		}
 	};
 
+	const getChatSenderPrefix = () => {
+		if (chat?.admin) return `${getMessageSenderText(chat.lastMessage?.sender)}:`;
+		return getMessageSenderText(chat.lastMessage?.sender) === 'You' ? 'You:' : '';
+	};
+
 	return (
 		<div
 			id={chat._id?.toString()}
 			className={cn(
-				'flex p-3 gap-3 rounded-xl hover:bg-light-grey hover:bg-opacity-50 mr-3 cursor-pointer focus-visible:bg-light-grey focus-visible:bg-opacity-50 focus-visible:outline-none',
+				'flex p-3 gap-3 rounded-xl bg-dark-grey hover:bg-gray-900 mr-3 cursor-pointer focus-visible:bg-dark-grey focus-visible:bg-opacity-50 focus-visible:outline-none',
 				{
-					'bg-light-grey bg-opacity-50': isActive,
+					'bg-dark-grey bg-opacity-50': isActive,
 				},
 			)}
 			onClick={handleChatClick}
@@ -54,19 +60,21 @@ const ChatPreview = ({ chat, isActive }: ChatPreviewProps) => {
 				size='md'
 			/>
 			<div className='flex justify-between gap-3 flex-1 '>
-				<div>
+				<div className='w-20'>
 					<h3 className='text-white font-medium ellipsis-1'>
 						{!chat?.admin ? getPrivateChatName(chat.members as any) : chat.name}
 					</h3>
 					{chat.lastMessage && (
-						<p className='ellipsis-1 text-gray-500' title={chat.lastMessage}>
-							{getMessageSenderText(chat.lastMessage?.sender)}:
+						<p className='ellipsis-1 text-gray-500' title={chat.lastMessage?.content}>
+							{getChatSenderPrefix()}
 							{chat.lastMessage?.content}
 						</p>
 					)}
 				</div>
-				<span className='text-gray-400 text-xs tracking-tighter justify-end -ml-6'>
-					<time className='ellipsis-1'>{chat.time} am</time>
+				<span className='text-gray-400 text-xs tracking-tighter justify-end self-center -ml-6'>
+					<time className='ellipsis-1'>
+						{getTimeFromNow(chat.lastMessage?.createdAt)}
+					</time>
 				</span>
 			</div>
 		</div>

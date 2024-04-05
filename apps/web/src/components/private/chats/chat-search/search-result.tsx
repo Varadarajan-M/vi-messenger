@@ -13,7 +13,7 @@ export const UserSearchResult = ({ item, onClick }: { item: User; onClick: () =>
 
 	return (
 		<div
-			className='flex gap-3 items-center cursor-pointer p-2 rounded-lg hover:bg-dark-grey'
+			className='flex gap-3 items-center cursor-pointer p-2 rounded-lg hover:bg-gradient-dark'
 			onClick={handleSearchResultClick}
 		>
 			<ChatAvatar
