@@ -42,9 +42,9 @@ const ChatPreview = ({ chat, isActive }: ChatPreviewProps) => {
 		<div
 			id={chat._id?.toString()}
 			className={cn(
-				'flex p-3 gap-3 rounded-xl bg-dark-grey hover:bg-gray-900 mr-3 cursor-pointer focus-visible:bg-dark-grey focus-visible:bg-opacity-50 focus-visible:outline-none',
+				'flex p-3 gap-3 rounded-xl bg-black hover:bg-gray-900 mr-3 cursor-pointer focus-visible:bg-dark-grey focus-visible:bg-opacity-50 focus-visible:outline-none',
 				{
-					'bg-dark-grey bg-opacity-50': isActive,
+					'bg-dark-grey': isActive,
 				},
 			)}
 			onClick={handleChatClick}

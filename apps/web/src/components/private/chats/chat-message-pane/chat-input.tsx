@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import useSendMessage from '@/hooks/messages/useSendMessage';
 import { ComponentPropsWithoutRef, useRef } from 'react';
 
-const PlusIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
+export const PlusIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 	<svg
 		width='15'
 		height='15'

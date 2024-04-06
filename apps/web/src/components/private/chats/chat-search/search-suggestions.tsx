@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import useCreateOrFetchChat from '@/hooks/chat/useCreateOrFetchChat';
 import { User } from '@/types/auth';
 import { Chat } from '@/types/chat';
 import { UserSearchResult } from './search-result';
@@ -16,6 +17,8 @@ const ChatSearchSuggestions = ({
 	isOpen: boolean;
 	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+	const { createOrFetchDm } = useCreateOrFetchChat();
+
 	if (!isOpen) return null;
 
 	return (
@@ -25,7 +28,13 @@ const ChatSearchSuggestions = ({
 				<ul className='flex flex-col gap-3'>
 					{suggestions?.users?.map((item) => (
 						<li key={item._id}>
-							<UserSearchResult item={item} onClick={() => setIsOpen(false)} />
+							<UserSearchResult
+								item={item}
+								onClick={() => {
+									createOrFetchDm(item?._id);
+									setIsOpen(false);
+								}}
+							/>
 						</li>
 					))}
 				</ul>
