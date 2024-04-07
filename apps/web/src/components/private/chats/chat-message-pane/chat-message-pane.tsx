@@ -10,7 +10,7 @@ const ChatMessagePane = () => {
 
 	return (
 		<section className='h-full pt-5 px-7 flex-1 bg-black flex flex-col'>
-			<ChatHeader />
+			<ChatHeader  chatId={chat}/>
 			<ChatMessageContainer chatId={chat} />
 		</section>
 	);

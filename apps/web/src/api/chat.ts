@@ -22,7 +22,27 @@ export const createOrFetchPrivateChat = async (userId: string) => {
 
 export const getUserChats = async () => {
 	try {
-		const res = await api.get(`/chat/all`);
+		const res = await api.get(`/chat/user-chats`);
+		return res;
+	} catch (err) {
+		console.log(err);
+		return err;
+	}
+};
+
+export const createGroupChat = async (name: string, members: string[]) => {
+	try {
+		const res = await api.post(`/chat/group`, { name, members });
+		return res;
+	} catch (err) {
+		console.log(err);
+		return err;
+	}
+};
+
+export const getChatDetails = async (chatId: string) => {
+	try {
+		const res = await api.get(`/chat/details/${chatId}`);
 		return res;
 	} catch (err) {
 		console.log(err);

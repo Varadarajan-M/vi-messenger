@@ -10,6 +10,7 @@ const ChatSearch = () => {
 			shortcutKey='k'
 			onChange={onSearch}
 			placeholder='Find/Create Chats...'
+			className='flex-1'
 			loading={loading}
 			renderSuggestions={({ isOpen, setIsOpen }) =>
 				!loading ? (

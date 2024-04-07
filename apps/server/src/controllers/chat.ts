@@ -5,11 +5,51 @@ import User from '../models/user';
 
 import { RequestWithChat, RequestWithUser } from '../types';
 
+// ----------------------- CHATS -------------------------
+
+export const getChatController = async (req: RequestWithChat, res: Response) => {
+	try {
+		if (!req?.chat) {
+			res.status(403);
+			throw new Error('Chat not found');
+		}
+		let chat = req?.chat;
+
+		if (!chat?.admin) {
+			chat = await req?.chat.populate({
+				path: 'members',
+				select: '-password',
+			});
+		}
+
+		return res.status(200).json({
+			ok: true,
+			payload: {
+				chat,
+			},
+		});
+	} catch (error: any) {
+		if (!res.statusCode) res.status(500);
+
+		const msg =
+			res?.statusCode === 500
+				? 'Internal server error'
+				: error?.message || 'Failed to get chat';
+
+		res.json({
+			ok: false,
+			error: msg,
+		});
+	}
+};
+
 // ----------------------- ALL CHATS ----------------------
 
 export const getUserChatsController = async (req: RequestWithUser, res: Response) => {
 	try {
 		const userId = req?.user?._id;
+
+		// TODO: conditionally populate members
 
 		const chats = await Chat.find({
 			members: {
@@ -205,7 +245,7 @@ export const createGroupChatController = async (req: RequestWithUser, res: Respo
 		await newChat.save();
 
 		const detailedChat = await User.populate(newChat, {
-			path: 'members',
+			path: 'admin members',
 			select: '-password',
 		});
 

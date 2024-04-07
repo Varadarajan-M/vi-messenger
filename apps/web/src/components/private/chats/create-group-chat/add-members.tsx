@@ -45,10 +45,10 @@ const AddMembers = ({
 	};
 
 	return (
-		<div className='flex flex-col gap-2'>
+		<div className='flex flex-col gap-2 flex-1'>
 			<Search
 				className='border border-purple-950 focus-within:border-blue-300'
-				placeholder='Search users'
+				placeholder='Start typing to add members...'
 				loading={loading}
 				onChange={onSearch}
 				showIcon={false}
@@ -61,7 +61,7 @@ const AddMembers = ({
 					/>
 				)}
 			/>
-			<div className='min-w-full max-h-48 min-h-48 bg-dark-grey bg-opacity-50 rounded-lg overflow-y-auto'>
+			<div className='min-w-full max-h-[60%] min-h-48 bg-dark-grey bg-opacity-50 rounded-lg overflow-y-auto'>
 				{selectedUsers.length > 0 && (
 					<h5 className='text-gray-400 font-semibold p-2'>Group Members</h5>
 				)}

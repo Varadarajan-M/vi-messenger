@@ -6,6 +6,9 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import useFetchSingleChat from '@/hooks/chat/useFetchSingleChat';
+import { getPrivateChatName } from '@/lib/chat';
+import { User } from '@/types/auth';
 
 const MenuIcon = () => (
 	<svg width='15' height='15' viewBox='0 0 15 15' fill='none' xmlns='http://www.w3.org/2000/svg'>
@@ -18,31 +21,52 @@ const MenuIcon = () => (
 	</svg>
 );
 
-const ChatHeader = () => {
+const ChatHeader = ({ chatId }: { chatId: string }) => {
+	const { chat, loading } = useFetchSingleChat(chatId);
+
 	return (
 		<header className='flex bg-gradient-dark rounded-lg mb-3 justify-between gap-4 sticky top-0'>
-			<div className='flex gap-3 items-center cursor-pointer p-2 rounded-lg'>
-				<ChatAvatar img={`${'https://i.pravatar.cc/300'}`} variant='block' size='sm' />
-				<div className='flex flex-col'>
-					<span className='text-white  font-semibold capitalize m-0 text-md'>
-						{'John Doe'}
-					</span>
-					<span className='text-gray-400 capitalize -mt-1 text-sm'>Online</span>
+			{loading && (
+				<div className='w-full flex items-center p-2 justify-center animate-pulse text-white font-medium'>
+					{/* TODO: Add Skeleton Here */}
+					Loading chat details ...
 				</div>
-			</div>
-			<DropdownMenu>
-				<DropdownMenuTrigger className='focus-visible:outline-none h-max w-max self-center px-2.5 py-2 rounded-full data-[state=open]:bg-gradient-dark transition-all'>
-					<MenuIcon />
-				</DropdownMenuTrigger>
-				<DropdownMenuContent
-					// sideOffset={}
-					className='mx-5 bg-gradient-dark text-white border-none'
-				>
-					<DropdownMenuItem>Profile</DropdownMenuItem>
-					<DropdownMenuItem>Delete chat</DropdownMenuItem>
-					<DropdownMenuItem>Chat Details</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
+			)}
+			{!loading && (
+				<>
+					<div className='flex gap-3 items-center cursor-pointer p-2 rounded-lg'>
+						<ChatAvatar
+							img={`${'https://i.pravatar.cc/300'}`}
+							variant='block'
+							size='sm'
+						/>
+						<div className='flex flex-col'>
+							{!loading && (
+								<span className='text-white  font-semibold capitalize m-0 text-md'>
+									{!chat?.admin
+										? getPrivateChatName(chat?.members as User[])
+										: chat?.name}
+								</span>
+							)}
+
+							{/* <span className='text-gray-400 capitalize -mt-1 text-sm'>Online</span> */}
+						</div>
+					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger className='focus-visible:outline-none h-max w-max self-center px-2.5 py-2 rounded-full data-[state=open]:bg-gradient-dark transition-all'>
+							<MenuIcon />
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							// sideOffset={}
+							className='mx-5 bg-gradient-dark text-white border-none'
+						>
+							<DropdownMenuItem>Profile</DropdownMenuItem>
+							<DropdownMenuItem>Delete chat</DropdownMenuItem>
+							<DropdownMenuItem>Chat Details</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</>
+			)}
 		</header>
 	);
 };

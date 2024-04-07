@@ -22,22 +22,28 @@ const ChatMessageContainer = ({ chatId }: ChatMessageContainerProps) => {
 };
 
 const Messages = ({ chatId }: { chatId: string }) => {
-	const messages = useFetchMessages(chatId);
+	const { messages, loading } = useFetchMessages(chatId);
 	const { user } = useAuthInfo();
 
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
 
 	return (
 		<div className='flex flex-col gap-3 h-full'>
-			{messages?.map((message, index) => (
-				<Message
-					key={message._id}
-					sender={getSender(message?.sender?._id)}
-					showAvatar={messages[index + 1]?.sender?._id !== message.sender?._id}
-					showUsername={messages[index - 1]?.sender?._id !== message.sender?._id}
-					message={message}
-				/>
-			))}
+			{loading && (
+				<div className='w-full flex items-center justify-center animate-pulse text-white font-medium'>
+					Loading chat messages ...
+				</div>
+			)}
+			{!loading &&
+				messages?.map((message, index) => (
+					<Message
+						key={message._id}
+						sender={getSender(message?.sender?._id)}
+						showAvatar={messages[index + 1]?.sender?._id !== message.sender?._id}
+						showUsername={messages[index - 1]?.sender?._id !== message.sender?._id}
+						message={message}
+					/>
+				))}
 		</div>
 	);
 };

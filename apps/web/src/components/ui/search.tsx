@@ -30,6 +30,7 @@ export const Search = ({
 	renderSuggestions,
 	className,
 	showIcon = true,
+	placeholder = 'Search',
 }: SearchProps) => {
 	const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -38,7 +39,7 @@ export const Search = ({
 		const handler = (e: KeyboardEvent) => {
 			if (e.key === shortcutKey && e.ctrlKey) {
 				e.preventDefault();
-				e.stopPropagation()
+				e.stopPropagation();
 				inputRef.current?.focus();
 			}
 			if (e.key === 'Escape' && isSuggestionsOpen) {
@@ -71,7 +72,7 @@ export const Search = ({
 			<Input
 				ref={inputRef}
 				onChange={handleChange}
-				placeholder='Find/Create Chats...'
+				placeholder={placeholder}
 				className={`${
 					showIcon ? 'pl-8' : ''
 				} focus-visible:ring-transparent border-none text-gray-300 placeholder:text-gray-500 placeholder:tracking-tight py-[1.4rem]  bg-black bg-opacity-80 rounded-xl shadow-sm placeholder:text-sm text-base`}

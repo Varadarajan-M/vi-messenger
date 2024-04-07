@@ -10,7 +10,7 @@ export const getPrivateChatName = (members: User[]) => {
 
 	const { _id } = session;
 
-	return members.find((member) => member?._id !== _id)?.username ?? 'DM';
+	return members?.find((member) => member?._id !== _id)?.username ?? 'DM';
 };
 
 export const getMessageSenderText = (sender: User) => {

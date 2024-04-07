@@ -1,15 +1,13 @@
 import { createOrFetchPrivateChat } from '@/api/chat';
 import { useChatsStore } from '@/zustand/store';
 import { useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+
+import useSetAndPopulateActiveChat from './useSetAndPopulateActiveChat';
 
 const useCreateOrFetchChat = () => {
-	const addToChats = useChatsStore((state) => state.addToChats);
-	const chats = useChatsStore((state) => state.chats);
 	const loading = useChatsStore((state) => state.loading);
 	const setLoading = useChatsStore((state) => state.setLoading);
-
-	const [searchParams, setSearchParams] = useSearchParams();
+	const setOrCreateActiveChat = useSetAndPopulateActiveChat();
 
 	const createOrFetchDm = useCallback(
 		async (userId: string) => {
@@ -17,12 +15,7 @@ const useCreateOrFetchChat = () => {
 				setLoading(true);
 				const res: any = await createOrFetchPrivateChat(userId);
 				if (res?.chat) {
-					const chat = chats.find((chat) => chat?._id === res?.chat._id);
-					if (!chat) {
-						addToChats(res?.chat);
-					}
-					searchParams.set('chat', res?.chat?._id?.toString());
-					setSearchParams(searchParams.toString());
+					setOrCreateActiveChat(res?.chat);
 				}
 			} catch (error) {
 				console.log(error);
@@ -30,7 +23,7 @@ const useCreateOrFetchChat = () => {
 				setLoading(false);
 			}
 		},
-		[addToChats, chats, searchParams, setLoading, setSearchParams],
+		[setLoading, setOrCreateActiveChat],
 	);
 
 	return { createOrFetchDm, loading };

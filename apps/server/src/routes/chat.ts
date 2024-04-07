@@ -5,24 +5,24 @@ import {
 	createGroupChatController,
 	deleteGroupChatController,
 	deletePrivateChatController,
+	getChatController,
 	getGroupChatController,
 	getGroupChatMembersController,
 	getOrCreatePrivateChatController,
+	getUserChatsController,
 	removeMembersFromGroupChatController,
 	updateGroupChatController,
-	getUserChatsController,
 } from '../controllers/chat';
 
 import { authorize, checkAdminPrivilege, checkMembership } from '../middlewares';
 
 const router = express.Router();
 
-
+router.get('/details/:id', authorize, checkMembership, getChatController);
 
 // ----------------------- ALL CHATS ----------------------
 
-
-router.route('/all').get(authorize, getUserChatsController);
+router.route('/user-chats').get(authorize, getUserChatsController);
 
 // --------------------- PRIVATE CHATS ----------------------
 
@@ -34,7 +34,7 @@ router
 
 // ----------------------- GROUP CHATS ----------------------
 
-router.post('/group', createGroupChatController);
+router.post('/group', authorize, createGroupChatController);
 
 router
 	.route('/group/:id')
