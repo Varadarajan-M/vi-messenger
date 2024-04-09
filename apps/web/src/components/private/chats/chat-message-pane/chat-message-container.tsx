@@ -1,5 +1,6 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
+import { useEffect, useRef } from 'react';
 import ChatInput from './chat-input';
 import Message from './chat-message';
 
@@ -24,11 +25,16 @@ const ChatMessageContainer = ({ chatId }: ChatMessageContainerProps) => {
 const Messages = ({ chatId }: { chatId: string }) => {
 	const { messages, loading } = useFetchMessages(chatId);
 	const { user } = useAuthInfo();
+	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
 
+	useEffect(() => {
+		messagesEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
+	}, [messages?.length]);
+
 	return (
-		<div className='flex flex-col gap-3 h-full'>
+		<div className='flex flex-col gap-3 h-full' onScroll={console.log}>
 			{loading && (
 				<div className='w-full flex items-center justify-center animate-pulse text-white font-medium'>
 					Loading chat messages ...
@@ -44,6 +50,7 @@ const Messages = ({ chatId }: { chatId: string }) => {
 						message={message}
 					/>
 				))}
+			{!loading && <div ref={messagesEndRef} />}
 		</div>
 	);
 };

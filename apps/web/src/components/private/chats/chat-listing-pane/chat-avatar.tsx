@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
+import { memo } from 'react';
 
 type ChatAvatarProps = {
 	variant: 'rounded' | 'block';
@@ -27,4 +28,4 @@ const ChatAvatar = ({ img, variant, size = 'md' }: ChatAvatarProps) => {
 		</div>
 	);
 };
-export default ChatAvatar;
+export default memo(ChatAvatar);

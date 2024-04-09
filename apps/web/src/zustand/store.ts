@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { getUserChats } from '@/api/chat';
+import { getChatDetails, getUserChats } from '@/api/chat';
 
 import { getChatMessages } from '@/api/message';
 import { Chat } from '@/types/chat';
@@ -14,7 +14,7 @@ type ChatStore = {
 	loading: boolean;
 	setLoading: (loading: boolean) => void;
 
-	findByIdAndUpdate: (id: string, update: Partial<Chat>) => void;
+	findByIdAndUpdate: (id: string, update: Partial<Chat>) => Promise<void>;
 
 	fetchChats: () => Promise<void>;
 };
@@ -23,6 +23,7 @@ export const useChatsStore = create<ChatStore>((set, get) => ({
 	chats: [],
 	setChats: (chats) => set({ chats }),
 	addToChats: (chat) => {
+		console.log(chat);
 		set({ chats: [chat, ...get().chats] });
 	},
 
@@ -43,10 +44,19 @@ export const useChatsStore = create<ChatStore>((set, get) => ({
 		}
 	},
 
-	findByIdAndUpdate(id: string, update: Partial<Chat>) {
-		set({
-			chats: get().chats.map((chat) => (chat?._id === id ? { ...chat, ...update } : chat)),
-		});
+	findByIdAndUpdate: async (id: string, update: Partial<Chat>) => {
+		const existingChat = get().chats.find((chat) => chat?._id === id);
+		console.log('existingChat', existingChat);
+		if (!existingChat) {
+			const res = (await getChatDetails(id, 'populate=1')) as { chat: Chat };
+			res.chat && set({ chats: [res.chat, ...get().chats] });
+		} else {
+			set({
+				chats: get().chats.map((chat) =>
+					chat?._id === id ? { ...chat, ...update } : chat,
+				),
+			});
+		}
 	},
 }));
 

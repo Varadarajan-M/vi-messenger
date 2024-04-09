@@ -43,6 +43,7 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 			sender: userId,
 			type,
 			content,
+			seenBy: [userId],
 		});
 
 		await newMessage.save();

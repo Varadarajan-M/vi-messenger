@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
+import SocketContextProvider from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 
 const ProtectedRoute = () => {
@@ -9,7 +10,11 @@ const ProtectedRoute = () => {
 		return <Navigate to='/login' replace />;
 	}
 
-	return <Outlet />;
+	return (
+		<SocketContextProvider>
+			<Outlet />
+		</SocketContextProvider>
+	);
 };
 
 export default ProtectedRoute;

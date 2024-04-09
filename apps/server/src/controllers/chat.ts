@@ -14,11 +14,14 @@ export const getChatController = async (req: RequestWithChat, res: Response) => 
 			throw new Error('Chat not found');
 		}
 		let chat = req?.chat;
+		let { populate } = req?.query;
 
-		if (!chat?.admin) {
-			chat = await req?.chat.populate({
-				path: 'members',
-				select: '-password',
+		if (!chat?.admin || populate === '1') {
+			chat = await (
+				await req?.chat.populate('members', '-password')
+			).populate({
+				path: 'lastMessage',
+				populate: { path: 'sender', select: '-password' },
 			});
 		}
 
@@ -98,6 +101,7 @@ export const getOrCreatePrivateChatController = async (req: RequestWithUser, res
 		const existingChat = await Chat.findOne({
 			members: {
 				$all: [loggedInUserId, selectedUserId],
+				$size: 2,
 			},
 		})
 			?.lean()
@@ -236,9 +240,11 @@ export const createGroupChatController = async (req: RequestWithUser, res: Respo
 			throw new Error('Member list must have atleast one member');
 		}
 
+		members.push(req?.user?._id);
+
 		const newChat = new Chat({
 			name: name?.trim(),
-			members,
+			members: Array.from(new Set(members)),
 			admin: req?.user?._id,
 		});
 

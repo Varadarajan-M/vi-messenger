@@ -66,7 +66,7 @@ const CreateGroupChat = () => {
 			const res = (await createGroupChat(data.name, memberIds)) as any;
 			if (res?.chat) addToChats(res.chat);
 			reset();
-			setSelectedUsers([]);
+			setSelectedUsers([user as User]);
 			setOpen(false);
 		} catch (err) {
 			console.log(err);

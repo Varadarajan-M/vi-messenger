@@ -14,10 +14,14 @@ const createServer = () => {
 
 	const server = http.createServer(app);
 
-	const io = new SocketIO.Server(server);
+	const io = new SocketIO.Server(server, {
+		cors: {
+			origin: 'http://localhost:3000',
+			methods: ['GET', 'POST', 'PUT', 'DELETE'],
+		},
+	});
 
-	app
-		.disable('x-powered-by')
+	app.disable('x-powered-by')
 		.use(morgan('dev'))
 		.use(express.urlencoded({ extended: true }))
 		.use(express.json())
@@ -25,11 +29,9 @@ const createServer = () => {
 
 	app.use('/api', routes);
 
-	app.get('/api/health', (_, res) =>
-		res.json({ ok: true, environment: process.env.NODE_ENV }),
-	);
+	app.get('/api/health', (_, res) => res.json({ ok: true, environment: process.env.NODE_ENV }));
 
-	return { app, io };
+	return { server, io };
 };
 
 export default createServer;
