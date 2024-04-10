@@ -1,22 +1,18 @@
 import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import ChatPreview from './chat-preview';
 
+import useActiveChat from '@/hooks/chat/useActiveChat';
 import useFetchChatsAndUnReadMsgs from '@/hooks/chat/useFetchChatsAndUnReadMsgs';
+import { scrollToChat } from '@/lib/chat';
 
 const ChatList = () => {
-	const [searchParams] = useSearchParams();
-	const activeChat = searchParams.get('chat') ?? '';
-
+	const { chat: chatId } = useActiveChat();
 	const { chats, unReadMessages } = useFetchChatsAndUnReadMsgs();
 
 	useEffect(() => {
-		if (activeChat?.trim().length) {
-			const chatPreviewEl = document.getElementById(activeChat);
-			chatPreviewEl?.scrollIntoView({ behavior: 'smooth' });
-		}
-	}, [activeChat]);
+		scrollToChat(chatId);
+	}, [chatId]);
 
 	return (
 		<div className='flex flex-col gap-3 overflow-auto scroll-smooth'>
@@ -24,7 +20,7 @@ const ChatList = () => {
 				<ChatPreview
 					key={chat?._id}
 					chat={chat as any}
-					isActive={activeChat === chat?._id?.toString()}
+					isActive={chatId === chat?._id?.toString()}
 					unReadMessages={unReadMessages[chat?._id?.toString() as string] ?? []}
 				/>
 			))}

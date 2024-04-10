@@ -1,8 +1,8 @@
-import { getMessageSenderText, getPrivateChatName } from '@/lib/chat';
+import useActiveChat from '@/hooks/chat/useActiveChat';
+import { getChatSenderPrefix, getPrivateChatName, scrollToChat } from '@/lib/chat';
 import { getTimeFromNow } from '@/lib/datetime';
 import { cn } from '@/lib/utils';
 import { memo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import ChatAvatar from './chat-avatar';
 
 const ChatDetails = memo(
@@ -50,34 +50,23 @@ type ChatPreviewProps = {
 		_id: string | number;
 		avatar: string;
 		time?: string;
-		admin?: string;
+		admin: string;
 	};
 	isActive: boolean;
 	unReadMessages?: string[];
 };
 
 const ChatPreview = ({ chat, isActive, unReadMessages }: ChatPreviewProps) => {
-	const [searchParams, setSearchParams] = useSearchParams();
-
+	const { setChat } = useActiveChat();
 	const handleChatClick = () => {
-		searchParams.set('chat', chat._id?.toString());
-		setSearchParams(searchParams.toString());
-		const chatPreviewEl = document.getElementById(chat._id?.toString());
-		chatPreviewEl?.scrollIntoView({ behavior: 'smooth' });
+		setChat(chat._id?.toString());
+		scrollToChat(chat._id?.toString());
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			handleChatClick();
 		}
-	};
-
-	const getChatSenderPrefix = () => {
-		if (chat?.admin) {
-			const msgSender = getMessageSenderText(chat?.lastMessage?.sender);
-			return msgSender ? `${msgSender}:` : '';
-		}
-		return getMessageSenderText(chat?.lastMessage?.sender) === 'You' ? 'You:' : '';
 	};
 
 	return (
@@ -104,7 +93,7 @@ const ChatPreview = ({ chat, isActive, unReadMessages }: ChatPreviewProps) => {
 			/>
 			<ChatDetails
 				name={`${!chat?.admin ? getPrivateChatName(chat.members as any) : chat.name}`}
-				content={`${getChatSenderPrefix()}${chat?.lastMessage?.content ?? ''}`}
+				content={`${getChatSenderPrefix(chat)}${chat?.lastMessage?.content ?? ''}`}
 				time={chat?.lastMessage?.createdAt}
 				msgCount={unReadMessages?.length ?? 0}
 			/>

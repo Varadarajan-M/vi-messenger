@@ -1,8 +1,7 @@
-import { useSocket } from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
+import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay';
 import { Chat } from '@/types/chat';
-import { useMessageStore } from '@/zustand/store';
 import { Fragment, useEffect, useRef } from 'react';
 import ChatInput from './chat-input';
 import Message from './chat-message';
@@ -14,7 +13,7 @@ type ChatMessageContainerProps = {
 const ChatMessageContainer = ({ chat }: ChatMessageContainerProps) => {
 	return (
 		<section className='flex-1 bg-gradient-dark w-full rounded-lg relative overflow-y-hidden overflow-x-hidden  pb-2'>
-			<div className='p-4 max-h-[90%] overflow-y-auto'>
+			<div className='p-4 max-h-[90%] overflow-y-auto' id='scrollable-messages-container'>
 				<Messages chat={chat} />
 			</div>
 
@@ -31,46 +30,23 @@ const Messages = ({ chat }: MessagesProps) => {
 	const { messages, loading } = useFetchMessages(chat?._id as string);
 	const { user } = useAuthInfo();
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
-	const unReadMessagesDisplayRef = useRef<HTMLParagraphElement | null>(null);
-	// const [unReadMessages, setUnReadMessages] = useState<string[]>([]);
-	const unReadMessages = useMessageStore((state) => state.unReadMessages)?.[chat?._id as string];
-	const setChatUnReadMessageList = useMessageStore((state) => state.setChatUnReadMessageList);
+	const { msgDisplayRef, unReadMessages } = useUnreadMessagesDisplay(chat?._id as string);
 
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
 
-	const socket = useSocket();
-
 	const scrollToNewMessage = () => {
-		if (messagesEndRef?.current)
-			messagesEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
+		setTimeout(() => {
+			if (messagesEndRef?.current)
+				messagesEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
+		}, 200);
 	};
 
 	useEffect(() => {
-		if (unReadMessages?.length > 0) {
-			socket?.emit('message_seen', unReadMessages);
-			const popupTimer = setTimeout(() => {
-				unReadMessagesDisplayRef?.current?.scrollIntoView({
-					behavior: 'smooth',
-					block: 'center',
-				});
-			}, 300);
-			const unReadMessagesClearTimer = setTimeout(
-				() => setChatUnReadMessageList(chat?._id as string, []),
-				8000,
-			);
-
-			return () => {
-				clearTimeout(popupTimer);
-				clearTimeout(unReadMessagesClearTimer);
-			};
-		}
-	}, [chat?._id, setChatUnReadMessageList, socket, unReadMessages]);
-
-	useEffect(() => {
-		if (unReadMessages?.length === 0) {
+		if (!unReadMessages?.length) {
+			console.log('triggered');
 			scrollToNewMessage();
 		}
-	}, [unReadMessages, messages.length]);
+	}, [unReadMessages?.length, messages.length]);
 
 	return (
 		<div className='flex flex-col gap-3 h-full py-16'>
@@ -82,9 +58,9 @@ const Messages = ({ chat }: MessagesProps) => {
 			{!loading &&
 				messages?.map((message, index) => (
 					<Fragment key={message._id}>
-						{unReadMessages[0] === message?._id && (
+						{unReadMessages?.[0] === message?._id && (
 							<p
-								ref={unReadMessagesDisplayRef}
+								ref={msgDisplayRef}
 								className='m-0 animate-pulse text-gray-300 underline  text-opacity-90 font-medium w-full p-4 text-center'
 							>
 								{`${unReadMessages?.length} new messages`}

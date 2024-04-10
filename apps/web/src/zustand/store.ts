@@ -108,11 +108,11 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	addToUnReadMessageList: (chatId: string, message: string) =>
 		set({
 			unReadMessages: {
-				...get().unReadMessages,
-				[chatId]: [...get().unReadMessages[chatId], message],
+				...(get()?.unReadMessages ?? []),
+				[chatId]: [...(get()?.unReadMessages?.[chatId] ?? []), message],
 			},
 		}),
 	setChatUnReadMessageList: (chatId: string, messages: string[]) => {
-		set({ unReadMessages: { ...get().unReadMessages, [chatId]: messages } });
+		set({ unReadMessages: { ...(get().unReadMessages ?? []), [chatId]: messages } });
 	},
 }));
