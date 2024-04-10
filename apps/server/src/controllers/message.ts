@@ -63,3 +63,31 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 		res.json({ ok: false, error: msg });
 	}
 };
+
+export const getUnreadMessagesController = async (req: RequestWithChat, res: Response) => {
+	try {
+		if (!req?.chat) {
+			res.status(403);
+			throw new Error('Chat not found');
+		}
+		const messages = await (
+			await Message.find({
+				chatId: req?.chat?._id,
+				seenBy: {
+					$nin: [req?.user?._id],
+				},
+			})
+				.sort({ createdAt: 1 })
+				.select('_id')
+				.lean()
+		).map(({ _id }) => _id);
+
+		res.status(200).json({ ok: true, payload: { messages } });
+	} catch (error: any) {
+		if (!res.statusCode) res.status(500);
+		const msg =
+			res?.statusCode === 500
+				? 'Internal server error'
+				: error?.message || 'Failed to get messages';
+	}
+};

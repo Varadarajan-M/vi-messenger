@@ -78,7 +78,7 @@ const initSocket = (io: Server) => {
 				);
 				if (onlineUsers[updatedMessage?.sender?.toString()!]) {
 					socket
-						.to(updatedMessage?.sender?.toString()!)
+						.to(updatedMessage?.chatId?.toString() || '')
 						?.emit('message_seen_ack', updatedMessage);
 					logger.info(
 						`sent message_seen_ack: ${JSON.stringify(updatedMessage, null, 2)}`,

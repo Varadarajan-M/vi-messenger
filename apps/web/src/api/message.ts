@@ -19,3 +19,13 @@ export const sendMessage = async (chatId: string, type: string, content: string)
 		return err;
 	}
 };
+
+export const getUnreadMessages = async (chatId: string) => {
+	try {
+		const res = await api.get(`/message/unread/${chatId}`);
+		return res;
+	} catch (err) {
+		console.log(err);
+		return err;
+	}
+};

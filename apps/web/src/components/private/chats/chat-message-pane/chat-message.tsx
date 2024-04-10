@@ -71,7 +71,7 @@ const Message = ({ showAvatar, showUsername, sender, message, chat }: MessagePro
 	};
 
 	return (
-		<div className={classes.msgContainer}>
+		<div className={classes.msgContainer} id={message?._id}>
 			<div className={classes.avatar}>
 				{showAvatar && (
 					<ChatAvatar
