@@ -46,6 +46,14 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 			const { value } = inputRef.current;
 			await onSendMessage(chatId, 'text', value);
 			inputRef.current.value = '';
+			inputRef.current.focus();
+		}
+	};
+
+	const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			handleClick();
 		}
 	};
 
@@ -61,6 +69,7 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 				<PlusIcon className='h-6 w-10 self-center' />
 				<Input
 					ref={inputRef}
+					onKeyDown={handleKeydown}
 					placeholder='Type a message...'
 					aria-label='Type a message'
 					aria-required='true'
