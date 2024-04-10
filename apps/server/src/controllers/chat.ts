@@ -2,6 +2,7 @@ import { Response } from 'express';
 
 import Chat from '../models/chat';
 import User from '../models/user';
+import Message from '../models/message';
 
 import { RequestWithChat, RequestWithUser } from '../types';
 
@@ -61,14 +62,25 @@ export const getUserChatsController = async (req: RequestWithUser, res: Response
 			lastMessage: { $exists: true },
 		})
 			.sort({ updatedAt: -1 })
-			.lean()
 			.populate('members', '-password')
-			.populate({ path: 'lastMessage', populate: { path: 'sender', select: '-password' } });
+			.populate({ path: 'lastMessage', populate: { path: 'sender', select: '-password' } })
+			.lean();
+
+		let unReadMessageMap: any = {};
+
+		for await (const chat of chats) {
+			const unReadMessages = await Message.find({
+				chatId: chat._id,
+				seenBy: { $nin: [userId] },
+			}).select('_id');
+			unReadMessageMap[chat._id.toString()] = unReadMessages.map(({ _id }) => _id);
+		}
 
 		return res.status(200).json({
 			ok: true,
 			payload: {
 				chats,
+				unReadMessages: unReadMessageMap,
 			},
 		});
 	} catch (error: any) {

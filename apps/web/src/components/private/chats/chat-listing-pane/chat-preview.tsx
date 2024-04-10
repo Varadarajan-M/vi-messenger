@@ -6,7 +6,17 @@ import { useSearchParams } from 'react-router-dom';
 import ChatAvatar from './chat-avatar';
 
 const ChatDetails = memo(
-	({ name, content, time }: { name: string; content: string; time: string }) => {
+	({
+		name,
+		content,
+		time,
+		msgCount = 0,
+	}: {
+		name: string;
+		content: string;
+		time: string;
+		msgCount: number;
+	}) => {
 		return (
 			<div className='flex justify-between gap-3 flex-1 '>
 				<div className='w-20'>
@@ -17,9 +27,16 @@ const ChatDetails = memo(
 						</p>
 					)}
 				</div>
-				<span className='text-gray-400 text-xs tracking-tighter justify-end self-center -ml-6'>
-					<time className='ellipsis-1'>{getTimeFromNow(time)}</time>
-				</span>
+				<div className='flex flex-col gap-2 items-center justify-center h-full'>
+					<span className='text-gray-400 text-xs tracking-tighter justify-end self-center -ml-6'>
+						<time className='ellipsis-1'>{getTimeFromNow(time)}</time>
+					</span>
+					{msgCount > 0 && (
+						<span className='bg-pink-500 px-2 py-0.5 rounded-full text-black font-bold text-xs tracking-tighter justify-end self-end ellipsis-1'>
+							{msgCount}
+						</span>
+					)}
+				</div>
 			</div>
 		);
 	},
@@ -36,9 +53,10 @@ type ChatPreviewProps = {
 		admin?: string;
 	};
 	isActive: boolean;
+	unReadMessages?: string[];
 };
 
-const ChatPreview = ({ chat, isActive }: ChatPreviewProps) => {
+const ChatPreview = ({ chat, isActive, unReadMessages }: ChatPreviewProps) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const handleChatClick = () => {
@@ -69,6 +87,7 @@ const ChatPreview = ({ chat, isActive }: ChatPreviewProps) => {
 				'flex p-3 gap-3 rounded-xl bg-black hover:bg-gray-900 mr-3 cursor-pointer focus-visible:bg-dark-grey focus-visible:bg-opacity-50 focus-visible:outline-none',
 				{
 					'bg-dark-grey': isActive,
+					'animate-pulse': (unReadMessages?.length ?? 0) > 0,
 				},
 			)}
 			onClick={handleChatClick}
@@ -87,6 +106,7 @@ const ChatPreview = ({ chat, isActive }: ChatPreviewProps) => {
 				name={`${!chat?.admin ? getPrivateChatName(chat.members as any) : chat.name}`}
 				content={`${getChatSenderPrefix()}${chat?.lastMessage?.content ?? ''}`}
 				time={chat?.lastMessage?.createdAt}
+				msgCount={unReadMessages?.length ?? 0}
 			/>
 		</div>
 	);

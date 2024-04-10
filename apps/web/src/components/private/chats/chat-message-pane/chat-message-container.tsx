@@ -1,9 +1,9 @@
-import { getUnreadMessages } from '@/api/message';
 import { useSocket } from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
 import { Chat } from '@/types/chat';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { useMessageStore } from '@/zustand/store';
+import { Fragment, useEffect, useRef } from 'react';
 import ChatInput from './chat-input';
 import Message from './chat-message';
 
@@ -32,7 +32,10 @@ const Messages = ({ chat }: MessagesProps) => {
 	const { user } = useAuthInfo();
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 	const unReadMessagesDisplayRef = useRef<HTMLParagraphElement | null>(null);
-	const [unReadMessages, setUnReadMessages] = useState<string[]>([]);
+	// const [unReadMessages, setUnReadMessages] = useState<string[]>([]);
+	const unReadMessages = useMessageStore((state) => state.unReadMessages)?.[chat?._id as string];
+	const setChatUnReadMessageList = useMessageStore((state) => state.setChatUnReadMessageList);
+
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
 
 	const socket = useSocket();
@@ -43,22 +46,25 @@ const Messages = ({ chat }: MessagesProps) => {
 	};
 
 	useEffect(() => {
-		const _fetch = async () => {
-			const res = (await getUnreadMessages(chat?._id as string)) as any;
-			if (res.messages?.length > 0) {
-				socket?.emit('message_seen', res?.messages);
-				setUnReadMessages(res?.messages);
-				setTimeout(() => {
-					unReadMessagesDisplayRef?.current?.scrollIntoView({
-						behavior: 'smooth',
-						block: 'center',
-					});
-				}, 300);
-				setTimeout(() => setUnReadMessages([]), 8000);
-			}
-		};
-		chat?._id && _fetch();
-	}, [chat?._id, socket]);
+		if (unReadMessages?.length > 0) {
+			socket?.emit('message_seen', unReadMessages);
+			const popupTimer = setTimeout(() => {
+				unReadMessagesDisplayRef?.current?.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+				});
+			}, 300);
+			const unReadMessagesClearTimer = setTimeout(
+				() => setChatUnReadMessageList(chat?._id as string, []),
+				8000,
+			);
+
+			return () => {
+				clearTimeout(popupTimer);
+				clearTimeout(unReadMessagesClearTimer);
+			};
+		}
+	}, [chat?._id, setChatUnReadMessageList, socket, unReadMessages]);
 
 	useEffect(() => {
 		if (unReadMessages?.length === 0) {

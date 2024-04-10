@@ -37,6 +37,7 @@ export const useChatsStore = create<ChatStore>((set, get) => ({
 			set({ loading: true });
 			const res = (await getUserChats()) as any;
 			set({ chats: res?.chats });
+			useMessageStore.getState().setUnReadMessages(res?.unReadMessages);
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -69,6 +70,10 @@ type MessageStore = {
 	addMessage: (message: Message) => void;
 	findByIdAndUpdate: (id: string, update: Partial<Message>) => void;
 	findByIdAndRemove: (id: string) => void;
+	unReadMessages: Record<string, string[]>;
+	setUnReadMessages: (unReadMessages: Record<string, string[]>) => void;
+	addToUnReadMessageList: (chatId: string, message: string) => void;
+	setChatUnReadMessageList: (chatId: string, messages: string[]) => void;
 };
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -98,4 +103,16 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		set({ messages: get().messages.filter((message) => message._id !== id) });
 	},
 	addMessage: (message: Message) => set((state) => ({ messages: [...state.messages, message] })),
+	unReadMessages: {},
+	setUnReadMessages: (unReadMessages) => set({ unReadMessages }),
+	addToUnReadMessageList: (chatId: string, message: string) =>
+		set({
+			unReadMessages: {
+				...get().unReadMessages,
+				[chatId]: [...get().unReadMessages[chatId], message],
+			},
+		}),
+	setChatUnReadMessageList: (chatId: string, messages: string[]) => {
+		set({ unReadMessages: { ...get().unReadMessages, [chatId]: messages } });
+	},
 }));
