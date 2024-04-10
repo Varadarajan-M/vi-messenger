@@ -1,6 +1,8 @@
 import { verify } from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { Server } from 'socket.io';
 import Chat from './models/chat';
+import Message from './models/message';
 import { SocketWithUser } from './types';
 import logger from './utils/logger';
 
@@ -63,6 +65,27 @@ const initSocket = (io: Server) => {
 				});
 			},
 		);
+
+		socket.on('message_seen', async (msgIds: string[]) => {
+			logger.info(`received message_seen; msgIds: ${JSON.stringify(msgIds, null, 2)}`);
+			for await (const msgId of msgIds) {
+				const currentUserId = new mongoose.Types.ObjectId(socket?.user?._id);
+				console.log('currentUserId:', currentUserId);
+				const updatedMessage = await Message.findOneAndUpdate(
+					{ _id: msgId },
+					{ $addToSet: { seenBy: currentUserId } },
+					{ new: true },
+				);
+				if (onlineUsers[updatedMessage?.sender?.toString()!]) {
+					socket
+						.to(updatedMessage?.sender?.toString()!)
+						?.emit('message_seen_ack', updatedMessage);
+					logger.info(
+						`sent message_seen_ack: ${JSON.stringify(updatedMessage, null, 2)}`,
+					);
+				}
+			}
+		});
 
 		socket.on('leave_chat', (roomId: string) => {
 			console.log('evt:leave_chat user left', socket?.user?.username, roomId);

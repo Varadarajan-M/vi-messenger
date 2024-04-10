@@ -6,9 +6,9 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import useFetchSingleChat from '@/hooks/chat/useFetchSingleChat';
 import { getPrivateChatName } from '@/lib/chat';
 import { User } from '@/types/auth';
+import { Chat } from '@/types/chat';
 
 const MenuIcon = () => (
 	<svg width='15' height='15' viewBox='0 0 15 15' fill='none' xmlns='http://www.w3.org/2000/svg'>
@@ -21,9 +21,11 @@ const MenuIcon = () => (
 	</svg>
 );
 
-const ChatHeader = ({ chatId }: { chatId: string }) => {
-	const { chat, loading } = useFetchSingleChat(chatId);
-
+type ChatHeaderProps = {
+	chat: Chat;
+	loading: boolean;
+};
+const ChatHeader = ({ chat, loading }: ChatHeaderProps) => {
 	return (
 		<header className='flex bg-gradient-dark rounded-lg mb-3 justify-between gap-4 sticky top-0'>
 			{loading && (
