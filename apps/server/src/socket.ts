@@ -4,19 +4,15 @@ import { Server } from 'socket.io';
 import Chat from './models/chat';
 import Message from './models/message';
 import { SocketWithUser } from './types';
-import logger from './utils/logger';
 
 const onlineUsers: any = {};
+const typingState: any = {};
 
 const addToOnlineUsers = (user: any) => {
-	logger.info(`Adding ${user.username} to online users...`);
 	onlineUsers[user._id] = [user?.socketId, user?.username];
-	logger.info(`onlineUsers: ${JSON.stringify(onlineUsers, null, 2)}`);
 };
 const removeFromOnlineUsers = (userId: string) => {
-	logger.info(`Removing ${userId} from online users...`);
 	delete onlineUsers[userId];
-	logger.info(`onlineUsers: ${JSON.stringify(onlineUsers, null, 2)}`);
 };
 
 const initSocket = (io: Server) => {
@@ -36,18 +32,29 @@ const initSocket = (io: Server) => {
 	});
 
 	io.on('connection', (socket: SocketWithUser) => {
-		logger.info(`Client connected with id: ${socket.id}`);
-
 		socket.emit('connected');
 
 		socket.on('join_online', () => {
 			socket.join(socket.user?._id);
 			addToOnlineUsers({ socketId: socket.id, ...socket.user });
+			io.emit('update_online_users', onlineUsers);
 		});
 
 		socket.on('join_chat', (roomId: string) => {
 			socket.join(roomId);
-			console.log('evt: join_chat user joined', socket?.user?.username, roomId);
+		});
+
+		socket.on('type_start', (data: { userId: string; chatId: string }) => {
+			typingState[data?.chatId] = {
+				...(typingState[data?.chatId] ?? {}),
+				[data.userId]: onlineUsers?.[data.userId]?.[1] ?? 'User',
+			};
+			socket.to(data?.chatId).emit('update_typing_status', typingState);
+		});
+
+		socket.on('type_end', (data: { userId: string; chatId: string }) => {
+			delete typingState[data?.chatId]?.[data.userId];
+			socket.to(data?.chatId).emit('update_typing_status', typingState);
 		});
 
 		socket.on(
@@ -60,14 +67,12 @@ const initSocket = (io: Server) => {
 					const memberId = member.toString();
 					if (onlineUsers[memberId] && memberId !== socket?.user?._id) {
 						io.to(memberId).emit('chat_update', message);
-						console.log('emitted to', memberId);
 					}
 				});
 			},
 		);
 
 		socket.on('message_seen', async (msgIds: string[]) => {
-			logger.info(`received message_seen; msgIds: ${JSON.stringify(msgIds, null, 2)}`);
 			for await (const msgId of msgIds) {
 				const currentUserId = new mongoose.Types.ObjectId(socket?.user?._id);
 				console.log('currentUserId:', currentUserId);
@@ -80,22 +85,18 @@ const initSocket = (io: Server) => {
 					socket
 						.to(updatedMessage?.chatId?.toString() || '')
 						?.emit('message_seen_ack', updatedMessage);
-					logger.info(
-						`sent message_seen_ack: ${JSON.stringify(updatedMessage, null, 2)}`,
-					);
 				}
 			}
 		});
 
 		socket.on('leave_chat', (roomId: string) => {
-			console.log('evt:leave_chat user left', socket?.user?.username, roomId);
 			socket.leave(roomId);
 		});
 
 		socket.on('disconnect', () => {
-			logger.info(`Client disconnected with id: ${socket.id}`);
 			socket.leave(socket.user?._id);
 			removeFromOnlineUsers(socket.user?._id);
+			io.emit('update_online_users', onlineUsers);
 		});
 	});
 };

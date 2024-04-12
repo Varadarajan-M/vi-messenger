@@ -1,4 +1,5 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
+import useTypingStatus from '@/hooks/chat/useTypingStatus';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
 import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay';
 import { Chat } from '@/types/chat';
@@ -10,12 +11,24 @@ type ChatMessageContainerProps = {
 	chat: Chat;
 };
 
+const TypingIndicator = ({ chatId }: { chatId: string }) => {
+	const { typingState, message } = useTypingStatus(chatId as string);
+
+	return typingState?.[chatId] ? (
+		<p className='m-0  text-gray-300 underline text-opacity-90 font-medium w-full p-2 pl-4 '>
+			{message}
+		</p>
+	) : null;
+};
+
 const ChatMessageContainer = ({ chat }: ChatMessageContainerProps) => {
 	return (
 		<section className='flex-1 bg-gradient-dark w-full rounded-lg relative overflow-y-hidden overflow-x-hidden  pb-2'>
 			<div className='p-4 max-h-[90%] overflow-y-auto' id='scrollable-messages-container'>
 				<Messages chat={chat} />
 			</div>
+
+			<TypingIndicator chatId={chat?._id?.toString()} />
 
 			<div className='sticky bottom-0 top-full p-3 w-full'>
 				<ChatInput chatId={chat?._id?.toString()} />
@@ -75,6 +88,7 @@ const Messages = ({ chat }: MessagesProps) => {
 						/>
 					</Fragment>
 				))}
+
 			{!loading && <div ref={messagesEndRef} />}
 		</div>
 	);

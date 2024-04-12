@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useSocket } from '@/contexts/SocketContext';
+import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useSendMessage from '@/hooks/messages/useSendMessage';
 import { ComponentPropsWithoutRef, useRef } from 'react';
 
@@ -41,12 +43,30 @@ const SendIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 const ChatInput = ({ chatId }: { chatId: string }) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { onSendMessage } = useSendMessage();
+	const { user } = useAuthInfo();
+	const socket = useSocket();
+
+	const startTyping = () => {
+		socket?.emit('type_start', {
+			chatId,
+			userId: user?._id,
+		});
+	};
+
+	const stopTyping = () => {
+		socket?.emit('type_end', {
+			chatId,
+			userId: user?._id,
+		});
+	};
+
 	const handleClick = async () => {
 		if (inputRef.current?.value?.trim()?.length) {
 			const { value } = inputRef.current;
 			await onSendMessage(chatId, 'text', value);
 			inputRef.current.value = '';
 			inputRef.current.focus();
+			stopTyping();
 		}
 	};
 
@@ -62,12 +82,15 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 			<div
 				tabIndex={0}
 				role='textbox'
+				onBlur={stopTyping}
 				aria-label='Type a message'
 				aria-required='true'
 				className='basis-[95%] flex py-1 bg-dark-grey bg-opacity-70  gap-2 relative transition-colors duration-500 rounded-xl shadow-md border border-transparent focus-visible:border-purple-900 focus-visible:outline-none focus-within:border-purple-900'
 			>
 				<PlusIcon className='h-6 w-10 self-center' />
 				<Input
+					onChange={startTyping}
+					onBlur={stopTyping}
 					ref={inputRef}
 					onKeyDown={handleKeydown}
 					placeholder='Type a message...'

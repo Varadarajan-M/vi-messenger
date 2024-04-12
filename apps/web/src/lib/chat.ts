@@ -14,6 +14,18 @@ export const getPrivateChatName = (members: User[]) => {
 	return members?.find((member) => member?._id !== _id)?.username ?? 'DM';
 };
 
+export const getPrivateChatMemberId = (members: User[]) => {
+	const session = getSession();
+
+	if (!session?._id) {
+		return null;
+	}
+
+	const { _id } = session;
+
+	return members?.find((member) => member?._id !== _id)?._id ?? null;
+};
+
 export const getMessageSenderText = (sender: User) => {
 	const session = getSession();
 
@@ -24,6 +36,21 @@ export const getMessageSenderText = (sender: User) => {
 	const { _id } = session;
 
 	return sender?._id === _id ? 'You' : sender?.username;
+};
+
+export const getGroupChatOnlineUserCount = (
+	onlineUsers: Record<string, string[]>,
+	members: string[],
+) => {
+	let count = 0;
+
+	for (let i = 0; i < members.length; i++) {
+		if (onlineUsers?.[members[i]]) {
+			count += 1;
+		}
+	}
+
+	return count;
 };
 
 export const getChatSenderPrefix = (chat: Chat) => {

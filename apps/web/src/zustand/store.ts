@@ -116,3 +116,31 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 		set({ unReadMessages: { ...(get().unReadMessages ?? []), [chatId]: messages } });
 	},
 }));
+
+type OnlineUserStore = {
+	onlineUsers: Record<string, string[]>;
+	setOnlineUsers: (onlineUsers: OnlineUserStore['onlineUsers']) => void;
+};
+
+export const useOnlineUsers = create<OnlineUserStore>((set) => ({
+	onlineUsers: {},
+	setOnlineUsers: (onlineUsers: OnlineUserStore['onlineUsers']) => {
+		set({ onlineUsers });
+	},
+}));
+
+type CurrentlyTyping = {
+	[userId: string]: boolean;
+};
+
+type TypingStateStore = {
+	typingStatus: Record<string, CurrentlyTyping[]>;
+	setTypingStatus: (typingStatus: TypingStateStore['typingStatus']) => void;
+};
+
+export const useTypingState = create<TypingStateStore>((set) => ({
+	typingStatus: {},
+	setTypingStatus: (typingStatus: TypingStateStore['typingStatus']) => {
+		set({ typingStatus });
+	},
+}));

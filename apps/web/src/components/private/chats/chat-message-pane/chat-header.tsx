@@ -6,7 +6,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getPrivateChatName } from '@/lib/chat';
+import {
+	getGroupChatOnlineUserCount,
+	getPrivateChatMemberId,
+	getPrivateChatName,
+} from '@/lib/chat';
 import { User } from '@/types/auth';
 import { Chat } from '@/types/chat';
 
@@ -24,8 +28,42 @@ const MenuIcon = () => (
 type ChatHeaderProps = {
 	chat: Chat;
 	loading: boolean;
+	onlineUsers: Record<string, string[]>;
 };
-const ChatHeader = ({ chat, loading }: ChatHeaderProps) => {
+
+const OnlineText = () => (
+	<p className='flex gap-1 items-center  -mt-1'>
+		<span className='rounded-full h-2 w-2 bg-green-600 animate-pulse min-h-2 min-w-2 '></span>
+		<span className='text-gray-400 capitalize text-sm'>Online</span>
+	</p>
+);
+
+const AwayText = () => (
+	<p className='flex gap-1 items-center -mt-1'>
+		<span className='rounded-full h-2 w-2 bg-yellow-200 min-h-2 min-w-2 '></span>
+		<span className='text-gray-400 capitalize text-sm'>Away</span>
+	</p>
+);
+
+const GroupInfoText = ({ members, online }: { members: number; online: number }) => (
+	<p className='flex gap-1 items-center -mt-1'>
+		<span className='text-gray-400 text-sm'>
+			{members} members, {online} online
+		</span>
+	</p>
+);
+
+const ChatHeader = ({ chat, loading, onlineUsers }: ChatHeaderProps) => {
+	const renderSecondaryText = () => {
+		if (chat?.admin) {
+			const members = chat?.members?.length;
+			const online = getGroupChatOnlineUserCount(onlineUsers, chat?.members as string[]);
+			return <GroupInfoText members={members} online={online} />;
+		}
+
+		const memberId = getPrivateChatMemberId(chat?.members as User[]) || '';
+		return onlineUsers?.[memberId] ? <OnlineText /> : <AwayText />;
+	};
 	return (
 		<header className='flex bg-gradient-dark rounded-lg mb-3 justify-between gap-4 sticky top-0'>
 			{loading && (
@@ -50,8 +88,7 @@ const ChatHeader = ({ chat, loading }: ChatHeaderProps) => {
 										: chat?.name}
 								</span>
 							)}
-
-							{/* <span className='text-gray-400 capitalize -mt-1 text-sm'>Online</span> */}
+							{renderSecondaryText()}
 						</div>
 					</div>
 					<DropdownMenu>
