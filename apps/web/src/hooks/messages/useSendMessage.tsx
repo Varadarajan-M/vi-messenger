@@ -16,49 +16,49 @@ const useSendMessage = () => {
 	const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
 
 	const onSendMessage = useCallback(
-		async (chatId: string, type: string, content: string) => {
-			if (content?.trim()?.length) {
-				{
-					const newMsgId = Math.random().toString();
+		async (chatId: string, type: string, content: Message['content']) => {
+			if (typeof content === 'string') {
+				content = content?.trim();
+			}
 
-					const msg = {
-						type,
-						content: content?.trim(),
-					};
+			const newMsgId = Math.random().toString();
 
-					addMessage({
-						_id: newMsgId,
-						chatId,
-						sender: {
-							_id: user?._id ?? '',
-							username: user?.username ?? '',
-							email: user?.email ?? '',
-							createdAt: new Date().toString(),
-							updatedAt: new Date().toString(),
-						},
-						seenBy: [user?._id ?? ''],
-						type: msg.type as any,
-						content: msg.content,
-						createdAt: new Date().toString(),
-						updatedAt: new Date().toString(),
-					});
+			const msg = {
+				type,
+				content,
+			};
 
-					const res = (await sendMessage(chatId, msg.type, msg.content)) as {
-						message: Message;
-					};
+			addMessage({
+				_id: newMsgId,
+				chatId,
+				sender: {
+					_id: user?._id ?? '',
+					username: user?.username ?? '',
+					email: user?.email ?? '',
+					createdAt: new Date().toString(),
+					updatedAt: new Date().toString(),
+				},
+				seenBy: [user?._id ?? ''],
+				type: msg.type as any,
+				content: msg.content,
+				createdAt: new Date().toString(),
+				updatedAt: new Date().toString(),
+			});
 
-					if (res?.message) {
-						findByIdAndUpdate(newMsgId, res.message);
-						findByIdAndUpdateChat(chatId, { lastMessage: res.message });
+			const res = (await sendMessage(chatId, msg.type, msg.content)) as {
+				message: Message;
+			};
 
-						socket?.emit('new_message', {
-							roomId: chatId,
-							message: res.message,
-						});
-					} else {
-						findByIdAndRemove(newMsgId);
-					}
-				}
+			if (res?.message) {
+				findByIdAndUpdate(newMsgId, res.message);
+				findByIdAndUpdateChat(chatId, { lastMessage: res.message });
+
+				socket?.emit('new_message', {
+					roomId: chatId,
+					message: res.message,
+				});
+			} else {
+				findByIdAndRemove(newMsgId);
 			}
 		},
 		[

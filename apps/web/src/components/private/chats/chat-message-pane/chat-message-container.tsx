@@ -5,7 +5,7 @@ import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay'
 import { Chat } from '@/types/chat';
 import { Fragment, useEffect, useRef } from 'react';
 import ChatInput from './chat-input';
-import Message from './chat-message';
+import Message from './message/chat-message';
 
 type ChatMessageContainerProps = {
 	chat: Chat;
@@ -15,7 +15,7 @@ const TypingIndicator = ({ chatId }: { chatId: string }) => {
 	const { typingState, message } = useTypingStatus(chatId as string);
 
 	return typingState?.[chatId] ? (
-		<p className='m-0  text-gray-300 underline text-opacity-90 font-medium w-full p-2 pl-4 '>
+		<p className='m-0 mt-1 text-gray-300 rounded-lg bg-transparent underline text-opacity-90 font-medium w-full h-6 pl-4 animate-pulse'>
 			{message}
 		</p>
 	) : null;
@@ -56,7 +56,6 @@ const Messages = ({ chat }: MessagesProps) => {
 
 	useEffect(() => {
 		if (!unReadMessages?.length) {
-			console.log('triggered');
 			scrollToNewMessage();
 		}
 	}, [unReadMessages?.length, messages.length]);

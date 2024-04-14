@@ -1,6 +1,14 @@
 export interface Message {
 	_id: string;
-	content: string;
+	content:
+		| {
+				url: string;
+				download: string;
+				preview?: string;
+				// eslint-disable-next-line no-mixed-spaces-and-tabs
+		  }
+		| string;
+
 	type: 'text' | 'image' | 'gif';
 	sender: MessageUser;
 	chatId: string;

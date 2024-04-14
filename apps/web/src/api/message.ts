@@ -1,4 +1,5 @@
 import api from '@/lib/axios';
+import { Message } from '@/types/message';
 
 export const getChatMessages = async (chatId: string) => {
 	try {
@@ -10,7 +11,7 @@ export const getChatMessages = async (chatId: string) => {
 	}
 };
 
-export const sendMessage = async (chatId: string, type: string, content: string) => {
+export const sendMessage = async (chatId: string, type: string, content: Message['content']) => {
 	try {
 		const res = await api.post(`/message/${chatId}`, { type, content });
 		return res;

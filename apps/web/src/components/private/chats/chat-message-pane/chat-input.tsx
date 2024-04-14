@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import Fileuploader from '@/components/ui/fileupload';
 import { Input } from '@/components/ui/input';
 import { useSocket } from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
@@ -23,6 +24,7 @@ export const PlusIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 		></path>
 	</svg>
 );
+
 const SendIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 	<svg
 		width='15'
@@ -70,6 +72,17 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 		}
 	};
 
+	const handleFileupload = async (res: any) => {
+		const url: string = res?.secure_url ?? '';
+		const downloadableUrl = url.replace('upload/', 'upload/fl_attachment/') ?? '';
+		const content = {
+			url,
+			download: downloadableUrl,
+			preview: res?.thumbnail_url ?? '',
+		};
+		await onSendMessage(chatId, 'image', content);
+	};
+
 	const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			e.preventDefault();
@@ -87,8 +100,18 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 				aria-required='true'
 				className='basis-[95%] flex py-1 bg-dark-grey bg-opacity-70  gap-2 relative transition-colors duration-500 rounded-xl shadow-md border border-transparent focus-visible:border-purple-900 focus-visible:outline-none focus-within:border-purple-900'
 			>
-				<PlusIcon className='h-6 w-10 self-center' />
+				<Fileuploader onUploadSuccess={handleFileupload} onUploadError={console.log}>
+					{({ openWidget }) => (
+						<PlusIcon
+							className='h-6 w-10 self-center'
+							onClick={openWidget}
+							role='button'
+							xlinkTitle='Upload'
+						/>
+					)}
+				</Fileuploader>
 				<Input
+					onPaste={console.log}
 					onChange={startTyping}
 					onBlur={stopTyping}
 					ref={inputRef}

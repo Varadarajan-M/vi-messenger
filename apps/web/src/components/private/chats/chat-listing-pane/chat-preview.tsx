@@ -69,6 +69,14 @@ const ChatPreview = ({ chat, isActive, unReadMessages }: ChatPreviewProps) => {
 		}
 	};
 
+	const getMessagePreview = () => {
+		const senderPrefix = getChatSenderPrefix(chat);
+		const content = chat?.lastMessage?.content?.url
+			? 'Attachment📎'
+			: chat?.lastMessage?.content;
+
+		return `${senderPrefix}${content}`;
+	};
 	return (
 		<div
 			id={chat._id?.toString()}
@@ -93,7 +101,7 @@ const ChatPreview = ({ chat, isActive, unReadMessages }: ChatPreviewProps) => {
 			/>
 			<ChatDetails
 				name={`${!chat?.admin ? getPrivateChatName(chat.members as any) : chat.name}`}
-				content={`${getChatSenderPrefix(chat)}${chat?.lastMessage?.content ?? ''}`}
+				content={getMessagePreview()}
 				time={chat?.lastMessage?.createdAt}
 				msgCount={unReadMessages?.length ?? 0}
 			/>

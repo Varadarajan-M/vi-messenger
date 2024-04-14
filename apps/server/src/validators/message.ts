@@ -11,7 +11,15 @@ export const messageValidator = (req: Request, res: Response, next: NextFunction
 
 		const { type, content } = req?.body;
 
-		const isValid = ['text', 'image', 'gif'].includes(type) && content?.length > 0;
+		let isValid = false;
+
+		if (isValid && type === 'text') {
+			isValid = content?.length > 0;
+		}
+
+		if (type === 'image' || type === 'gif') {
+			isValid = content?.url?.length > 0;
+		}
 
 		if (!isValid) {
 			res.status(422);
