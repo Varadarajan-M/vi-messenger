@@ -17,10 +17,11 @@ const Fileuploader = ({ onUploadSuccess, onUploadError, children }: Fileuploader
 					cloudName: 'dsyrltebn',
 					uploadPreset: 'vdth9cfm',
 					sources: ['local', 'url'],
-					multiple: true,
 					defaultSource: 'local',
 					showCompletedButton: true,
-					clientAllowedFormats: ['png', 'jpg', 'svg', 'webp'],
+					cropping: true,
+					multiple: true,
+					clientAllowedFormats: ['png', 'jpg', 'svg', 'webp', 'mp4', 'mov', 'wmv'],
 					styles: {
 						palette: {
 							window: '#000000',
@@ -29,7 +30,7 @@ const Fileuploader = ({ onUploadSuccess, onUploadError, children }: Fileuploader
 							tabIcon: '#FFFFFF',
 							inactiveTabIcon: '#8E9FBF',
 							menuIcons: '#2AD9FF',
-							link: '#08C0FF',
+							link: 'purple',
 							action: '#336BFF',
 							inProgress: '#00BFFF',
 							complete: '#33ff00',
@@ -50,7 +51,9 @@ const Fileuploader = ({ onUploadSuccess, onUploadError, children }: Fileuploader
 					},
 				},
 				(err: any, res: any) => {
-					if (err) [onUploadError(err)];
+					if (err) {
+						onUploadError(err);
+					}
 
 					if (!err && res?.event === 'success') {
 						onUploadSuccess(res?.info);

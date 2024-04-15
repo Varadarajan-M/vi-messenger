@@ -66,7 +66,7 @@ const Message = ({ showAvatar, showUsername, sender, message, chat }: MessagePro
 			</div>
 			<div className={classes.msgBubble}>
 				{showUsername && (
-					<p className='text-sm font-semibold text-gray-400 capitalize'>
+					<p className='text-md font-semibold text-gray-400 capitalize'>
 						{message?.sender?.username ?? 'User'}
 					</p>
 				)}

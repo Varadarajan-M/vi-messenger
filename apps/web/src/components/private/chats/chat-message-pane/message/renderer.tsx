@@ -1,16 +1,16 @@
 import { Message } from '@/types/message';
-import { useEffect, useRef } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 
 type RendererProps = {
 	type: string;
 	content: Message['content'];
 };
 
-const ImageRenderer = ({ type, content }: RendererProps) => {
-	const imageRef = useRef<HTMLImageElement>(null);
+const MediaRenderer = ({ type, content }: RendererProps) => {
+	const elementRef = useRef<HTMLVideoElement | HTMLImageElement>(null);
 
 	useEffect(() => {
-		const target = imageRef?.current;
+		const target = elementRef?.current;
 		const observer = new IntersectionObserver((entries) => {
 			const [first] = entries;
 			// @ts-expect-error content
@@ -27,14 +27,14 @@ const ImageRenderer = ({ type, content }: RendererProps) => {
 		};
 
 		// @ts-expect-error content
-	}, [content?.preview, content?.url, imageRef]);
+	}, [content?.preview, content?.url, elementRef]);
 
 	if (type === 'image' && typeof content === 'object') {
 		return (
-			<a href={content?.download} download>
+			<a href={content?.download} className='mb-3' download>
 				<img
-					ref={imageRef}
-					className='w-64 h-64 aspect-square rounded-md object-cover z-[999999]'
+					ref={elementRef as MutableRefObject<HTMLImageElement>}
+					className='w-64 h-64 aspect-square rounded-md object-cover'
 					src={content?.preview ?? content?.url}
 					alt='chat image'
 					loading='lazy'
@@ -42,15 +42,31 @@ const ImageRenderer = ({ type, content }: RendererProps) => {
 			</a>
 		);
 	}
+
+	if (type === 'video' && typeof content === 'object') {
+		return (
+			<a href={content?.download} className='mb-3' download>
+				<video
+					ref={elementRef as MutableRefObject<HTMLVideoElement>}
+					className='aspect-video rounded-md object-cover'
+					src={content?.preview ?? content?.url}
+					controls
+				/>
+			</a>
+		);
+	}
+
+	return null;
 };
 
 export const MessageRenderer = ({ type, content }: RendererProps) => {
 	if (type === 'text' && typeof content === 'string') {
-		return <p className='text-sm font-medium text-white'>{content ?? ''}</p>;
+		return <p className='text-lg font-medium text-white'>{content ?? ''}</p>;
 	}
 
-	if (type === 'image' && typeof content === 'object') {
-		return <ImageRenderer type={type} content={content} />;
+	if (type === 'image' || (type === 'video' && typeof content === 'object')) {
+		return <MediaRenderer type={type} content={content} />;
 	}
+
 	return null;
 };

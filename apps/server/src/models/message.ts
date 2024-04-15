@@ -1,12 +1,10 @@
 import { InferSchemaType, Schema, model } from 'mongoose';
 
-
-
 const messageSchema = new Schema(
 	{
 		type: {
 			type: String,
-			enum: ['text', 'image', 'gif'],
+			enum: ['text', 'image', 'gif', 'video'],
 			required: true,
 		},
 		content: {
