@@ -61,7 +61,7 @@ const BrandName = () => <h3 className='font-extrabold text-white text-3xl mb-10'
 
 const ChatSidebar = () => {
 	return (
-		<aside className='h-100 bg-black p-5 flex flex-col items-center min-w-24'>
+		<aside className='hidden md:flex md:flex-col md:items-center h-100 bg-black p-5   min-w-24'>
 			<BrandName />
 			<SidebarMenu />
 		</aside>

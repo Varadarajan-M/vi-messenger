@@ -11,6 +11,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useSendMessage from '@/hooks/messages/useSendMessage';
 import { ComponentPropsWithoutRef, Fragment, useRef, useState } from 'react';
+import useMediaQuery from '@/hooks/common/useMediaQuery';
 
 import Picker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { MouseDownEvent } from 'emoji-picker-react/dist/config/config';
@@ -113,6 +114,7 @@ const AttachmentUpload = ({ chatId }: { chatId: string }) => {
 
 const EmojiPicker = ({ onEmojiSelect }: { onEmojiSelect: MouseDownEvent }) => {
 	const [open, setOpen] = useState(false);
+	const isSmallScreen = useMediaQuery('( max-width: 400px )');
 	return (
 		<Fragment>
 			<EmojiIcon
@@ -129,6 +131,8 @@ const EmojiPicker = ({ onEmojiSelect }: { onEmojiSelect: MouseDownEvent }) => {
 						bottom: '80%',
 						background: 'black',
 						zIndex: 99999999,
+						width: isSmallScreen ? 200 : 300,
+						transform: isSmallScreen ? 'translateX(25%)' : 'translateX(0)',
 					}}
 					lazyLoadEmojis
 					onEmojiClick={(data, e) => {

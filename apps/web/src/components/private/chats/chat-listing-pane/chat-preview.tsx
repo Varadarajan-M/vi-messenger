@@ -75,7 +75,7 @@ const ChatPreview = ({ chat, isActive, unReadMessages }: ChatPreviewProps) => {
 			? 'Attachment📎'
 			: chat?.lastMessage?.content;
 
-		return `${senderPrefix}${content}`;
+		return content ? `${senderPrefix}${content}` : '';
 	};
 	return (
 		<div

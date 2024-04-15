@@ -1,4 +1,5 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
+import useMediaQuery from '@/hooks/common/useMediaQuery';
 import { getTimeFromDate } from '@/lib/datetime';
 import { cn } from '@/lib/utils';
 import { Chat } from '@/types/chat';
@@ -17,6 +18,7 @@ type MessageProps = {
 
 const Message = ({ showAvatar, showUsername, sender, message, chat }: MessageProps) => {
 	const { user } = useAuthInfo();
+	const isMediumScreen = useMediaQuery('( max-width: 1024px )');
 
 	const getSeenStatus = () => {
 		// to only show seen status to the sender of the message
@@ -50,6 +52,7 @@ const Message = ({ showAvatar, showUsername, sender, message, chat }: MessagePro
 		msgContainer: cn('flex gap-3.5 max-w-[50%] items-center', {
 			'self-start': sender === 'other',
 			'self-end': sender === 'self',
+			'max-w-full': isMediumScreen,
 		}),
 	};
 

@@ -17,20 +17,19 @@ const useUnreadMessagesDisplay = (chatId: string) => {
 	};
 
 	useEffect(() => {
+		let popupTimer: any, msgClearTimer: any;
 		if (unReadMessages?.length > 0) {
 			console.log('emitted message_seen', unReadMessages);
 			socket?.emit('message_seen', unReadMessages);
-			const popupTimer = setTimeout(scrollToUnreadMsg, 300);
-			const msgClearTimer = setTimeout(() => {
+			popupTimer = setTimeout(scrollToUnreadMsg, 300);
+			msgClearTimer = setTimeout(() => {
 				setChatUnReadMessageList(chatId, []);
-			}, 8000);
-
-			return () => {
-				clearTimeout(popupTimer);
-				clearTimeout(msgClearTimer);
-				setChatUnReadMessageList(chatId, []);
-			};
+			}, 5000);
 		}
+		return () => {
+			clearTimeout(popupTimer);
+			clearTimeout(msgClearTimer);
+		};
 	}, [chatId, setChatUnReadMessageList, socket, unReadMessages]);
 
 	return { msgDisplayRef, unReadMessages };

@@ -13,7 +13,12 @@ const useActiveChat = () => {
 		[searchParams, setSearchParams],
 	);
 
-	return { chat, setSearchParams, setChat };
+	const resetChat = useCallback(() => {
+		searchParams.delete('chat');
+		setSearchParams(searchParams.toString());
+	}, [searchParams, setSearchParams]);
+
+	return { chat, setSearchParams, setChat, resetChat };
 };
 
 export default useActiveChat;
