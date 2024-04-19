@@ -72,6 +72,17 @@ const initSocket = (io: Server) => {
 			},
 		);
 
+		socket.on(
+			'delete_message',
+			({ roomId, messageId }: { roomId: string; messageId: string }) => {
+				socket.to(roomId).emit('message_deleted', messageId);
+			},
+		);
+
+		socket.on('edit_message', async ({ roomId, message }: any) => {
+			socket.to(roomId).emit('message_edited', message);
+		});
+
 		socket.on('message_seen', async (msgIds: string[]) => {
 			for await (const msgId of msgIds) {
 				const currentUserId = new mongoose.Types.ObjectId(socket?.user?._id);

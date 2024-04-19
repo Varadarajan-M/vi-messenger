@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 import {
 	useAddMessage,
 	useChatUpdate,
+	useDeleteMessage,
+	useEditMessage,
 	useJoinOnline,
 	useSeenMessage,
 } from './chat-container.hooks';
@@ -21,6 +23,8 @@ const ChatsContainer = () => {
 	const onSeenMessage = useSeenMessage();
 	const setOnlineUsers = useOnlineUsers((state) => state.setOnlineUsers);
 	const { onUpdateTypingStatus } = useTypingStatus();
+	const onDeleteMessage = useDeleteMessage();
+	const onEditMessage = useEditMessage();
 
 	useEffect(() => {
 		if (socket) {
@@ -43,14 +47,26 @@ const ChatsContainer = () => {
 		socket?.on('chat_message', onAddMessage);
 		socket?.on('message_seen_ack', onSeenMessage);
 		socket?.on('update_typing_status', onUpdateTypingStatus);
+		socket?.on('message_deleted', onDeleteMessage);
+		socket?.on('message_edited', onEditMessage);
 
 		return () => {
 			socket?.emit('leave_chat', activeChat);
 			socket?.off('chat_message', onAddMessage);
 			socket?.off('message_seen_ack', onSeenMessage);
 			socket?.off('update_typing_status', onUpdateTypingStatus);
+			socket?.off('message_deleted', onDeleteMessage);
+			socket?.off('message_edited', onEditMessage);
 		};
-	}, [activeChat, onAddMessage, onSeenMessage, onUpdateTypingStatus, socket]);
+	}, [
+		activeChat,
+		onAddMessage,
+		onDeleteMessage,
+		onEditMessage,
+		onSeenMessage,
+		onUpdateTypingStatus,
+		socket,
+	]);
 
 	return (
 		<main className='flex items-stretch h-full flex-1 bg-gradient-dark border-l-0 border-l-gray-300 rounded-l-3xl'>

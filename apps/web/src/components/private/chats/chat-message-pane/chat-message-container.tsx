@@ -1,11 +1,13 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useTypingStatus from '@/hooks/chat/useTypingStatus';
+import useDeleteMessage from '@/hooks/messages/useDeleteMessage';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
 import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay';
 import { Chat } from '@/types/chat';
 import { Fragment, useEffect, useRef } from 'react';
 import ChatInput from './chat-input';
 import Message from './message/chat-message';
+import useEditMessage from '@/hooks/messages/useEditMessage';
 
 type ChatMessageContainerProps = {
 	chat: Chat;
@@ -44,6 +46,8 @@ const Messages = ({ chat }: MessagesProps) => {
 	const { user } = useAuthInfo();
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 	const { msgDisplayRef, unReadMessages } = useUnreadMessagesDisplay(chat?._id as string);
+	const onDeleteMessage = useDeleteMessage();
+	const onEditMessage = useEditMessage();
 
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
 
@@ -84,6 +88,8 @@ const Messages = ({ chat }: MessagesProps) => {
 							showUsername={messages[index - 1]?.sender?._id !== message.sender?._id}
 							message={message}
 							chat={chat}
+							onDelete={onDeleteMessage}
+							onEdit={onEditMessage}
 						/>
 					</Fragment>
 				))}

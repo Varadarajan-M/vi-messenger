@@ -49,6 +49,32 @@ export const useAddMessage = () => {
 	return onAddMessage;
 };
 
+export const useDeleteMessage = () => {
+	const findByIdAndRemove = useMessageStore((state) => state.findByIdAndRemove);
+
+	const onDeleteMessage = useCallback(
+		(messageId: string) => {
+			findByIdAndRemove(messageId);
+		},
+		[findByIdAndRemove],
+	);
+
+	return onDeleteMessage;
+};
+
+export const useEditMessage = () => {
+	const findByIdAndUpdateMsg = useMessageStore((state) => state.findByIdAndUpdate);
+
+	const onEditMessage = useCallback(
+		(message: Message) => {
+			findByIdAndUpdateMsg(message._id, { content: message?.content });
+		},
+		[findByIdAndUpdateMsg],
+	);
+
+	return onEditMessage;
+};
+
 export const useSeenMessage = () => {
 	const findByIdAndUpdateMsg = useMessageStore((state) => state.findByIdAndUpdate);
 
