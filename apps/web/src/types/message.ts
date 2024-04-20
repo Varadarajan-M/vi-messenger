@@ -15,7 +15,12 @@ export interface Message {
 	seenBy: string[]; // Assuming seenBy is an array of user IDs (strings)
 	createdAt: string; // Date in ISO 8601 format
 	updatedAt: string; // Date in ISO 8601 format
+	reactions?: {
+		[key in MessageReaction]: string[];
+	};
 }
+
+export type MessageReaction = 'like' | 'love' | 'happy' | 'sad' | 'angry' | 'dislike';
 
 interface MessageUser {
 	_id: string;

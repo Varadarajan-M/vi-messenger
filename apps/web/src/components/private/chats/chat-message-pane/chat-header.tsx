@@ -15,7 +15,7 @@ import { User } from '@/types/auth';
 import { Chat } from '@/types/chat';
 import { ComponentPropsWithoutRef } from 'react';
 
-const MenuIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
+export const MenuIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 	<svg
 		width='15'
 		height='15'
@@ -34,7 +34,7 @@ const MenuIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 	</svg>
 );
 
-const BackIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
+export const BackIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 	<svg
 		width='15'
 		height='15'

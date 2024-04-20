@@ -4,7 +4,7 @@ import { getChatDetails, getUserChats } from '@/api/chat';
 
 import { getChatMessages } from '@/api/message';
 import { Chat } from '@/types/chat';
-import { Message } from '@/types/message';
+import { Message, MessageReaction } from '@/types/message';
 
 type ChatStore = {
 	chats: Partial<Chat>[];
@@ -74,6 +74,8 @@ type MessageStore = {
 	setUnReadMessages: (unReadMessages: Record<string, string[]>) => void;
 	addToUnReadMessageList: (chatId: string, message: string) => void;
 	setChatUnReadMessageList: (chatId: string, messages: string[]) => void;
+	toggleReactionOnMessage: (messageId: string, userId: string, reaction: MessageReaction) => void;
+	getMessage: (id: string) => Message | undefined;
 };
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
@@ -115,6 +117,26 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	setChatUnReadMessageList: (chatId: string, messages: string[]) => {
 		set({ unReadMessages: { ...(get().unReadMessages ?? []), [chatId]: messages } });
 	},
+	toggleReactionOnMessage(messageId: string, userId: string, reaction: MessageReaction) {
+		set({
+			messages: get().messages.map((message) => {
+				if (message._id === messageId) {
+					return {
+						...message,
+						reactions: {
+							...(message?.reactions ?? {}),
+							[reaction]: new Set(message?.reactions?.[reaction] ?? []).has(userId)
+								? message?.reactions?.[reaction].filter((id) => id !== userId)
+								: [userId, ...(message?.reactions?.[reaction] ?? [])],
+						},
+					};
+				} else {
+					return message;
+				}
+			}) as any,
+		});
+	},
+	getMessage: (id: string) => get().messages.find((message) => message._id === id),
 }));
 
 type OnlineUserStore = {

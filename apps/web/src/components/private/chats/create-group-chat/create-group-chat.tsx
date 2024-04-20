@@ -62,6 +62,7 @@ const CreateGroupChat = () => {
 	const onSubmit = async (data: CreateGroupFormData) => {
 		try {
 			const memberIds = data.members.map((member) => member._id);
+			if (memberIds.length < 3) return;
 			setLoading(true);
 			const res = (await createGroupChat(data.name, memberIds)) as any;
 			if (res?.chat) addToChats(res.chat);

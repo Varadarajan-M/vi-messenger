@@ -26,6 +26,11 @@ const messageSchema = new Schema(
 			type: [Schema.Types.ObjectId],
 			ref: 'User',
 		},
+		reactions: {
+			type: Map,
+			of: [Schema.Types.ObjectId],
+			ref: 'User',
+		},
 	},
 	{
 		timestamps: true,

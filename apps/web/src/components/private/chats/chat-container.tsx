@@ -9,6 +9,7 @@ import {
 	useDeleteMessage,
 	useEditMessage,
 	useJoinOnline,
+	useReactToMessage,
 	useSeenMessage,
 } from './chat-container.hooks';
 import ChatListingPane from './chat-listing-pane/chat-listing-pane';
@@ -25,6 +26,7 @@ const ChatsContainer = () => {
 	const { onUpdateTypingStatus } = useTypingStatus();
 	const onDeleteMessage = useDeleteMessage();
 	const onEditMessage = useEditMessage();
+	const onReactMessage = useReactToMessage();
 
 	useEffect(() => {
 		if (socket) {
@@ -49,6 +51,7 @@ const ChatsContainer = () => {
 		socket?.on('update_typing_status', onUpdateTypingStatus);
 		socket?.on('message_deleted', onDeleteMessage);
 		socket?.on('message_edited', onEditMessage);
+		socket?.on('message_reaction_ack', onReactMessage);
 
 		return () => {
 			socket?.emit('leave_chat', activeChat);
@@ -57,12 +60,14 @@ const ChatsContainer = () => {
 			socket?.off('update_typing_status', onUpdateTypingStatus);
 			socket?.off('message_deleted', onDeleteMessage);
 			socket?.off('message_edited', onEditMessage);
+			socket?.off('message_reaction_ack', onReactMessage);
 		};
 	}, [
 		activeChat,
 		onAddMessage,
 		onDeleteMessage,
 		onEditMessage,
+		onReactMessage,
 		onSeenMessage,
 		onUpdateTypingStatus,
 		socket,

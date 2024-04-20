@@ -61,7 +61,11 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 
 export const MessageRenderer = ({ type, content }: RendererProps) => {
 	if (type === 'text' && typeof content === 'string') {
-		return <p className='text-lg font-medium text-white'>{content ?? ''}</p>;
+		return (
+			<p className='text-lg font-medium text-white max-w-[90%] break-words'>
+				{content ?? ''}
+			</p>
+		);
 	}
 
 	if (type === 'image' || (type === 'video' && typeof content === 'object')) {

@@ -50,3 +50,13 @@ export const deleteMessage = async (messageId: string, chatId: string) => {
 		return err;
 	}
 };
+
+export const getMessageReactions = async (chatId: string, messageId: string) => {
+	try {
+		const res = await api.get(`/message/${chatId}/${messageId}/reactions`);
+		return res;
+	} catch (err) {
+		console.log(err);
+		return err;
+	}
+};

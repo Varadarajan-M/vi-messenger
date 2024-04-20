@@ -9,11 +9,11 @@ import Fileuploader from '@/components/ui/fileupload';
 import { Input } from '@/components/ui/input';
 import { useSocket } from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
+import useMediaQuery from '@/hooks/common/useMediaQuery';
 import useSendMessage from '@/hooks/messages/useSendMessage';
 import { ComponentPropsWithoutRef, Fragment, useRef, useState } from 'react';
-import useMediaQuery from '@/hooks/common/useMediaQuery';
 
-import Picker, { EmojiClickData, Theme } from 'emoji-picker-react';
+import Picker, { EmojiClickData, EmojiStyle, Theme } from 'emoji-picker-react';
 import { MouseDownEvent } from 'emoji-picker-react/dist/config/config';
 
 export const EmojiIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
@@ -135,6 +135,7 @@ const EmojiPicker = ({ onEmojiSelect }: { onEmojiSelect: MouseDownEvent }) => {
 						transform: isSmallScreen ? 'translateX(25%)' : 'translateX(0)',
 					}}
 					lazyLoadEmojis
+					emojiStyle={EmojiStyle.NATIVE}
 					onEmojiClick={(data, e) => {
 						onEmojiSelect(data, e);
 						setOpen(false);

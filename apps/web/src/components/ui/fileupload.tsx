@@ -19,7 +19,6 @@ const Fileuploader = ({ onUploadSuccess, onUploadError, children }: Fileuploader
 					sources: ['local', 'url'],
 					defaultSource: 'local',
 					showCompletedButton: true,
-					cropping: true,
 					multiple: true,
 					clientAllowedFormats: ['png', 'jpg', 'svg', 'webp', 'mp4', 'mov', 'wmv'],
 					styles: {

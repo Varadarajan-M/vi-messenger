@@ -44,6 +44,14 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 			type,
 			content,
 			seenBy: [userId],
+			reactions: {
+				like: [],
+				love: [],
+				happy: [],
+				sad: [],
+				angry: [],
+				dislike: [],
+			},
 		});
 
 		await newMessage.save();
@@ -181,6 +189,38 @@ export const updateMessageController = async (req: RequestWithChat, res: Respons
 			res?.statusCode === 500
 				? 'Internal server error'
 				: error?.message || 'Failed to update message';
+		res.json({ ok: false, error: msg });
+	}
+};
+
+export const getMessageReactionController = async (req: RequestWithChat, res: Response) => {
+	try {
+		if (!req?.chat) {
+			res.status(403);
+			throw new Error('Chat not found');
+		}
+
+		const { mid: messageId } = req?.params;
+
+		if (!messageId) {
+			res.status(400);
+			throw new Error('Message not found');
+		}
+
+		const reactions = await Message.findOne({
+			_id: messageId,
+			chatId: req?.chat?._id,
+		})
+			.select('reactions -_id')
+			.populate('reactions', '-password');
+
+		return res.status(200).json({ ok: true, payload: reactions });
+	} catch (error: any) {
+		if (!res.statusCode) res.status(500);
+		const msg =
+			res?.statusCode === 500
+				? 'Internal server error'
+				: error?.message || 'Failed to get message reaction';
 		res.json({ ok: false, error: msg });
 	}
 };

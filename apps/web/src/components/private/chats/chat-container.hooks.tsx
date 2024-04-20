@@ -75,6 +75,19 @@ export const useEditMessage = () => {
 	return onEditMessage;
 };
 
+export const useReactToMessage = () => {
+	const findByIdAndUpdateMsg = useMessageStore((state) => state.findByIdAndUpdate);
+
+	const onReactToMessage = useCallback(
+		(message: Message) => {
+			findByIdAndUpdateMsg(message._id, { reactions: message?.reactions });
+		},
+		[findByIdAndUpdateMsg],
+	);
+
+	return onReactToMessage;
+};
+
 export const useSeenMessage = () => {
 	const findByIdAndUpdateMsg = useMessageStore((state) => state.findByIdAndUpdate);
 

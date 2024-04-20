@@ -83,6 +83,24 @@ const initSocket = (io: Server) => {
 			socket.to(roomId).emit('message_edited', message);
 		});
 
+		socket.on('message_reaction', async ({ roomId, messageId, reactions }: any) => {
+			const isMember = await Chat.findOne({
+				_id: roomId,
+				members: {
+					$in: [new mongoose.Types.ObjectId(socket?.user?._id)],
+				},
+			});
+			if (!isMember) return;
+
+			const updatedMessage = await Message.findOneAndUpdate(
+				{ _id: messageId },
+				{ $set: { reactions } },
+				{ new: true },
+			);
+
+			socket.to(roomId).emit('message_reaction_ack', updatedMessage);
+		});
+
 		socket.on('message_seen', async (msgIds: string[]) => {
 			for await (const msgId of msgIds) {
 				const currentUserId = new mongoose.Types.ObjectId(socket?.user?._id);

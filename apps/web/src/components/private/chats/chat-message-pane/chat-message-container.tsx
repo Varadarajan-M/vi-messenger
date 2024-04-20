@@ -1,13 +1,14 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useTypingStatus from '@/hooks/chat/useTypingStatus';
 import useDeleteMessage from '@/hooks/messages/useDeleteMessage';
+import useEditMessage from '@/hooks/messages/useEditMessage';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
 import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay';
 import { Chat } from '@/types/chat';
 import { Fragment, useEffect, useRef } from 'react';
 import ChatInput from './chat-input';
 import Message from './message/chat-message';
-import useEditMessage from '@/hooks/messages/useEditMessage';
+import useReactToMessage from '@/hooks/messages/useReactToMessage';
 
 type ChatMessageContainerProps = {
 	chat: Chat;
@@ -48,6 +49,7 @@ const Messages = ({ chat }: MessagesProps) => {
 	const { msgDisplayRef, unReadMessages } = useUnreadMessagesDisplay(chat?._id as string);
 	const onDeleteMessage = useDeleteMessage();
 	const onEditMessage = useEditMessage();
+	const onReactToMessage = useReactToMessage();
 
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
 
@@ -65,7 +67,7 @@ const Messages = ({ chat }: MessagesProps) => {
 	}, [unReadMessages?.length, messages.length]);
 
 	return (
-		<div className='flex flex-col gap-3 h-full py-16'>
+		<div className='flex flex-col gap-8 h-full py-16'>
 			{loading && (
 				<div className='w-full flex items-center justify-center animate-pulse text-white font-medium'>
 					Loading chat messages ...
@@ -85,11 +87,15 @@ const Messages = ({ chat }: MessagesProps) => {
 						<Message
 							sender={getSender(message?.sender?._id)}
 							showAvatar={messages[index + 1]?.sender?._id !== message.sender?._id}
-							showUsername={messages[index - 1]?.sender?._id !== message.sender?._id}
+							showUsername={
+								getSender(message?.sender?._id) === 'other' &&
+								messages[index - 1]?.sender?._id !== message.sender?._id
+							}
 							message={message}
 							chat={chat}
 							onDelete={onDeleteMessage}
 							onEdit={onEditMessage}
+							onReact={onReactToMessage}
 						/>
 					</Fragment>
 				))}

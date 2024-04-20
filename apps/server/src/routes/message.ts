@@ -4,6 +4,7 @@ import {
 	createMessageController,
 	deleteMessageController,
 	getChatMessagesController,
+	getMessageReactionController,
 	getUnreadMessagesController,
 	updateMessageController,
 } from '../controllers/message';
@@ -21,6 +22,8 @@ router
 	.route('/:id/:mid')
 	.patch(authorize, checkMembership, updateMessageController)
 	.delete(authorize, checkMembership, deleteMessageController);
+
+router.route('/:id/:mid/reactions').get(authorize, checkMembership, getMessageReactionController);
 
 router.route('/unread/:id').get(authorize, checkMembership, getUnreadMessagesController);
 
