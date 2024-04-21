@@ -29,7 +29,7 @@ const MessageReactions = ({
 
 	const renderReactionPicker = () => {
 		return (
-			<div className='absolute translate-x-[-50%] max-w-[70vw] tablet:max-w-[500px] top-full left-[50%] z-[9999] overflow-x-auto flex gap-3 items-center p-3 rounded-3xl bg-black'>
+			<div className='absolute left-0 md:translate-x-[-50%] max-w-[300px] md:max-w-[500px] top-full md:left-[50%] z-[10] overflow-x-auto flex gap-3 items-center p-3 rounded-3xl bg-black'>
 				{REACTIONS.map((emoji) => (
 					<span
 						className={cn(

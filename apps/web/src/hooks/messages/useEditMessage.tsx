@@ -1,4 +1,5 @@
 import { editMessage } from '@/api/message';
+import { toast } from '@/components/ui/use-toast';
 import { useSocket } from '@/contexts/SocketContext';
 import { useMessageStore } from '@/zustand/store';
 import { useCallback } from 'react';
@@ -18,8 +19,17 @@ const useEditMessage = () => {
 					roomId: chatId,
 					message: res.message,
 				});
+				toast({
+					description: 'Message Updated!',
+					className: 'bg-black text-white',
+				});
 			} else {
-				alert(res?.error ?? 'Failed to edit message');
+				toast({
+					title: 'Failed to edit message',
+					description: res?.error,
+					duration: 2000,
+					variant: 'destructive',
+				});
 			}
 		},
 		[findByIdAndUpdate, socket],

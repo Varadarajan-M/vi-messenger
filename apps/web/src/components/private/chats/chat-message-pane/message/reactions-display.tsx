@@ -33,7 +33,7 @@ const EmojiDisplay = ({
 	messageReactions: ReturnType<typeof getMessageReactions>;
 }) => {
 	return (
-		<div className='inline-flex items-center absolute top-full -mt-1 z-10 left-0 -ml-1 gap-0.5 w-fit border border-gray-600 bg-gray-800 rounded-3xl p-1 px-3 justify-self-end'>
+		<div className='inline-flex items-center absolute top-full -mt-1 left-0 -ml-1 gap-0.5 w-fit border border-gray-600 bg-gray-800 rounded-3xl p-1 px-3 justify-self-end'>
 			{messageReactions?.emojis?.slice(0, 3).map((emoji) => (
 				<span
 					className='text-xl transition-all duration-300 hover:animate-shake'

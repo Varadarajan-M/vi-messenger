@@ -24,11 +24,7 @@ const InfiniteScroll = ({
 			observer.disconnect();
 		};
 	}, [fetcher, elementRef, scrollableElementId]);
-	return (
-		<div ref={elementRef} className='text-white'>
-			Infinite scroll
-		</div>
-	);
+	return <div ref={elementRef} />;
 };
 
 export default InfiniteScroll;

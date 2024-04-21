@@ -138,7 +138,7 @@ const EmojiPicker = ({
 						bottom: '80%',
 						background: 'black',
 						zIndex: 99999999,
-						width: isSmallScreen ? 200 : 300,
+						width: isSmallScreen ? window.innerWidth - 50 : 300,
 						transform: isSmallScreen ? 'translateX(25%)' : 'translateX(0)',
 					}}
 					lazyLoadEmojis
