@@ -1,7 +1,7 @@
+import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import { REACTIONS } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { Message, MessageReaction } from '@/types/message';
-import EmojiPicker, { EmojiStyle, Theme } from 'emoji-picker-react';
 import { useState } from 'react';
 import { EmojiIcon } from '../chat-input';
 
@@ -15,42 +15,45 @@ const MessageReactions = ({
 	onReact: (messageId: string, reaction: MessageReaction) => void;
 }) => {
 	const [open, setOpen] = useState(false);
+	const { user } = useAuthInfo();
 
 	const classes = cn('relative', className);
 
-	const onReactionClick = (reaction: any) => {
-		setOpen(!open);
-		onReact(
-			message?._id,
-			REACTIONS?.[reaction?.imageUrl as keyof typeof REACTIONS] as MessageReaction,
+	const onReactionClick = (reaction: MessageReaction) => {
+		onReact(message?._id, reaction);
+		setOpen(false);
+	};
+
+	const hasReacted = (reaction: MessageReaction) =>
+		new Set(message?.reactions?.[reaction] ?? []).has(user?._id as string);
+
+	const renderReactionPicker = () => {
+		return (
+			<div className='absolute translate-x-[-50%] max-w-[70vw] tablet:max-w-[500px] top-full left-[50%] z-[9999] overflow-x-auto flex gap-3 items-center p-3 rounded-3xl bg-black'>
+				{REACTIONS.map((emoji) => (
+					<span
+						className={cn(
+							`relative animate-pulse cursor-pointer hover:scale-[1.6] transition-all text-xl tablet:text-2xl font-bold hover:animate-none`,
+							{
+								'bg-white bg-opacity-20 p-1 rounded-full': hasReacted(
+									emoji.value as MessageReaction,
+								),
+							},
+						)}
+						key={emoji.value}
+						onClick={() => onReactionClick(emoji.value as MessageReaction)}
+					>
+						{emoji.label}
+					</span>
+				))}
+			</div>
 		);
 	};
 
 	return (
-		<div className={classes} onMouseLeave={() => setOpen(false)}>
+		<div className={classes}>
 			<EmojiIcon onClick={() => setOpen(!open)} />
-			{(
-				<EmojiPicker
-					theme={Theme.DARK}
-					emojiStyle={EmojiStyle.NATIVE}
-					style={{
-						position: 'absolute',
-						left: '50%',
-						top: '100%',
-						marginTop: '0.5rem',
-						zIndex: 99999999,
-						transform: 'translateX(-50%)',
-						maxWidth: '80vw',
-						overflowX: 'auto',
-						display: open ? '' : 'none',
-					}}
-					reactionsDefaultOpen
-					lazyLoadEmojis
-					open={open}
-					allowExpandReactions={false}
-					onReactionClick={onReactionClick}
-				/>
-			)}
+			{open && renderReactionPicker()}
 		</div>
 	);
 };

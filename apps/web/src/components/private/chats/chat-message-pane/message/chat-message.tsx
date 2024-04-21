@@ -129,7 +129,7 @@ const Message = ({
 
 	const classes = {
 		msgBubble: cn(
-			'relative bg-dark-grey rounded-2xl pt-3 pr-3 pb-2 pl-3.5 flex flex-col gap-0.5 min-w-28 group',
+			'relative bg-dark-grey rounded-2xl pt-3 pr-3 pb-2 pl-3.5 flex flex-col gap-0.5 min-w-28',
 			{
 				'message-bubble message-bubble__other rounded-bl-none':
 					showAvatar && sender === 'other',
@@ -148,7 +148,7 @@ const Message = ({
 			'self-end justify-end': sender === 'self',
 			'max-w-full': isMediumScreen,
 		}),
-		reactionBtn: cn('bg-gray-500 bg-opacity-30 p-1.5 rounded-full hidden group-hover:inline', {
+		reactionBtn: cn('bg-gray-500 bg-opacity-30 p-1.5 rounded-full', {
 			'order-0': sender === 'self',
 		}),
 	};

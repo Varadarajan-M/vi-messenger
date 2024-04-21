@@ -1,3 +1,5 @@
+import { REACTION_NAME_MAP } from '@/lib/data';
+
 export interface Message {
 	_id: string;
 	content:
@@ -20,7 +22,7 @@ export interface Message {
 	};
 }
 
-export type MessageReaction = 'like' | 'love' | 'happy' | 'sad' | 'angry' | 'dislike';
+export type MessageReaction = keyof typeof REACTION_NAME_MAP;
 
 interface MessageUser {
 	_id: string;

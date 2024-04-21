@@ -112,8 +112,15 @@ const AttachmentUpload = ({ chatId }: { chatId: string }) => {
 	);
 };
 
-const EmojiPicker = ({ onEmojiSelect }: { onEmojiSelect: MouseDownEvent }) => {
-	const [open, setOpen] = useState(false);
+const EmojiPicker = ({
+	onEmojiSelect,
+	open,
+	setOpen,
+}: {
+	onEmojiSelect: MouseDownEvent;
+	open: boolean;
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
 	const isSmallScreen = useMediaQuery('( max-width: 400px )');
 	return (
 		<Fragment>
@@ -138,7 +145,6 @@ const EmojiPicker = ({ onEmojiSelect }: { onEmojiSelect: MouseDownEvent }) => {
 					emojiStyle={EmojiStyle.NATIVE}
 					onEmojiClick={(data, e) => {
 						onEmojiSelect(data, e);
-						setOpen(false);
 					}}
 				/>
 			)}
@@ -151,6 +157,7 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 	const { onSendMessage } = useSendMessage();
 	const { user } = useAuthInfo();
 	const socket = useSocket();
+	const [emojiOpen, setEmojiOpen] = useState(false);
 
 	const startTyping = () => {
 		socket?.emit('type_start', {
@@ -173,6 +180,7 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 			inputRef.current.value = '';
 			inputRef.current.focus();
 			stopTyping();
+			setEmojiOpen(false);
 		}
 	};
 
@@ -213,7 +221,7 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 					className='text-gray-300 self-center text-2xl placeholder:text-gray-400 border-none basis-[94%] -ml-3 focus:focus-visible:border-none focus:focus-visible:outline-none focus:focus-visible:ring-0'
 				/>
 
-				<EmojiPicker onEmojiSelect={onEmojiClick} />
+				<EmojiPicker open={emojiOpen} setOpen={setEmojiOpen} onEmojiSelect={onEmojiClick} />
 			</div>
 			<Button
 				type='submit'

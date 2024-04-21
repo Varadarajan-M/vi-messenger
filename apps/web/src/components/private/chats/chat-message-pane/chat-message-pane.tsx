@@ -12,7 +12,7 @@ const ChatMessagePane = () => {
 	const { chat, loading: chatLoading } = useFetchSingleChat(chatId);
 	const onlineUsers = useOnlineUsers((state) => state.onlineUsers);
 
-	const isSmallScreen = useMediaQuery('( max-width: 768px )');
+	const isSmallScreen = useMediaQuery('( max-width: 900px )');
 
 	const classNames = cn('h-full flex-1 bg-black flex flex-col', {
 		hidden: isSmallScreen && !chatId,

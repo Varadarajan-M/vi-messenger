@@ -57,10 +57,11 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 			reactions: {
 				like: [],
 				love: [],
+				swag: [],
+				fire: [],
 				happy: [],
 				sad: [],
 				angry: [],
-				dislike: [],
 			},
 		});
 

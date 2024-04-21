@@ -29,7 +29,10 @@ const TypingIndicator = ({ chatId }: { chatId: string }) => {
 const ChatMessageContainer = ({ chat }: ChatMessageContainerProps) => {
 	return (
 		<section className='flex-1 bg-gradient-dark w-full rounded-lg relative overflow-y-hidden overflow-x-hidden  pb-2'>
-			<div className='p-4 max-h-[90%] overflow-y-auto' id='scrollable-messages-container'>
+			<div
+				className='p-4 max-h-[90%] h-[80%] overflow-y-auto'
+				id='scrollable-messages-container'
+			>
 				<Messages key={chat?._id} chat={chat} />
 			</div>
 

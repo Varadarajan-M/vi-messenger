@@ -14,16 +14,16 @@ import ChatAvatar from '../../chat-listing-pane/chat-avatar';
 
 const getMessageReactions = (message: Message) => {
 	let totalCount = 0;
-	const images: string[] = [];
+	const emojis: string[] = [];
 	Object.keys(message?.reactions ?? {}).forEach((key: string) => {
 		const reactionCount = message?.reactions?.[key as MessageReaction]?.length || 0;
 		totalCount += reactionCount;
-		reactionCount > 0 && images.push(REACTION_NAME_MAP[key as MessageReaction]);
+		reactionCount > 0 && emojis.push(REACTION_NAME_MAP[key as MessageReaction]);
 	});
 
 	return {
 		totalCount,
-		images,
+		emojis,
 	};
 };
 
@@ -33,9 +33,14 @@ const EmojiDisplay = ({
 	messageReactions: ReturnType<typeof getMessageReactions>;
 }) => {
 	return (
-		<div className='inline-flex items-center absolute top-full -mt-1 z-10 left-0 gap-0.5 w-fit border border-gray-600 bg-gray-800 rounded-3xl p-1 px-3 justify-self-end'>
-			{messageReactions?.images?.slice(0, 3).map((image, index) => (
-				<img key={index} src={image} alt='' height={20} width={15} />
+		<div className='inline-flex items-center absolute top-full -mt-1 z-10 left-0 -ml-1 gap-0.5 w-fit border border-gray-600 bg-gray-800 rounded-3xl p-1 px-3 justify-self-end'>
+			{messageReactions?.emojis?.slice(0, 3).map((emoji) => (
+				<span
+					className='text-xl transition-all duration-300 hover:animate-shake'
+					key={emoji}
+				>
+					{emoji}
+				</span>
 			))}
 			{(messageReactions?.totalCount ?? 0) > 0 && (
 				<span className='text-gray-400 text-xs mt-0.5 font-semibold ml-1'>
@@ -80,11 +85,9 @@ const MessageReactionDisplay = ({ message }: { message: Message }) => {
 										{user?.username}
 									</p>
 								</div>
-								<ChatAvatar
-									img={REACTION_NAME_MAP[key as MessageReaction]}
-									size='sm'
-									variant='block'
-								/>
+								<span className='text-3xl font-bold'>
+									{REACTION_NAME_MAP[key as MessageReaction]}
+								</span>
 							</div>
 						)),
 					)}
