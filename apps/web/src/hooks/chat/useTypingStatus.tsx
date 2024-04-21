@@ -1,9 +1,9 @@
 import { useTypingState } from '@/zustand/store';
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 
-const useTypingStatus = (chatId?: string) => {
+const useTypingStatus = (chatId: string = '') => {
 	const { user } = useAuthInfo();
 	const setTypingStatus = useTypingState((state) => state.setTypingStatus);
 	const typingState = useTypingState((state) => state.typingStatus);

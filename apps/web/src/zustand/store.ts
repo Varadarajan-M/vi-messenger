@@ -66,7 +66,7 @@ type MessageStore = {
 	setMessages: (messages: Message[]) => void;
 	loading: boolean;
 	setLoading: (loading: boolean) => void;
-	fetchMessages: (chatId: string) => Promise<void>;
+	fetchMessages: (chatId: string, skip?: number, limit?: number) => Promise<void>;
 	addMessage: (message: Message) => void;
 	findByIdAndUpdate: (id: string, update: Partial<Message>) => void;
 	findByIdAndRemove: (id: string) => void;
@@ -76,18 +76,28 @@ type MessageStore = {
 	setChatUnReadMessageList: (chatId: string, messages: string[]) => void;
 	toggleReactionOnMessage: (messageId: string, userId: string, reaction: MessageReaction) => void;
 	getMessage: (id: string) => Message | undefined;
+	totalMessages: number;
 };
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
 	messages: [],
+	totalMessages: 0,
 	setMessages: (messages) => set({ messages }),
 	loading: false,
 	setLoading: (loading) => set({ loading }),
-	fetchMessages: async (chatId: string) => {
+	fetchMessages: async (chatId: string, skip?: number, limit?: number) => {
 		try {
-			set({ loading: true });
-			const res = (await getChatMessages(chatId)) as any;
-			set({ messages: res?.messages });
+			if ((skip ?? 0) <= get()?.totalMessages) {
+				set({ loading: true });
+				const res = (await getChatMessages(chatId, skip, limit)) as any;
+
+				set({
+					totalMessages: res?.total ?? 0,
+					messages: !skip
+						? res?.messages ?? []
+						: [...(res?.messages ?? []), ...(get().messages ?? [])],
+				});
+			}
 		} catch (error) {
 			console.log(error);
 		} finally {

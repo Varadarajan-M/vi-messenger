@@ -1,3 +1,4 @@
+import placeholder from '@/assets/placeholder.webp';
 import { Message } from '@/types/message';
 import { MutableRefObject, useEffect, useRef } from 'react';
 
@@ -35,7 +36,7 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 				<img
 					ref={elementRef as MutableRefObject<HTMLImageElement>}
 					className='w-64 h-64 aspect-square rounded-md object-cover'
-					src={content?.preview ?? content?.url}
+					src={placeholder}
 					alt='chat image'
 					loading='lazy'
 				/>
@@ -49,7 +50,7 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 				<video
 					ref={elementRef as MutableRefObject<HTMLVideoElement>}
 					className='aspect-video rounded-md object-cover'
-					src={content?.preview ?? content?.url}
+					src={""}
 					controls
 				/>
 			</a>

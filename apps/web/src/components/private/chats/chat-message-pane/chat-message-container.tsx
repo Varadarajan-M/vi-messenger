@@ -1,14 +1,16 @@
+import InfiniteScroll from '@/components/ui/infinite-scroll';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useTypingStatus from '@/hooks/chat/useTypingStatus';
+import useDetectScroll from '@/hooks/common/useDetectScroll';
 import useDeleteMessage from '@/hooks/messages/useDeleteMessage';
 import useEditMessage from '@/hooks/messages/useEditMessage';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
+import useReactToMessage from '@/hooks/messages/useReactToMessage';
 import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay';
 import { Chat } from '@/types/chat';
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import ChatInput from './chat-input';
 import Message from './message/chat-message';
-import useReactToMessage from '@/hooks/messages/useReactToMessage';
 
 type ChatMessageContainerProps = {
 	chat: Chat;
@@ -28,7 +30,7 @@ const ChatMessageContainer = ({ chat }: ChatMessageContainerProps) => {
 	return (
 		<section className='flex-1 bg-gradient-dark w-full rounded-lg relative overflow-y-hidden overflow-x-hidden  pb-2'>
 			<div className='p-4 max-h-[90%] overflow-y-auto' id='scrollable-messages-container'>
-				<Messages chat={chat} />
+				<Messages key={chat?._id} chat={chat} />
 			</div>
 
 			<TypingIndicator chatId={chat?._id?.toString()} />
@@ -43,28 +45,50 @@ const ChatMessageContainer = ({ chat }: ChatMessageContainerProps) => {
 type MessagesProps = ChatMessageContainerProps;
 
 const Messages = ({ chat }: MessagesProps) => {
-	const { messages, loading } = useFetchMessages(chat?._id as string);
+	const [page, setPage] = useState(1);
+	const skip = (page - 1) * 10;
 	const { user } = useAuthInfo();
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 	const { msgDisplayRef, unReadMessages } = useUnreadMessagesDisplay(chat?._id as string);
 	const onDeleteMessage = useDeleteMessage();
 	const onEditMessage = useEditMessage();
 	const onReactToMessage = useReactToMessage();
+	const limit = unReadMessages?.length > 10 ? unReadMessages?.length + 5 : 10;
+
+	const { messages, loading } = useFetchMessages(chat?._id as string, skip, limit);
+
+	const scrolling = useDetectScroll('scrollable-messages-container');
+
+	const [showInfiniteScroll, setShowInfiniteScroll] = useState(false);
 
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
 
-	const scrollToNewMessage = () => {
+	const scrollToNewMessage = useCallback(() => {
 		setTimeout(() => {
-			if (messagesEndRef?.current)
+			if (messagesEndRef?.current && !scrolling) {
 				messagesEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
+			}
 		}, 200);
-	};
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	useEffect(() => {
-		if (!unReadMessages?.length) {
+		if (!unReadMessages?.length && messages?.length > 0 && messagesEndRef?.current) {
 			scrollToNewMessage();
 		}
-	}, [unReadMessages?.length, messages.length]);
+	}, [unReadMessages?.length, messages, scrollToNewMessage]);
+
+	useEffect(() => {
+		if (messages.length) {
+			setTimeout(() => setShowInfiniteScroll(true), 2000);
+		}
+	}, [messages]);
+
+	const handleScrollUp = useCallback(() => {
+		setPage((p) => p + 1);
+		setShowInfiniteScroll(false);
+	}, []);
 
 	return (
 		<div className='flex flex-col gap-8 h-full py-16'>
@@ -72,6 +96,9 @@ const Messages = ({ chat }: MessagesProps) => {
 				<div className='w-full flex items-center justify-center animate-pulse text-white font-medium'>
 					Loading chat messages ...
 				</div>
+			)}
+			{!loading && messages?.length > 0 && showInfiniteScroll && (
+				<InfiniteScroll fetcher={handleScrollUp} />
 			)}
 			{!loading &&
 				messages?.map((message, index) => (

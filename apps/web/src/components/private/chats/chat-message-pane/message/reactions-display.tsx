@@ -15,13 +15,11 @@ import ChatAvatar from '../../chat-listing-pane/chat-avatar';
 const getMessageReactions = (message: Message) => {
 	let totalCount = 0;
 	const images: string[] = [];
-	console.time('getMessageReactions');
 	Object.keys(message?.reactions ?? {}).forEach((key: string) => {
 		const reactionCount = message?.reactions?.[key as MessageReaction]?.length || 0;
 		totalCount += reactionCount;
 		reactionCount > 0 && images.push(REACTION_NAME_MAP[key as MessageReaction]);
 	});
-	console.timeEnd('getMessageReactions');
 
 	return {
 		totalCount,

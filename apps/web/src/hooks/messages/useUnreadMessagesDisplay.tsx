@@ -19,7 +19,6 @@ const useUnreadMessagesDisplay = (chatId: string) => {
 	useEffect(() => {
 		let popupTimer: any, msgClearTimer: any;
 		if (unReadMessages?.length > 0) {
-			console.log('emitted message_seen', unReadMessages);
 			socket?.emit('message_seen', unReadMessages);
 			popupTimer = setTimeout(scrollToUnreadMsg, 300);
 			msgClearTimer = setTimeout(() => {

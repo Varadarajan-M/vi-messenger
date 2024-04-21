@@ -29,25 +29,28 @@ const MessageReactions = ({
 	return (
 		<div className={classes} onMouseLeave={() => setOpen(false)}>
 			<EmojiIcon onClick={() => setOpen(!open)} />
-			<EmojiPicker
-				theme={Theme.DARK}
-				emojiStyle={EmojiStyle.NATIVE}
-				style={{
-					position: 'absolute',
-					left: '50%',
-					top: '100%',
-					marginTop: '0.5rem',
-					zIndex: 99999999,
-					transform: 'translateX(-50%)',
-					maxWidth: '80vw',
-					overflowX: 'auto',
-				}}
-				reactionsDefaultOpen
-				lazyLoadEmojis
-				open={open}
-				allowExpandReactions={false}
-				onReactionClick={onReactionClick}
-			/>
+			{(
+				<EmojiPicker
+					theme={Theme.DARK}
+					emojiStyle={EmojiStyle.NATIVE}
+					style={{
+						position: 'absolute',
+						left: '50%',
+						top: '100%',
+						marginTop: '0.5rem',
+						zIndex: 99999999,
+						transform: 'translateX(-50%)',
+						maxWidth: '80vw',
+						overflowX: 'auto',
+						display: open ? '' : 'none',
+					}}
+					reactionsDefaultOpen
+					lazyLoadEmojis
+					open={open}
+					allowExpandReactions={false}
+					onReactionClick={onReactionClick}
+				/>
+			)}
 		</div>
 	);
 };

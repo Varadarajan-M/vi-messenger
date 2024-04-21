@@ -1,9 +1,9 @@
 import api from '@/lib/axios';
 import { Message } from '@/types/message';
 
-export const getChatMessages = async (chatId: string) => {
+export const getChatMessages = async (chatId: string, skip?: number, limit?: number) => {
 	try {
-		const res = await api.get(`/message/${chatId}`);
+		const res = await api.get(`/message/${chatId}?skip=${skip}&limit=${limit}`);
 		return res;
 	} catch (err) {
 		console.log(err);

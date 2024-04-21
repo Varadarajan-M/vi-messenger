@@ -37,7 +37,9 @@ export const GroupSearchResult = ({ item, onClick }: { item: Chat; onClick: () =
 					{item?.name}
 				</p>
 				<p className='text-gray-300 text-opacity-90 font-medium capitalize ellipsis-1'>
-					{item?.lastMessage?.content ?? ''}
+					{(typeof item?.lastMessage?.content === 'string' &&
+						item?.lastMessage?.content) ??
+						''}
 				</p>
 			</div>
 		</div>

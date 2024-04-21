@@ -5,6 +5,9 @@ import { Message } from '@/types/message';
 import { useChatsStore, useMessageStore } from '@/zustand/store';
 import { useCallback } from 'react';
 
+import inChatNotification from '@/assets/chat_message.mp3';
+import windowNotification from '@/assets/notification.wav';
+
 export const useChatUpdate = () => {
 	const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
 	const addToUnreadMessageList = useMessageStore((state) => state.addToUnReadMessageList);
@@ -16,6 +19,8 @@ export const useChatUpdate = () => {
 			findByIdAndUpdateChat(message?.chatId, { lastMessage: message });
 
 			if (chat !== message?.chatId) {
+				const audioElement = new Audio(windowNotification);
+				audioElement.play();
 				addToUnreadMessageList(message?.chatId, message?._id);
 			}
 		},
@@ -41,6 +46,8 @@ export const useAddMessage = () => {
 	const onAddMessage = useCallback(
 		(message: Message) => {
 			addMessage({ ...message, seenBy: [...message.seenBy, user?._id as string] });
+			const audioElement = new Audio(inChatNotification);
+			audioElement.play();
 			socket?.emit('message_seen', [message._id]);
 		},
 		[addMessage, socket, user?._id],

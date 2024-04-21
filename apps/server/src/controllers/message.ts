@@ -9,12 +9,22 @@ export const getChatMessagesController = async (req: RequestWithChat, res: Respo
 			throw new Error('Chat not found');
 		}
 
-		const messages = await Message.find({ chatId: req?.chat?._id })
-			.sort({ createdAt: 1 })
-			.populate('sender', '-password')
-			.populate('seenBy', '-password');
+		const skip = req?.query?.skip ? Number(req?.query?.skip) : 0;
 
-		res.status(200).json({ ok: true, payload: { messages } });
+		const limit = req?.query?.limit ? Number(req?.query?.limit) : 10;
+
+		const [total, messages] = await Promise.all([
+			Message.countDocuments({ chatId: req?.chat?._id }),
+			Message.find({ chatId: req?.chat?._id })
+				.sort({ createdAt: 'desc' })
+				.skip(skip)
+				.limit(limit)
+				.lean()
+				.populate('sender', '-password')
+				.populate('seenBy', '-password'),
+		]);
+
+		res.status(200).json({ ok: true, payload: { messages: messages.reverse(), total } });
 	} catch (error: any) {
 		if (!res.statusCode) res.status(500);
 		const msg =
