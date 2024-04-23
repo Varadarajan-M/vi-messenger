@@ -48,3 +48,7 @@ export const getSession = (): User | null => {
 export const setSession = (session: User) => {
 	window.localStorage.setItem('session', JSON.stringify(session));
 };
+
+export const clearSession = () => {
+	window.localStorage.removeItem('session');
+};

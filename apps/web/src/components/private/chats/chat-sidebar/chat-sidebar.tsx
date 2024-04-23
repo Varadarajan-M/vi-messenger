@@ -1,4 +1,17 @@
+import { Button } from '@/components/ui/button';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import useAuth from '@/hooks/auth/useAuth';
+import useMediaQuery from '@/hooks/common/useMediaQuery';
+import { cn } from '@/lib/utils';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import ChatAvatar from '../chat-listing-pane/chat-avatar';
+import ProfileDrawer from './profile-drawer';
 
 const SidebarMenu = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -59,13 +72,56 @@ const SidebarMenu = () => {
 
 const BrandName = () => <h3 className='font-extrabold text-white text-3xl mb-10'>VI</h3>;
 
+const UserProfileMenu = () => {
+	const [showProfile, setShowProfile] = useState(false);
+	const isSmallScreen = useMediaQuery('( max-width: 900px )');
+	const { resetUser } = useAuth();
+
+	const onProfileMenuClick = () => {
+		setShowProfile(!showProfile);
+	};
+
+	return (
+		<>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button
+						variant={'ghost'}
+						className={cn('hover:bg-transparent', {
+							'mt-auto': !isSmallScreen,
+							'mb-auto': isSmallScreen,
+						})}
+					>
+						<ChatAvatar img='https://i.pravatar.cc/300' variant='rounded' size='sm' />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className='bg-gradient-dark text-white border-purple-900'>
+					<DropdownMenuItem onClick={onProfileMenuClick}>Profile</DropdownMenuItem>
+					<DropdownMenuItem onClick={resetUser}>Logout</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+			<ProfileDrawer open={showProfile} setOpen={setShowProfile} />
+		</>
+	);
+};
+
 const ChatSidebar = () => {
 	return (
-		<aside className='hidden md:flex md:flex-col md:items-center h-100 bg-black p-5   min-w-24'>
+		<aside className='hidden tablet:flex tablet:flex-col md:items-center h-100 bg-black p-5   min-w-24'>
 			<BrandName />
 			<SidebarMenu />
+			<UserProfileMenu />
 		</aside>
 	);
 };
 
 export default ChatSidebar;
+
+export const MobileSidebarContent = () => {
+	return (
+		<div className='flex items-center justify-between gap-4'>
+			<BrandName />
+			<UserProfileMenu />
+		</div>
+	);
+};

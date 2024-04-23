@@ -4,7 +4,7 @@ import { AuthContext } from '@/contexts/AuthContext';
 
 import { login, register } from '@/api/auth';
 import { toast } from '@/components/ui/use-toast';
-import { setSession } from '@/lib/auth';
+import { clearSession, setSession } from '@/lib/auth';
 import { AuthFormData } from '@/types/auth';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,7 +21,11 @@ const useAuth = () => {
 					setSession(res);
 					navigate('/');
 				} else {
-					alert(res.error);
+					toast({
+						description: res?.error,
+						duration: 2000,
+						variant: 'destructive',
+					});
 				}
 			} catch (error) {
 				console.log(error);
@@ -59,7 +63,9 @@ const useAuth = () => {
 
 	const resetUser = useCallback(() => {
 		ctx?.setUser(null);
-	}, [ctx]);
+		clearSession();
+		navigate('/login', { replace: true });
+	}, [ctx, navigate]);
 
 	if (!ctx) {
 		throw new Error('useAuth must be used within an AuthProvider');

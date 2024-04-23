@@ -6,9 +6,11 @@ type ChatAvatarProps = {
 	variant: 'rounded' | 'block';
 	size: 'md' | 'sm';
 	img: string;
+	onClick?: () => void;
+	className?: string;
 };
 
-const ChatAvatar = ({ img, variant, size = 'md' }: ChatAvatarProps) => {
+const ChatAvatar = ({ img, variant, size = 'md', onClick, className }: ChatAvatarProps) => {
 	const avatarVariants = cva('overflow-hidden', {
 		variants: {
 			variant: {
@@ -23,7 +25,7 @@ const ChatAvatar = ({ img, variant, size = 'md' }: ChatAvatarProps) => {
 	});
 
 	return (
-		<div className={cn(avatarVariants({ variant, size }))}>
+		<div className={cn(avatarVariants({ variant, size }), className)} onClick={onClick}>
 			<img src={img} alt='chat avatar' className='w-full h-full object-cover' />
 		</div>
 	);

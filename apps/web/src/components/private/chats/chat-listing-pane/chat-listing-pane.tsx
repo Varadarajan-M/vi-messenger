@@ -3,6 +3,7 @@ import ChatList from './chat-list';
 
 import useMediaQuery from '@/hooks/common/useMediaQuery';
 import { cn } from '@/lib/utils';
+import { MobileSidebarContent } from '../chat-sidebar/chat-sidebar';
 import ChatListPaneHeader from './chat-list-header';
 
 const ChatListingPane = () => {
@@ -19,6 +20,7 @@ const ChatListingPane = () => {
 
 	return (
 		<section className={classNames}>
+			{isSmallScreen && <MobileSidebarContent />}
 			<ChatListPaneHeader />
 			<ChatList />
 		</section>
