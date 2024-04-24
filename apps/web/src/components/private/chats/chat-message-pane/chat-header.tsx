@@ -7,6 +7,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
+	getChatAvatar,
 	getGroupChatOnlineUserCount,
 	getPrivateChatMemberId,
 	getPrivateChatName,
@@ -75,10 +76,11 @@ const AwayText = () => (
 );
 
 const GroupInfoText = ({ members, online }: { members: number; online: number }) => (
-	<p className='flex gap-1 items-center -mt-1'>
-		<span className='text-gray-400 text-sm'>
-			{members} members, {online} online
-		</span>
+	<p className='flex gap-1 items-center -mt-1 pl-1'>
+		<span className='rounded-full h-2 w-2 bg-yellow-200  min-h-2 min-w-2 '></span>
+		<span className='text-gray-400 capitalize text-sm'>{members} members</span>
+		<span className='rounded-full h-2 w-2 bg-green-600 animate-pulse min-h-2 min-w-2 '></span>
+		<span className='text-gray-400 text-sm'>{online} online</span>
 	</p>
 );
 
@@ -106,11 +108,7 @@ const ChatHeader = ({ chat, loading, onlineUsers, onBackNavigation }: ChatHeader
 					<div className='flex gap-3 items-center cursor-pointer p-2 rounded-lg'>
 						<BackIcon className='h-6 w-5' onClick={onBackNavigation} />
 
-						<ChatAvatar
-							img={`${'https://i.pravatar.cc/300'}`}
-							variant='block'
-							size='sm'
-						/>
+						<ChatAvatar img={getChatAvatar(chat)} variant='block' size='sm' />
 						<div className='flex flex-col'>
 							{!loading && (
 								<span className='text-white  font-semibold capitalize m-0 text-md'>

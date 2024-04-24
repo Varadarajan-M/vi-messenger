@@ -30,4 +30,5 @@ interface MessageUser {
 	email: string;
 	createdAt: string; // Date in ISO 8601 format
 	updatedAt: string; // Date in ISO 8601 format
+	picture?: string;
 }

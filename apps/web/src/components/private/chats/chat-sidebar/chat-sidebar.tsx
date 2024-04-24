@@ -6,8 +6,9 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import useAuth from '@/hooks/auth/useAuth';
+import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useMediaQuery from '@/hooks/common/useMediaQuery';
-import { cn } from '@/lib/utils';
+import { cn, getTextAvatar } from '@/lib/utils';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ChatAvatar from '../chat-listing-pane/chat-avatar';
@@ -76,6 +77,7 @@ const UserProfileMenu = () => {
 	const [showProfile, setShowProfile] = useState(false);
 	const isSmallScreen = useMediaQuery('( max-width: 900px )');
 	const { resetUser } = useAuth();
+	const { user } = useAuthInfo();
 
 	const onProfileMenuClick = () => {
 		setShowProfile(!showProfile);
@@ -92,7 +94,14 @@ const UserProfileMenu = () => {
 							'mb-auto': isSmallScreen,
 						})}
 					>
-						<ChatAvatar img='https://i.pravatar.cc/300' variant='rounded' size='sm' />
+						<ChatAvatar
+							img={
+								user?.picture ?? getTextAvatar(user?.username ?? user?.email ?? '')
+							}
+							variant='rounded'
+							size='sm'
+							className='border-2 border-lime-300 '
+						/>
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='bg-gradient-dark text-white border-purple-900'>

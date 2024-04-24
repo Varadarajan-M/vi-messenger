@@ -1,6 +1,8 @@
 import { Chat } from '@/types/chat';
 import ChatAvatar from '../chat-listing-pane/chat-avatar';
 
+import { getChatAvatar } from '@/lib/chat';
+import { getTextAvatar } from '@/lib/utils';
 import { User } from '@/types/auth';
 
 export const UserSearchResult = ({ item, onClick }: { item: User; onClick: () => void }) => {
@@ -10,7 +12,7 @@ export const UserSearchResult = ({ item, onClick }: { item: User; onClick: () =>
 			onClick={onClick}
 		>
 			<ChatAvatar
-				img={`${item?.picture ?? 'https://i.pravatar.cc/300'}`}
+				img={item?.picture ?? getTextAvatar(item?.username ?? '')}
 				variant='rounded'
 				size='sm'
 			/>
@@ -27,11 +29,7 @@ export const GroupSearchResult = ({ item, onClick }: { item: Chat; onClick: () =
 			className='flex gap-3 items-center cursor-pointer p-2 rounded-lg hover:bg-dark-grey'
 			onClick={onClick}
 		>
-			<ChatAvatar
-				img={`${`https://i.pravatar.cc/300/?u=${item?._id}`}`}
-				variant='rounded'
-				size='sm'
-			/>
+			<ChatAvatar img={getChatAvatar(item)} variant='rounded' size='sm' />
 			<div>
 				<p className='text-gray-300 text-opacity-90 font-medium capitalize ellipsis-1'>
 					{item?.name}

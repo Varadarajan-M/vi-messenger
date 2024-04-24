@@ -11,6 +11,7 @@ import { useMemo } from 'react';
 
 import useFetchReactions from '@/hooks/messages/useFetchReactions';
 import ChatAvatar from '../../chat-listing-pane/chat-avatar';
+import { getTextAvatar } from '@/lib/utils';
 
 const getMessageReactions = (message: Message) => {
 	let totalCount = 0;
@@ -77,7 +78,7 @@ const MessageReactionDisplay = ({ message }: { message: Message }) => {
 							<div className='flex justify-between items-center' key={i}>
 								<div className='flex gap-4 items-center'>
 									<ChatAvatar
-										img={`${'https://i.pravatar.cc/300'}`}
+										img={user?.picture ?? getTextAvatar(user?.username ?? "")}
 										variant='block'
 										size='md'
 									/>

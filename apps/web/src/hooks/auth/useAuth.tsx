@@ -5,7 +5,8 @@ import { AuthContext } from '@/contexts/AuthContext';
 import { login, register } from '@/api/auth';
 import { toast } from '@/components/ui/use-toast';
 import { clearSession, setSession } from '@/lib/auth';
-import { AuthFormData } from '@/types/auth';
+import { getTextAvatar } from '@/lib/utils';
+import { AuthFormData, User } from '@/types/auth';
 import { useNavigate } from 'react-router-dom';
 
 const useAuth = () => {
@@ -17,8 +18,10 @@ const useAuth = () => {
 			try {
 				const res = (await login(data)) as any;
 				if (!res.error) {
-					ctx?.setUser(res);
-					setSession(res);
+					const pic = res?.picture ?? getTextAvatar(res?.username);
+					const user = { ...res, picture: pic };
+					ctx?.setUser(user);
+					setSession(user);
 					navigate('/');
 				} else {
 					toast({
@@ -67,6 +70,12 @@ const useAuth = () => {
 		navigate('/login', { replace: true });
 	}, [ctx, navigate]);
 
+	const setUser = (user: User | null) => {
+		if (!user) return;
+		ctx?.setUser(user);
+		setSession(user);
+	};
+
 	if (!ctx) {
 		throw new Error('useAuth must be used within an AuthProvider');
 	}
@@ -75,6 +84,7 @@ const useAuth = () => {
 		handleLogin,
 		handleRegister,
 		resetUser,
+		setUser: setUser,
 	};
 };
 

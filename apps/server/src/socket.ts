@@ -118,6 +118,14 @@ const initSocket = (io: Server) => {
 			}
 		});
 
+		socket.on('username_update', (newUsername: string) => {
+			socket.user = { ...socket.user, username: newUsername };
+			if (onlineUsers?.[socket?.user?._id].length === 2) {
+				onlineUsers[socket.user._id][1] = newUsername;
+				io.emit('update_online_users', onlineUsers);	
+			}
+		});
+
 		socket.on('leave_chat', (roomId: string) => {
 			socket.leave(roomId);
 		});

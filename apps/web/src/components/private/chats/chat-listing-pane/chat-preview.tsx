@@ -1,5 +1,5 @@
 import useActiveChat from '@/hooks/chat/useActiveChat';
-import { getChatSenderPrefix, getPrivateChatName, scrollToChat } from '@/lib/chat';
+import { getChatAvatar, getChatSenderPrefix, getPrivateChatName, scrollToChat } from '@/lib/chat';
 import { getTimeFromNow } from '@/lib/datetime';
 import { cn } from '@/lib/utils';
 import { memo } from 'react';
@@ -94,11 +94,7 @@ const ChatPreview = ({ chat, isActive, unReadMessages }: ChatPreviewProps) => {
 			aria-label={`Chat with ${chat.name}`}
 			aria-describedby={`lastMessage-${chat._id}`}
 		>
-			<ChatAvatar
-				img={chat.avatar ?? 'https://i.pravatar.cc/300'}
-				variant='block'
-				size='md'
-			/>
+			<ChatAvatar img={getChatAvatar(chat as any) ?? ''} variant='block' size='md' />
 			<ChatDetails
 				name={`${!chat?.admin ? getPrivateChatName(chat.members as any) : chat.name}`}
 				content={getMessagePreview()}

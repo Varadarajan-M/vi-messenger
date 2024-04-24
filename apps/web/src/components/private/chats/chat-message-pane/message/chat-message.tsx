@@ -7,7 +7,7 @@ import {
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useMediaQuery from '@/hooks/common/useMediaQuery';
 import { getTimeFromDate } from '@/lib/datetime';
-import { cn } from '@/lib/utils';
+import { cn, getTextAvatar } from '@/lib/utils';
 import { User } from '@/types/auth';
 import { Chat } from '@/types/chat';
 import { Message, MessageReaction } from '@/types/message';
@@ -158,7 +158,10 @@ const Message = ({
 			<div className={classes.avatar}>
 				{showAvatar && (
 					<ChatAvatar
-						img={`https://i.pravatar.cc/300?u=${message?.sender?._id}`}
+						img={
+							message?.sender?.picture ??
+							getTextAvatar(message?.sender?.username ?? message?.sender?.email)
+						}
 						variant='block'
 						size='md'
 					/>

@@ -1,6 +1,29 @@
 import { User } from '@/types/auth';
 import { Chat } from '@/types/chat';
 import { getSession } from './auth';
+import { getTextAvatar } from './utils';
+
+export const getChatAvatar = (chat: Chat) => {
+	const session = getSession();
+
+	if (!session?._id) {
+		return null;
+	}
+
+	const { _id } = session;
+
+	if (chat?.members?.length > 2) {
+		console.log('group', chat?.avatar ?? getTextAvatar(chat?.name ?? ''));
+		return chat?.avatar ?? getTextAvatar(chat?.name ?? '');
+	} else {
+		const member: any = chat?.members?.find((member: any) => member?._id !== _id);
+		console.log(
+			'dm',
+			member?.picture ?? getTextAvatar(member?.username ?? member?.email ?? ''),
+		);
+		return member?.picture ?? getTextAvatar(member?.username ?? member?.email ?? '');
+	}
+};
 
 export const getPrivateChatName = (members: User[]) => {
 	const session = getSession();
