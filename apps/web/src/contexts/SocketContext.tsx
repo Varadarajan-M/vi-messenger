@@ -6,7 +6,7 @@ const SocketContext = createContext<ReturnType<typeof io> | null>(null);
 
 const SocketContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
 	const [socket] = useState(() =>
-		io('http://localhost:5000', {
+		io('https://vi-messenger.onrender.com', {
 			auth: {
 				token: `${getSession()?.token}`,
 			},
