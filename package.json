@@ -9,7 +9,9 @@
 	],
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "concurrently \"npm run dev -w apps/web\" \"npm run dev -w apps/server\""
+		"dev": "concurrently \"npm run dev -w apps/web\" \"npm run dev -w apps/server\"",
+		"start": "npm start -w apps/server",
+		"build": "npm i -w apps/web && npm run build -w apps/web"
 	},
 	"keywords": [],
 	"author": "Varadarajan M",

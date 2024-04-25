@@ -4,7 +4,8 @@
 	"description": "Server for VI Messenger Application",
 	"main": "src/index.ts",
 	"scripts": {
-		"dev": "tsx watch src/index.ts"
+		"dev": "tsx watch src/index.ts",
+		"start": "tsx src/index.ts"
 	},
 	"author": "Varadarajan M",
 	"license": "ISC",
