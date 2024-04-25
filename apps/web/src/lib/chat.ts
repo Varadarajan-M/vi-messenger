@@ -13,14 +13,10 @@ export const getChatAvatar = (chat: Chat) => {
 	const { _id } = session;
 
 	if (chat?.members?.length > 2) {
-		console.log('group', chat?.avatar ?? getTextAvatar(chat?.name ?? ''));
 		return chat?.avatar ?? getTextAvatar(chat?.name ?? '');
 	} else {
 		const member: any = chat?.members?.find((member: any) => member?._id !== _id);
-		console.log(
-			'dm',
-			member?.picture ?? getTextAvatar(member?.username ?? member?.email ?? ''),
-		);
+
 		return member?.picture ?? getTextAvatar(member?.username ?? member?.email ?? '');
 	}
 };

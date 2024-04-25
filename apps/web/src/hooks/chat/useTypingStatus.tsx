@@ -20,7 +20,6 @@ const useTypingStatus = (chatId: string = '') => {
 		if (chatId) {
 			let msg = '';
 			if (typingState[chatId]) {
-				console.log('typingState[chatId]', typingState[chatId]);
 				const currentlyTypingCountExcludingMe: any = Object.keys(
 					typingState[chatId],
 				).filter((id) => id !== user?._id);
@@ -30,7 +29,6 @@ const useTypingStatus = (chatId: string = '') => {
 						typingState?.[chatId]?.[currentlyTypingCountExcludingMe?.[0]];
 					msg = `${userTyping} is typing...`;
 				}
-				console.log(currentlyTypingCountExcludingMe);
 
 				if (currentlyTypingCountExcludingMe.length > 1) {
 					const user1 = typingState?.[chatId]?.[currentlyTypingCountExcludingMe?.[0]];

@@ -7,6 +7,7 @@ import useEditMessage from '@/hooks/messages/useEditMessage';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
 import useReactToMessage from '@/hooks/messages/useReactToMessage';
 import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay';
+import { getDate } from '@/lib/datetime';
 import { Chat } from '@/types/chat';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import ChatInput from './chat-input';
@@ -46,6 +47,14 @@ const ChatMessageContainer = ({ chat }: ChatMessageContainerProps) => {
 };
 
 type MessagesProps = ChatMessageContainerProps;
+
+const ChatDateSeparator = ({ date }: { date: string }) => {
+	return (
+		<span className='rounded-3xl mx-auto justify-self-center bg-gray-800  text-gray-300 w-[max-content] underline font-medium px-4 py-2'>
+			{date}
+		</span>
+	);
+};
 
 const Messages = ({ chat }: MessagesProps) => {
 	const [page, setPage] = useState(1);
@@ -93,6 +102,15 @@ const Messages = ({ chat }: MessagesProps) => {
 		setShowInfiniteScroll(false);
 	}, []);
 
+	const renderChatDateSeparator = (previousMessage: Message, currentMessage: Message) => {
+		const prevMsgDate = getDate(previousMessage?.createdAt ?? '');
+		const currMsgDate = getDate(currentMessage?.createdAt ?? '');
+
+		if (prevMsgDate !== currMsgDate) {
+			return <ChatDateSeparator date={currMsgDate} />;
+		}
+	};
+
 	return (
 		<div className='flex flex-col gap-8 h-full py-16'>
 			{loading && (
@@ -114,6 +132,7 @@ const Messages = ({ chat }: MessagesProps) => {
 								{`${unReadMessages?.length} new messages`}
 							</p>
 						)}
+						{renderChatDateSeparator(messages?.[index - 1], message)}
 						<Message
 							sender={getSender(message?.sender?._id)}
 							showAvatar={messages[index + 1]?.sender?._id !== message.sender?._id}

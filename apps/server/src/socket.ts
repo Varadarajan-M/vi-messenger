@@ -104,7 +104,6 @@ const initSocket = (io: Server) => {
 		socket.on('message_seen', async (msgIds: string[]) => {
 			for await (const msgId of msgIds) {
 				const currentUserId = new mongoose.Types.ObjectId(socket?.user?._id);
-				console.log('currentUserId:', currentUserId);
 				const updatedMessage = await Message.findOneAndUpdate(
 					{ _id: msgId },
 					{ $addToSet: { seenBy: currentUserId } },
@@ -122,7 +121,7 @@ const initSocket = (io: Server) => {
 			socket.user = { ...socket.user, username: newUsername };
 			if (onlineUsers?.[socket?.user?._id].length === 2) {
 				onlineUsers[socket.user._id][1] = newUsername;
-				io.emit('update_online_users', onlineUsers);	
+				io.emit('update_online_users', onlineUsers);
 			}
 		});
 

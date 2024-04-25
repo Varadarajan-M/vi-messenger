@@ -6,7 +6,7 @@ import useActiveChat from './useActiveChat';
 const useFetchSingleChat = (chatId: string) => {
 	const [loading, setLoading] = useState(false);
 	const [chat, setChat] = useState<Chat | null>(null);
-	const { resetChat } = useActiveChat();
+	const { chat: activeChatId, resetChat } = useActiveChat();
 
 	useEffect(() => {
 		const fetchChat = async () => {
@@ -23,8 +23,9 @@ const useFetchSingleChat = (chatId: string) => {
 				}
 			}
 		};
+		if (chatId && activeChatId !== chatId) return;
 		fetchChat();
-	}, [chatId, resetChat]);
+	}, [activeChatId, chatId, resetChat]);
 
 	return { loading, chat };
 };
