@@ -4,7 +4,7 @@ import { getSession } from './auth';
 const api = axios.create({
 	baseURL:
 		process.env.NODE_ENV === 'production'
-			? import.meta.env.VITE_API_URL
+			? 'https://vi-messenger.onrender.com/api'
 			: `http://localhost:5000/api`,
 });
 
