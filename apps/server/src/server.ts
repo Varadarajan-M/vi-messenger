@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import http from 'http';
 import morgan from 'morgan';
+import path from 'path';
 import SocketIO from 'socket.io';
 
 import routes from './routes';
@@ -29,7 +30,18 @@ const createServer = () => {
 
 	app.use('/api', routes);
 
-	app.get('/api/health', (_, res) => res.json({ ok: true, environment: process.env.NODE_ENV }));
+	const __dirname1 = path.resolve();
+
+	if (process.env.NODE_ENV === 'production') {
+		app.use(express.static(path.join(__dirname1, '../web/dist')));
+		app.get('*', (req, res) =>
+			res.sendFile(path.resolve(__dirname1, '../web/dist', 'index.html')),
+		);
+	} else {
+		app.get('/api/health', (_, res) =>
+			res.json({ ok: true, environment: process.env.NODE_ENV }),
+		);
+	}
 
 	return { server, io };
 };
