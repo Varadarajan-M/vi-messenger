@@ -3,7 +3,7 @@ import {
 	isEmailValid,
 	isPasswordValid,
 	isUsernameValid,
-} from 'utils/validators';
+} from '../utils';
 
 export const emailValidator = (
 	req: Request,
