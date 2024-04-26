@@ -99,7 +99,7 @@ const UserProfileMenu = () => {
 						<ChatAvatar
 							img={
 								user?.picture ??
-								getTextAvatar(user?.username ?? user?.email) ??
+								getTextAvatar(user?.username ?? user?.email ?? "") ??
 								placeholderImg
 							}
 							variant='rounded'

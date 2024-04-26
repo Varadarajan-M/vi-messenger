@@ -8,7 +8,7 @@ import { useCallback, useEffect } from 'react';
 import inChatNotification from '@/assets/chat_message.mp3';
 import windowNotification from '@/assets/notification.wav';
 
-let audioElement;
+let audioElement: HTMLAudioElement;
 
 export const useChatUpdate = () => {
 	const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
