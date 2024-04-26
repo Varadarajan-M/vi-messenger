@@ -41,8 +41,9 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
 	const resourcesToCache = ['api.dicebear.com', 'res.cloudinary.com', '.mp3', '.css', '.wav'];
+	const appUrl = `https://vi-messenger.onrender.com/api`;
 
-	if (event.request.url.includes('/u/login')) return;
+	if (event.request.url.includes('/u/login') || event.request.url.includes(appUrl)) return;
 
 	event.respondWith(
 		caches.match(event.request).then((cachedResponse) => {
