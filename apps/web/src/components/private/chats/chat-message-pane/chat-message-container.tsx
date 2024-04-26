@@ -23,6 +23,7 @@ import Message from './message/chat-message';
 
 type ChatMessageContainerProps = {
 	chat: Chat;
+	chatId: string;
 };
 
 const TypingIndicator = ({ chatId }: { chatId: string }) => {
@@ -35,7 +36,7 @@ const TypingIndicator = ({ chatId }: { chatId: string }) => {
 	) : null;
 };
 
-const ChatMessageContainer = ({ chat }: ChatMessageContainerProps) => {
+const ChatMessageContainer = ({ chat, chatId }: ChatMessageContainerProps) => {
 	const lastMessageRef = useRef<any>(null);
 
 	const onSendMessage = useCallback(() => {
@@ -63,7 +64,7 @@ const ChatMessageContainer = ({ chat }: ChatMessageContainerProps) => {
 				className='p-4 max-h-[90%] h-[80%] overflow-y-auto'
 				id='scrollable-messages-container'
 			>
-				<Messages key={chat?._id} chat={chat} ref={lastMessageRef} />
+				<Messages key={chatId} chat={chat} chatId={chatId} ref={lastMessageRef} />
 			</div>
 
 			<TypingIndicator chatId={chat?._id?.toString()} />
@@ -113,19 +114,18 @@ const InitialMessageLoader = () => {
 	);
 };
 
-const Messages = forwardRef(({ chat }: MessagesProps, ref: any) => {
+const Messages = forwardRef(({ chat, chatId }: MessagesProps, ref: any) => {
 	const [page, setPage] = useState(1);
 	const skip = (page - 1) * 10;
 	const { user } = useAuthInfo();
 	const lastMessageRef = useRef<any>(null);
-	const { msgDisplayRef, unReadMessages } = useUnreadMessagesDisplay(chat?._id as string);
+	const { msgDisplayRef, unReadMessages } = useUnreadMessagesDisplay(chatId as string);
 	const onDeleteMessage = useDeleteMessage();
 	const onEditMessage = useEditMessage();
 	const onReactToMessage = useReactToMessage();
 	const limit = unReadMessages?.length > 10 ? unReadMessages?.length + 5 : 10;
 
-	const { messages, loading, totalCount } = useFetchMessages(chat?._id as string, skip, limit);
-
+	const { messages, loading, totalCount } = useFetchMessages(chatId as string, skip, limit);
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
 
 	const scrollToNewMessage = useCallback(() => {
@@ -156,6 +156,10 @@ const Messages = forwardRef(({ chat }: MessagesProps, ref: any) => {
 			scrollToNewMessage,
 		};
 	});
+
+	useEffect(() => {
+		console.log('run once');
+	}, []);
 
 	const canShowPreviousMessages =
 		!loading && skip < totalCount && totalCount !== 0 && totalCount !== messages.length;

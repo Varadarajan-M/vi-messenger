@@ -1,17 +1,17 @@
 import useActiveChat from '@/hooks/chat/useActiveChat';
-import useFetchSingleChat from '@/hooks/chat/useFetchSingleChat';
 import useMediaQuery from '@/hooks/common/useMediaQuery';
 import { cn } from '@/lib/utils';
+import { Chat } from '@/types/chat';
 import { useOnlineUsers } from '@/zustand/store';
+import { useState } from 'react';
 import ChatEmptyPane from './chat-empty-pane';
 import ChatHeader from './chat-header';
 import ChatMessageContainer from './chat-message-container';
 
 const ChatMessagePane = () => {
 	const { chat: chatId, resetChat } = useActiveChat();
-	const { chat, loading: chatLoading } = useFetchSingleChat(chatId);
+	const [chat, setChat] = useState<Chat>({} as Chat);
 	const onlineUsers = useOnlineUsers((state) => state.onlineUsers);
-
 	const isSmallScreen = useMediaQuery('( max-width: 900px )');
 
 	const classNames = cn('h-full flex-1 bg-black flex flex-col', {
@@ -28,11 +28,12 @@ const ChatMessagePane = () => {
 			<section className={classNames}>
 				<ChatHeader
 					onBackNavigation={resetChat}
-					chat={chat!}
-					loading={chatLoading}
+					chatId={chatId}
 					onlineUsers={onlineUsers}
+					setChat={setChat}
 				/>
-				<ChatMessageContainer chat={chat!} />
+
+				<ChatMessageContainer chatId={chatId} chat={chat!} />
 			</section>
 		);
 	}

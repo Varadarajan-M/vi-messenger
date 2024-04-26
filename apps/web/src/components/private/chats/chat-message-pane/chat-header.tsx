@@ -1,3 +1,4 @@
+import useFetchSingleChat from '@/hooks/chat/useFetchSingleChat';
 import ChatAvatar from '../chat-listing-pane/chat-avatar';
 
 import {
@@ -13,8 +14,7 @@ import {
 	getPrivateChatName,
 } from '@/lib/chat';
 import { User } from '@/types/auth';
-import { Chat } from '@/types/chat';
-import { ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef, useEffect } from 'react';
 
 export const MenuIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 	<svg
@@ -55,10 +55,10 @@ export const BackIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 );
 
 type ChatHeaderProps = {
-	chat: Chat;
-	loading: boolean;
+	chatId: string;
 	onlineUsers: Record<string, string[]>;
 	onBackNavigation: () => void;
+	setChat: (c: any) => void;
 };
 
 const OnlineText = () => (
@@ -84,7 +84,13 @@ const GroupInfoText = ({ members, online }: { members: number; online: number })
 	</p>
 );
 
-const ChatHeader = ({ chat, loading, onlineUsers, onBackNavigation }: ChatHeaderProps) => {
+const ChatHeader = ({ chatId, setChat, onlineUsers, onBackNavigation }: ChatHeaderProps) => {
+	const { chat, loading } = useFetchSingleChat(chatId);
+
+	useEffect(() => {
+		setChat(chat);
+	}, [chat, setChat]);
+
 	const renderSecondaryText = () => {
 		if (chat?.admin) {
 			const members = chat?.members?.length;
