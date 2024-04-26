@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite --port 3000 --host",
-		"build": "tsc && vite build --mode production",
+		"build": "tsc && vite build --mode production && cp ./service-worker.js ./dist" ,
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview"
 	},

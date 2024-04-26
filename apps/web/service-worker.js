@@ -2,9 +2,6 @@ const staticCacheName = 'chat-app-static-v1';
 const dynamicCacheName = 'chat-app-dynamic-v1';
 
 const localAssetsToCache = [
-	'src/assets/chat_message.mp3',
-	'src/assets/notification.wav',
-	'src/assets/placeholder.webp',
 	'https://upload-widget.cloudinary.com/global/all.js',
 	'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap',
 	'https://fonts.gstatic.com/s/archivo/v19/k3kBo8UDI-1M0wlSfdzyIEkpwTM29hr-8mTYCx-muLRm.woff2',
@@ -43,7 +40,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-	const resourcesToCache = ['api.dicebear.com', 'res.cloudinary.com'];
+	const resourcesToCache = ['api.dicebear.com', 'res.cloudinary.com', '.mp3', '.css', '.wav'];
 
 	if (event.request.url.includes('/u/login')) return;
 
@@ -52,13 +49,15 @@ self.addEventListener('fetch', (event) => {
 			if (cachedResponse) console.log('cache hit', event.request.url);
 			return (
 				cachedResponse ||
-				fetch(event.request).then(async (res) => {
-					const cache = await caches.open(dynamicCacheName);
-					if (resourcesToCache.some((r) => event.request.url.includes(r))) {
-						await cache.put(event.request, res.clone());
-					}
-					return res;
-				})
+				fetch(event.request)
+					.then(async (res) => {
+						const cache = await caches.open(dynamicCacheName);
+						if (resourcesToCache.some((r) => event.request.url.includes(r))) {
+							await cache.put(event.request, res.clone());
+						}
+						return res;
+					})
+					.catch(() => caches.match(event.request).then((res) => res))
 			);
 		}),
 	);
