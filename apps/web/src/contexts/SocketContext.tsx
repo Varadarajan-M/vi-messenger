@@ -5,8 +5,12 @@ import { io } from 'socket.io-client';
 const SocketContext = createContext<ReturnType<typeof io> | null>(null);
 
 const SocketContextProvider: React.FC<PropsWithChildren> = ({ children }) => {
+	const url =
+		process.env.NODE_ENV === 'production'
+			? 'https://vi-messenger.onrender.com'
+			: 'http://localhost:5000';
 	const [socket] = useState(() =>
-		io('https://vi-messenger.onrender.com', {
+		io(url, {
 			auth: {
 				token: `${getSession()?.token}`,
 			},

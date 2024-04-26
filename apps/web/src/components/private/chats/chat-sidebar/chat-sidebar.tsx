@@ -14,6 +14,8 @@ import { useSearchParams } from 'react-router-dom';
 import ChatAvatar from '../chat-listing-pane/chat-avatar';
 import ProfileDrawer from './profile-drawer';
 
+import placeholderImg from '@/assets/placeholder.webp';
+
 const SidebarMenu = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const window = searchParams.get('window') ?? 'all-chats';
@@ -96,7 +98,9 @@ const UserProfileMenu = () => {
 					>
 						<ChatAvatar
 							img={
-								user?.picture ?? getTextAvatar(user?.username ?? user?.email ?? '')
+								user?.picture ??
+								getTextAvatar(user?.username ?? user?.email) ??
+								placeholderImg
 							}
 							variant='rounded'
 							size='sm'

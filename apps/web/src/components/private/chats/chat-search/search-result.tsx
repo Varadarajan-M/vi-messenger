@@ -5,6 +5,8 @@ import { getChatAvatar } from '@/lib/chat';
 import { getTextAvatar } from '@/lib/utils';
 import { User } from '@/types/auth';
 
+import placeholderImg from '@/assets/placeholder.webp';
+
 export const UserSearchResult = ({ item, onClick }: { item: User; onClick: () => void }) => {
 	return (
 		<div
@@ -12,7 +14,7 @@ export const UserSearchResult = ({ item, onClick }: { item: User; onClick: () =>
 			onClick={onClick}
 		>
 			<ChatAvatar
-				img={item?.picture ?? getTextAvatar(item?.username ?? '')}
+				img={item?.picture ?? getTextAvatar(item?.username) ?? placeholderImg}
 				variant='rounded'
 				size='sm'
 			/>

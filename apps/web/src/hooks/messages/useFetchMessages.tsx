@@ -6,6 +6,7 @@ const useFetchMessages = (chatId: string, skip?: number, limit?: number) => {
 	const messages = useMessageStore((state) => state.messages);
 	const fetchMessages = useMessageStore((state) => state.fetchMessages);
 	const loading = useMessageStore((state) => state.loading);
+	const totalCount = useMessageStore((state) => state.totalMessages);
 	const { chat: activeChatId } = useActiveChat();
 
 	useEffect(() => {
@@ -13,7 +14,7 @@ const useFetchMessages = (chatId: string, skip?: number, limit?: number) => {
 		fetchMessages(chatId, skip, limit);
 	}, [activeChatId, chatId, fetchMessages, limit, skip]);
 
-	return { loading, messages };
+	return { loading, messages, totalCount };
 };
 
 export default useFetchMessages;

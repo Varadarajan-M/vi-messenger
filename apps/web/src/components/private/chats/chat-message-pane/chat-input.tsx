@@ -152,7 +152,13 @@ const EmojiPicker = ({
 	);
 };
 
-const ChatInput = ({ chatId }: { chatId: string }) => {
+const ChatInput = ({
+	chatId,
+	onSendMessage: sendMessageCb,
+}: {
+	chatId: string;
+	onSendMessage: () => void;
+}) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { onSendMessage } = useSendMessage();
 	const { user } = useAuthInfo();
@@ -175,10 +181,11 @@ const ChatInput = ({ chatId }: { chatId: string }) => {
 
 	const handleClick = async () => {
 		if (inputRef.current?.value?.trim()?.length) {
-			const { value } = inputRef.current;
-			await onSendMessage(chatId, 'text', value);
+			const value = inputRef.current?.value;
 			inputRef.current.value = '';
 			inputRef.current.focus();
+			await onSendMessage(chatId, 'text', value);
+			sendMessageCb?.();
 			stopTyping();
 			setEmojiOpen(false);
 		}

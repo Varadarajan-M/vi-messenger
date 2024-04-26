@@ -3,10 +3,12 @@ import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useActiveChat from '@/hooks/chat/useActiveChat';
 import { Message } from '@/types/message';
 import { useChatsStore, useMessageStore } from '@/zustand/store';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import inChatNotification from '@/assets/chat_message.mp3';
 import windowNotification from '@/assets/notification.wav';
+
+let audioElement;
 
 export const useChatUpdate = () => {
 	const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
@@ -14,12 +16,16 @@ export const useChatUpdate = () => {
 
 	const { chat } = useActiveChat();
 
+	useEffect(() => {
+		audioElement = new Audio();
+	}, []);
+
 	const onChatUpdate = useCallback(
 		(message: Message) => {
 			findByIdAndUpdateChat(message?.chatId, { lastMessage: message });
 
 			if (chat !== message?.chatId) {
-				const audioElement = new Audio(windowNotification);
+				audioElement.src = windowNotification;
 				audioElement.play();
 				addToUnreadMessageList(message?.chatId, message?._id);
 			}
@@ -43,10 +49,14 @@ export const useAddMessage = () => {
 	const { user } = useAuthInfo();
 	const socket = useSocket();
 
+	useEffect(() => {
+		audioElement = new Audio();
+	}, []);
+
 	const onAddMessage = useCallback(
 		(message: Message) => {
 			addMessage({ ...message, seenBy: [...message.seenBy, user?._id as string] });
-			const audioElement = new Audio(inChatNotification);
+			audioElement.src = inChatNotification;
 			audioElement.play();
 			socket?.emit('message_seen', [message._id]);
 		},

@@ -21,6 +21,8 @@ import MessageReactions from './message-reactions';
 import MessageReactionDisplay from './reactions-display';
 import { MessageRenderer } from './renderer';
 
+import placeholderImg from '@/assets/placeholder.webp';
+
 type MessageProps = {
 	showAvatar: boolean;
 	showUsername: boolean;
@@ -160,7 +162,8 @@ const Message = ({
 					<ChatAvatar
 						img={
 							message?.sender?.picture ??
-							getTextAvatar(message?.sender?.username ?? message?.sender?.email)
+							getTextAvatar(message?.sender?.username ?? message?.sender?.email) ??
+							placeholderImg
 						}
 						variant='block'
 						size='md'

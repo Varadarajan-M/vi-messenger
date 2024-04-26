@@ -6,5 +6,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getTextAvatar = (name: string) => {
+	if (!name.trim().length) return;
 	return `https://api.dicebear.com/8.x/initials/svg?seed=${name}`;
 };

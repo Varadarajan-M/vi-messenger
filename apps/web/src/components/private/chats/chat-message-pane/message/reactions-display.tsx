@@ -13,6 +13,8 @@ import useFetchReactions from '@/hooks/messages/useFetchReactions';
 import ChatAvatar from '../../chat-listing-pane/chat-avatar';
 import { getTextAvatar } from '@/lib/utils';
 
+import placeholderImg from '@/assets/placeholder.webp';
+
 const getMessageReactions = (message: Message) => {
 	let totalCount = 0;
 	const emojis: string[] = [];
@@ -78,7 +80,11 @@ const MessageReactionDisplay = ({ message }: { message: Message }) => {
 							<div className='flex justify-between items-center' key={i}>
 								<div className='flex gap-4 items-center'>
 									<ChatAvatar
-										img={user?.picture ?? getTextAvatar(user?.username ?? "")}
+										img={
+											user?.picture ??
+											getTextAvatar(user?.username) ??
+											placeholderImg
+										}
 										variant='block'
 										size='md'
 									/>
