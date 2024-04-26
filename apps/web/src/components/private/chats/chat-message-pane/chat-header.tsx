@@ -14,6 +14,7 @@ import {
 	getPrivateChatName,
 } from '@/lib/chat';
 import { User } from '@/types/auth';
+import { Chat } from '@/types/chat';
 import { ComponentPropsWithoutRef, useEffect } from 'react';
 
 export const MenuIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
@@ -114,7 +115,7 @@ const ChatHeader = ({ chatId, setChat, onlineUsers, onBackNavigation }: ChatHead
 					<div className='flex gap-3 items-center cursor-pointer p-2 rounded-lg'>
 						<BackIcon className='h-6 w-5' onClick={onBackNavigation} />
 
-						<ChatAvatar img={getChatAvatar(chat)} variant='block' size='sm' />
+						<ChatAvatar img={getChatAvatar(chat as Chat)} variant='block' size='sm' />
 						<div className='flex flex-col'>
 							{!loading && (
 								<span className='text-white  font-semibold capitalize m-0 text-md'>
