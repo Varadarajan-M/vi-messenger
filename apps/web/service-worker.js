@@ -42,8 +42,14 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
 	const resourcesToCache = ['api.dicebear.com', 'res.cloudinary.com', '.mp3', '.css', '.wav'];
 	const appUrl = `https://vi-messenger.onrender.com/api`;
+	const wsUrl = `https://vi-messenger.onrender.com/socket.io`;
 
-	if (event.request.url.includes('/u/login') || event.request.url.includes(appUrl)) return;
+	if (
+		event.request.url.includes('/u/login') ||
+		event.request.url.includes(appUrl) ||
+		event.request.url.includes(wsUrl)
+	)
+		return;
 
 	event.respondWith(
 		caches.match(event.request).then((cachedResponse) => {
