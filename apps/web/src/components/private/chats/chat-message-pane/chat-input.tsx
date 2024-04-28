@@ -11,7 +11,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useMediaQuery from '@/hooks/common/useMediaQuery';
 import useSendMessage from '@/hooks/messages/useSendMessage';
-import { ComponentPropsWithoutRef, Fragment, useRef, useState } from 'react';
+import { ComponentPropsWithoutRef, Fragment, useCallback, useRef, useState } from 'react';
 
 import Picker, { EmojiClickData, EmojiStyle, Theme } from 'emoji-picker-react';
 import { MouseDownEvent } from 'emoji-picker-react/dist/config/config';
@@ -160,23 +160,28 @@ const ChatInput = ({
 	onSendMessage: () => void;
 }) => {
 	const inputRef = useRef<HTMLInputElement>(null);
+	const emittedOnce = useRef(false);
 	const { onSendMessage } = useSendMessage();
 	const { user } = useAuthInfo();
 	const socket = useSocket();
 	const [emojiOpen, setEmojiOpen] = useState(false);
 
-	const startTyping = () => {
-		socket?.emit('type_start', {
-			chatId,
-			userId: user?._id,
-		});
-	};
+	const startTyping = useCallback(() => {
+		if (!emittedOnce.current) {
+			socket?.emit('type_start', {
+				chatId,
+				userId: user?._id,
+			});
+		}
+		emittedOnce.current = true;
+	}, [chatId, socket, user?._id]);
 
 	const stopTyping = () => {
 		socket?.emit('type_end', {
 			chatId,
 			userId: user?._id,
 		});
+		emittedOnce.current = false;
 	};
 
 	const handleClick = async () => {
@@ -217,7 +222,6 @@ const ChatInput = ({
 				<AttachmentUpload chatId={chatId} />
 
 				<Input
-					onPaste={console.log}
 					onChange={startTyping}
 					onBlur={stopTyping}
 					ref={inputRef}

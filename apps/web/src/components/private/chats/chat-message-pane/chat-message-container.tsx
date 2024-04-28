@@ -9,6 +9,7 @@ import useReactToMessage from '@/hooks/messages/useReactToMessage';
 import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay';
 import { getDate } from '@/lib/datetime';
 import { Chat } from '@/types/chat';
+import { ArrowDownIcon } from '@radix-ui/react-icons';
 import {
 	Fragment,
 	forwardRef,
@@ -40,7 +41,6 @@ const ChatMessageContainer = ({ chat, chatId }: ChatMessageContainerProps) => {
 	const lastMessageRef = useRef<any>(null);
 
 	const onSendMessage = useCallback(() => {
-		console.log(lastMessageRef?.current);
 		if (lastMessageRef?.current) {
 			lastMessageRef?.current?.scrollToNewMessage();
 		}
@@ -114,6 +114,18 @@ const InitialMessageLoader = () => {
 	);
 };
 
+const ScrollToBottom = ({ onClick }: { onClick: () => void }) => {
+	return (
+		<div
+			title='Scroll to bottom'
+			onClick={onClick}
+			className='ml-auto absolute bottom-[120px] bg-black right-5 border-[2px] grid place-content-center rounded-full border-purple-900 hover:border-red-500 w-[42px] h-[42px] hover:scale-125 transition-all duration-300 text-white'
+		>
+			<ArrowDownIcon className='w-5 h-5' />
+		</div>
+	);
+};
+
 const Messages = forwardRef(({ chat, chatId }: MessagesProps, ref: any) => {
 	const [page, setPage] = useState(1);
 	const skip = (page - 1) * 10;
@@ -124,6 +136,7 @@ const Messages = forwardRef(({ chat, chatId }: MessagesProps, ref: any) => {
 	const onEditMessage = useEditMessage();
 	const onReactToMessage = useReactToMessage();
 	const limit = unReadMessages?.length > 10 ? unReadMessages?.length + 5 : 10;
+	const isInitial = useRef(true);
 
 	const { messages, loading, totalCount } = useFetchMessages(chatId as string, skip, limit);
 	const getSender = (senderId: string) => (user?._id === senderId ? 'self' : 'other');
@@ -134,8 +147,6 @@ const Messages = forwardRef(({ chat, chatId }: MessagesProps, ref: any) => {
 				lastMessageRef?.current?.scrollIntoView({ behavior: 'smooth' });
 			}
 		}, 200);
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [lastMessageRef]);
 
 	const renderChatDateSeparator = (previousMessage: Message, currentMessage: Message) => {
@@ -157,15 +168,28 @@ const Messages = forwardRef(({ chat, chatId }: MessagesProps, ref: any) => {
 		};
 	});
 
-	useEffect(() => {
-		console.log('run once');
-	}, []);
-
 	const canShowPreviousMessages =
 		!loading && skip < totalCount && totalCount !== 0 && totalCount !== messages.length;
 
+	// This effect is used for starting the chat at the bottom of the messages container
+	useEffect(() => {
+		if (isInitial.current && messages.length > 0 && unReadMessages?.length === 0) {
+			const container = document.getElementById('scrollable-messages-container')!;
+			container && (container.scrollTop = container.scrollHeight);
+			isInitial.current = false;
+		}
+	}, [unReadMessages, isInitial, messages]);
+
+	useEffect(() => {
+		if (chatId) isInitial.current = true;
+	}, [chatId]);
+
+	useEffect(() => {
+		if (unReadMessages?.length > 0) isInitial.current = false;
+	}, [unReadMessages?.length]);
+
 	return (
-		<div className='flex flex-col gap-8 h-full py-16'>
+		<div className='flex flex-col gap-8 h-full py-16 '>
 			{loading && messages.length === 0 && <InitialMessageLoader />}
 			{canShowPreviousMessages && (
 				<ShowPreviousMessages onClick={handleShowPreviousMessages} />
@@ -197,6 +221,7 @@ const Messages = forwardRef(({ chat, chatId }: MessagesProps, ref: any) => {
 					/>
 				</Fragment>
 			))}
+			{<ScrollToBottom onClick={scrollToNewMessage} />}
 
 			{!loading && <div ref={lastMessageRef} />}
 		</div>

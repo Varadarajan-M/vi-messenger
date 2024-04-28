@@ -7,6 +7,7 @@ import { toast } from '@/components/ui/use-toast';
 import { clearSession, setSession } from '@/lib/auth';
 import { getTextAvatar } from '@/lib/utils';
 import { AuthFormData, User } from '@/types/auth';
+import { useChatsStore, useMessageStore } from '@/zustand/store';
 import { useNavigate } from 'react-router-dom';
 
 const useAuth = () => {
@@ -67,6 +68,8 @@ const useAuth = () => {
 	const resetUser = useCallback(() => {
 		ctx?.setUser(null);
 		clearSession();
+		useMessageStore.setState(useMessageStore.getInitialState());
+		useChatsStore.setState(useChatsStore.getInitialState());
 		navigate('/login', { replace: true });
 	}, [ctx, navigate]);
 

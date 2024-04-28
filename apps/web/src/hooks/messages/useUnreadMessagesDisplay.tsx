@@ -10,8 +10,6 @@ const useUnreadMessagesDisplay = (chatId: string) => {
 	const msgDisplayRef = useRef<HTMLParagraphElement | null>(null);
 
 	const scrollToUnreadMsg = () => {
-		console.log('trying to scroll to unreads ', msgDisplayRef?.current);
-
 		msgDisplayRef?.current?.scrollIntoView({
 			behavior: 'smooth',
 			block: 'center',
@@ -28,8 +26,6 @@ const useUnreadMessagesDisplay = (chatId: string) => {
 			}, 8000);
 		}
 		return () => {
-			console.log('clearing', msgDisplayRef);
-
 			clearTimeout(popupTimer);
 			clearTimeout(msgClearTimer);
 		};

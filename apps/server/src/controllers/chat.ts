@@ -1,8 +1,8 @@
 import { Response } from 'express';
 
 import Chat from '../models/chat';
-import User from '../models/user';
 import Message from '../models/message';
+import User from '../models/user';
 
 import { RequestWithChat, RequestWithUser } from '../types';
 
@@ -24,6 +24,12 @@ export const getChatController = async (req: RequestWithChat, res: Response) => 
 				path: 'lastMessage',
 				populate: { path: 'sender', select: '-password' },
 			});
+		}
+
+		if (!chat?.admin) {
+			res.setHeader('Cache-Control', 'max-age=120, stale-while-revalidate');
+		} else {
+			res.setHeader('Cache-Control', 'max-age=180, stale-while-revalidate');
 		}
 
 		return res.status(200).json({
