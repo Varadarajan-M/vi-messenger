@@ -5,6 +5,7 @@ import http from 'http';
 import morgan from 'morgan';
 import path from 'path';
 import SocketIO from 'socket.io';
+import compression from 'compression';
 
 import routes from './routes';
 
@@ -23,6 +24,18 @@ const createServer = () => {
 	});
 
 	app.disable('x-powered-by')
+		.use(
+			compression({
+				level: 6, //
+				threshold: 0,
+				filter: (req, res) => {
+					if (!req.headers['x-no-compression']) {
+						return compression.filter(req, res);
+					}
+					return false;
+				},
+			}),
+		)
 		.use(morgan('dev'))
 		.use(express.urlencoded({ extended: true }))
 		.use(express.json())

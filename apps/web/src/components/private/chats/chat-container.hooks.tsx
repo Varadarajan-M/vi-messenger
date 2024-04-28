@@ -5,8 +5,11 @@ import { Message } from '@/types/message';
 import { useChatsStore, useMessageStore } from '@/zustand/store';
 import { useCallback, useEffect } from 'react';
 
-import inChatNotification from '@/assets/chat_message.mp3';
-import windowNotification from '@/assets/notification.wav';
+const inChatNotification =
+	'https://res.cloudinary.com/dsyrltebn/video/upload/v1714323570/dkbexwp7498pl4avxkpy.mp3';
+	
+const windowNotification =
+	'https://res.cloudinary.com/dsyrltebn/video/upload/v1714323571/ay2yeiivobanuqbnfkzg.wav';
 
 let audioElement: HTMLAudioElement;
 
