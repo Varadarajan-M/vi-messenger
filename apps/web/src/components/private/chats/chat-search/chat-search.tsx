@@ -13,7 +13,7 @@ const ChatSearch = () => {
 			className='flex-1'
 			loading={loading}
 			renderSuggestions={({ isOpen, setIsOpen }) =>
-				!loading ? (
+				!loading && searchResult ? (
 					<ChatSearchSuggestions
 						suggestions={searchResult!}
 						isOpen={isOpen}
