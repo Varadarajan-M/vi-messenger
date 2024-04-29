@@ -14,22 +14,15 @@ export const getChatController = async (req: RequestWithChat, res: Response) => 
 			res.status(403);
 			throw new Error('Chat not found');
 		}
-		let chat = req?.chat;
-		let { populate } = req?.query;
-
-		if (!chat?.admin || populate === '1') {
-			chat = await (
-				await req?.chat.populate('members', '-password')
-			).populate({
-				path: 'lastMessage',
-				populate: { path: 'sender', select: '-password' },
-			});
-		}
+		let chat = await (
+			await req?.chat.populate('members', '-password')
+		).populate({
+			path: 'lastMessage',
+			populate: { path: 'sender', select: '-password' },
+		});
 
 		if (!chat?.admin) {
 			res.setHeader('Cache-Control', 'max-age=120, stale-while-revalidate');
-		} else {
-			res.setHeader('Cache-Control', 'max-age=180, stale-while-revalidate');
 		}
 
 		return res.status(200).json({
@@ -296,16 +289,21 @@ export const createGroupChatController = async (req: RequestWithUser, res: Respo
 
 export const updateGroupChatController = async (req: RequestWithChat, res: Response) => {
 	try {
-		const { name } = req.body;
+		const { name, members } = req.body;
 
 		if (!name || !name?.trim()?.length) {
 			res.status(400);
 			throw new Error('Invalid Chat Name');
 		}
 
+		if (!members?.length || members?.length < 3) {
+			res.status(400);
+			throw new Error('Member list must have atleast 3 members');
+		}
+
 		const chat = req.chat!;
 
-		chat.set({ name: name?.trim() });
+		chat.set({ name: name?.trim(), members: Array.from(new Set(members)) });
 
 		await chat.save();
 
@@ -313,6 +311,7 @@ export const updateGroupChatController = async (req: RequestWithChat, res: Respo
 			ok: true,
 			payload: { chat, message: 'Chat updated' },
 		});
+		
 	} catch (error: any) {
 		if (!res.statusCode) res.status(500);
 

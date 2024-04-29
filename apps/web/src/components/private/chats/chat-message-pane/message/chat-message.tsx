@@ -94,7 +94,6 @@ export const MessageOptionMenu = ({
 						Delete
 					</DropdownMenuItem>
 				</DeleteMessageDialog>
-				<DropdownMenuItem>Chat Details</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
@@ -202,7 +201,12 @@ const Message = ({
 				<MessageReactionDisplay message={message} />
 			</div>
 
-			<MessageReactions message={message} onReact={onReact} className={classes.reactionBtn} />
+			<MessageReactions
+				sender={sender}
+				message={message}
+				onReact={onReact}
+				className={classes.reactionBtn}
+			/>
 		</div>
 	);
 };

@@ -17,7 +17,7 @@ export const getChatAvatar = (chat: Chat) => {
 	} else {
 		const member: any = chat?.members?.find((member: any) => member?._id !== _id);
 
-		return member?.picture ?? getTextAvatar(member?.username ?? member?.email ?? "User");
+		return member?.picture ?? getTextAvatar(member?.username ?? member?.email ?? 'User');
 	}
 };
 
@@ -59,12 +59,12 @@ export const getMessageSenderText = (sender: User) => {
 
 export const getGroupChatOnlineUserCount = (
 	onlineUsers: Record<string, string[]>,
-	members: string[],
+	members: User[],
 ) => {
 	let count = 0;
 
 	for (let i = 0; i < members.length; i++) {
-		if (onlineUsers?.[members[i]]) {
+		if (onlineUsers?.[members[i]?._id]) {
 			count += 1;
 		}
 	}

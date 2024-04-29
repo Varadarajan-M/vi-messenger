@@ -45,7 +45,7 @@ const ChatSearchSuggestions = ({
 										}}
 									/>
 								</li>
-						  ))
+						))
 						: renderNotFound('No users found!')}
 				</ul>
 			</div>
@@ -63,7 +63,7 @@ const ChatSearchSuggestions = ({
 										}}
 									/>
 								</li>
-						  ))
+						))
 						: renderNotFound('No groups found!')}
 				</ul>
 			</div>

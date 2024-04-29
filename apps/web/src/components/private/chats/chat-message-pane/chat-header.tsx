@@ -15,7 +15,9 @@ import {
 } from '@/lib/chat';
 import { User } from '@/types/auth';
 import { Chat } from '@/types/chat';
-import { ComponentPropsWithoutRef, useEffect } from 'react';
+import { ComponentPropsWithoutRef, useEffect, useState } from 'react';
+import GroupChat from '../group-chat/group-chat';
+import useAuthInfo from '@/hooks/auth/useAuthInfo';
 
 export const MenuIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 	<svg
@@ -87,7 +89,7 @@ const GroupInfoText = ({ members, online }: { members: number; online: number })
 
 const ChatHeader = ({ chatId, setChat, onlineUsers, onBackNavigation }: ChatHeaderProps) => {
 	const { chat, loading } = useFetchSingleChat(chatId);
-
+	const { user } = useAuthInfo();
 	useEffect(() => {
 		setChat(chat);
 	}, [chat, setChat]);
@@ -95,13 +97,21 @@ const ChatHeader = ({ chatId, setChat, onlineUsers, onBackNavigation }: ChatHead
 	const renderSecondaryText = () => {
 		if (chat?.admin) {
 			const members = chat?.members?.length;
-			const online = getGroupChatOnlineUserCount(onlineUsers, chat?.members as string[]);
+			const online = getGroupChatOnlineUserCount(onlineUsers, chat?.members as User[]);
 			return <GroupInfoText members={members} online={online} />;
 		}
 
 		const memberId = getPrivateChatMemberId(chat?.members as User[]) || '';
 		return onlineUsers?.[memberId] ? <OnlineText /> : <AwayText />;
 	};
+
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+	const handleOpenChange = (open: boolean) => {
+		isPopupOpen ? setIsMenuOpen(true) : setIsMenuOpen(open);
+	};
+
 	return (
 		<header className='flex bg-gradient-dark rounded-lg mb-3 justify-between gap-4 sticky top-0'>
 			{loading && (
@@ -127,19 +137,34 @@ const ChatHeader = ({ chatId, setChat, onlineUsers, onBackNavigation }: ChatHead
 							{renderSecondaryText()}
 						</div>
 					</div>
-					<DropdownMenu>
-						<DropdownMenuTrigger className='focus-visible:outline-none h-max w-max self-center px-2.5 py-2 rounded-full data-[state=open]:bg-gradient-dark transition-all'>
-							<MenuIcon className='h-5 w-5' />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent
-							// sideOffset={}
-							className='mx-5 bg-gradient-dark text-white border-none'
-						>
-							<DropdownMenuItem>Profile</DropdownMenuItem>
-							<DropdownMenuItem>Delete chat</DropdownMenuItem>
-							<DropdownMenuItem>Chat Details</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					{chat?.admin && user?._id === chat?.admin && (
+						<DropdownMenu open={isMenuOpen} onOpenChange={handleOpenChange}>
+							<DropdownMenuTrigger className='focus-visible:outline-none h-max w-max self-center px-2.5 py-2 rounded-full data-[state=open]:bg-gradient-dark transition-all'>
+								<MenuIcon className='h-5 w-5' />
+							</DropdownMenuTrigger>
+							<DropdownMenuContent className='mx-5 bg-gradient-dark text-white border-none'>
+								{chat?.admin && user?._id === chat?.admin && (
+									<GroupChat
+										mode='edit'
+										chatId={chatId}
+										defaultName={chat?.name}
+										defaultMembers={chat?.members as any}
+										onClose={() => setIsPopupOpen(false)}
+										renderButton={({ onClick }) => (
+											<DropdownMenuItem
+												onClick={() => {
+													onClick();
+													setIsPopupOpen(true);
+												}}
+											>
+												Edit Group
+											</DropdownMenuItem>
+										)}
+									/>
+								)}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					)}
 				</>
 			)}
 		</header>

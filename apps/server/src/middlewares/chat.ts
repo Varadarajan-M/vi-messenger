@@ -1,7 +1,8 @@
 import { NextFunction, Response } from 'express';
 
-import { getChatIfAdmin, getChatIfMember } from '../utils/chat';
+import { getChatIfMember } from '../utils/chat';
 
+import Chat from '../models/chat';
 import { RequestWithChat } from '../types';
 
 /**
@@ -27,7 +28,13 @@ export const checkAdminPrivilege = async (
 
 		const loggedInUserId = req?.user?._id;
 
-		const chat = await getChatIfAdmin(chatId, loggedInUserId);
+		const chat = await Chat?.findOne({
+			_id: chatId,
+			members: {
+				$all: [loggedInUserId],
+			},
+			admin: loggedInUserId,
+		});
 
 		if (!chat) {
 			res.status(403);

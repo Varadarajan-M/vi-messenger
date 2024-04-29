@@ -40,6 +40,16 @@ export const createGroupChat = async (name: string, members: string[]) => {
 	}
 };
 
+export const updateGroupChat = async (chatId: string, name: string, members: string[]) => {
+	try {
+		const res = await api.put(`/chat/group/${chatId}`, { name, members });
+		return res;
+	} catch (err) {
+		console.log(err);
+		return err;
+	}
+};
+
 export const getChatDetails = async (chatId: string, queryParams: string = '') => {
 	const params = new URLSearchParams(queryParams);
 	try {

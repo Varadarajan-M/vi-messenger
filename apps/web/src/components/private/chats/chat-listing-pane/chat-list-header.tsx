@@ -1,7 +1,7 @@
 import useMediaQuery from '@/hooks/common/useMediaQuery';
 import { cn } from '@/lib/utils';
 import ChatSearch from '../chat-search/chat-search';
-import CreateGroupChat from '../create-group-chat/create-group-chat';
+import CreateGroupChat from '../group-chat/group-chat';
 
 const ChatListPaneHeader = () => {
 	const isSmallScreen = useMediaQuery('( max-width: 900px )');

@@ -142,7 +142,7 @@ export const DeleteAccount = () => {
 							Are you sure you want to delete your account? This action is permanent.
 						</DialogDescription>
 					</DialogHeader>
-					<DialogFooter>
+					<DialogFooter className='flex gap-2 md:gap-0'>
 						<DialogClose asChild>
 							<Button disabled={deleteUserLoading} variant='secondary'>
 								Cancel

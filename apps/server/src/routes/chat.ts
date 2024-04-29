@@ -40,7 +40,7 @@ router
 	.route('/group/:id')
 	.get(authorize, checkMembership, getGroupChatController)
 	.all(authorize, checkAdminPrivilege)
-	.patch(updateGroupChatController)
+	.put(updateGroupChatController)
 	.delete(deleteGroupChatController);
 
 router

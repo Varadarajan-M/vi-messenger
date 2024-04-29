@@ -13,7 +13,8 @@ import { Input } from '@/components/ui/input';
 import { PlusIcon } from '@radix-ui/react-icons';
 import { Label } from '@radix-ui/react-label';
 
-import { createGroupChat } from '@/api/chat';
+import { createGroupChat, updateGroupChat } from '@/api/chat';
+import { toast } from '@/components/ui/use-toast';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import { User } from '@/types/auth';
 import { useChatsStore } from '@/zustand/store';
@@ -26,7 +27,23 @@ type CreateGroupFormData = {
 	members: User[];
 };
 
-const CreateGroupChat = () => {
+type GroupChatProps = {
+	mode?: 'create' | 'edit';
+	defaultMembers?: User[];
+	defaultName?: string;
+	renderButton?: ({ onClick }: { onClick: () => void }) => React.ReactNode;
+	onClose?: () => void;
+	chatId?: string;
+};
+
+const GroupChat = ({
+	mode = 'create',
+	defaultMembers,
+	defaultName,
+	renderButton,
+	onClose,
+	chatId,
+}: GroupChatProps) => {
 	const {
 		register,
 		handleSubmit,
@@ -38,13 +55,20 @@ const CreateGroupChat = () => {
 	} = useForm<CreateGroupFormData>({
 		mode: 'onSubmit',
 		defaultValues: {
-			name: '',
+			name: mode === 'create' ? '' : defaultName ?? '',
 			members: [],
 		},
 	});
 
 	const { user } = useAuthInfo();
-	const [selectedUsers, setSelectedUsers] = useState<User[]>([user as User]);
+
+	const initialSelectedUsers = !defaultMembers?.find((m) => m._id === user?._id)
+		? [user as User, ...(defaultMembers ?? [])]
+		: defaultMembers;
+
+	const [selectedUsers, setSelectedUsers] = useState<User[]>(
+		mode === 'create' ? [user as User] : initialSelectedUsers,
+	);
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 
@@ -64,11 +88,49 @@ const CreateGroupChat = () => {
 			const memberIds = data.members.map((member) => member._id);
 			if (memberIds.length < 3) return;
 			setLoading(true);
-			const res = (await createGroupChat(data.name, memberIds)) as any;
-			if (res?.chat) addToChats(res.chat);
-			reset();
-			setSelectedUsers([user as User]);
-			setOpen(false);
+			if (mode === 'edit') {
+				const res = (await updateGroupChat(chatId as string, data.name, memberIds)) as any;
+				if (res?.chat) {
+					toast({
+						title: 'Group updated successfully',
+						variant: 'default',
+						style: {
+							backgroundColor: 'black',
+							color: 'white',
+							border: '1px solid purple',
+						},
+					});
+					window.location.reload();
+				} else {
+					toast({
+						title: 'Group update failed',
+						description: res?.error,
+						variant: 'destructive',
+					});
+				}
+			} else {
+				const res = (await createGroupChat(data.name, memberIds)) as any;
+				if (res?.chat) {
+					addToChats(res.chat);
+					toast({
+						title: 'Group created successfully',
+						variant: 'default',
+						style: {
+							backgroundColor: 'black',
+							color: 'white',
+							border: '1px solid purple',
+						},
+					});
+					reset();
+					setSelectedUsers([user as User]);
+					setOpen(false);
+				} else {
+					toast({
+						title: 'Group creation failed',
+						variant: 'destructive',
+					});
+				}
+			}
 		} catch (err) {
 			console.log(err);
 		} finally {
@@ -79,20 +141,24 @@ const CreateGroupChat = () => {
 	return (
 		<Dialog open={open}>
 			<DialogTrigger asChild>
-				<Button
-					type='submit'
-					title='Create Group Chat'
-					aria-label='Create Group Chat'
-					role='button'
-					onClick={() => setOpen(true)}
-					className='self-center h-full transition-colors bg-black hover:bg-opacity-20 border border-transparent focus:border-purple-950'
-				>
-					<PlusIcon />
-				</Button>
+				{renderButton ? (
+					renderButton({ onClick: () => setOpen(true) })
+				) : (
+					<Button
+						type='submit'
+						title='Create Group Chat'
+						aria-label='Create Group Chat'
+						role='button'
+						onClick={() => setOpen(true)}
+						className='self-center h-full transition-colors bg-black hover:bg-opacity-20 border border-transparent focus:border-purple-950'
+					>
+						<PlusIcon />
+					</Button>
+				)}
 			</DialogTrigger>
-			<DialogContent className='sm:max-w-md bg-black text-white border-white  h-[70vh] overflow-y-auto flex flex-col'>
+			<DialogContent className='w-[85vw] sm:max-w-md bg-black text-white border-white  h-[70vh] overflow-y-auto flex flex-col'>
 				<DialogHeader>
-					<DialogTitle>Create Group</DialogTitle>
+					<DialogTitle>{mode === 'create' ? 'Create' : 'Edit'} Group</DialogTitle>
 					<DialogDescription>Chat with your people with groups.</DialogDescription>
 				</DialogHeader>
 				<form className='flex-1 flex flex-col' onSubmit={handleSubmit(onSubmit)}>
@@ -103,7 +169,6 @@ const CreateGroupChat = () => {
 							</Label>
 							<Input
 								id='name'
-								defaultValue=''
 								placeholder='Group Name'
 								className='border border-purple-950 focus-within:border-blue-300 h-10'
 								{...register('name', {
@@ -125,20 +190,27 @@ const CreateGroupChat = () => {
 								{errors.members?.message}
 							</p>
 						)}
-						<DialogFooter className='justify-end'>
+						<DialogFooter className='justify-end gap-2'>
 							<DialogClose asChild>
 								<Button
 									type='button'
 									variant='secondary'
 									className='bg-dark-grey text-white hover:bg-gray-700'
-									onClick={() => setOpen(false)}
+									onClick={() => {
+										setOpen(false);
+										onClose?.();
+									}}
 									disabled={loading}
 								>
 									Close
 								</Button>
 							</DialogClose>
 							<Button type='submit' variant={'secondary'} disabled={loading}>
-								{!loading ? 'Create' : 'Creating...'}
+								{mode === 'create'
+									? !loading
+										? 'Create'
+										: 'Creating...'
+									: 'Update Group'}
 							</Button>
 						</DialogFooter>
 					</div>
@@ -148,4 +220,4 @@ const CreateGroupChat = () => {
 	);
 };
 
-export default CreateGroupChat;
+export default GroupChat;

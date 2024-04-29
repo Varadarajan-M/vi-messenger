@@ -9,10 +9,12 @@ const MessageReactions = ({
 	message,
 	className,
 	onReact,
+	sender,
 }: {
 	message: Message;
 	className?: string;
 	onReact: (messageId: string, reaction: MessageReaction) => void;
+	sender: 'self' | 'other';
 }) => {
 	const [open, setOpen] = useState(false);
 	const { user } = useAuthInfo();
@@ -29,7 +31,15 @@ const MessageReactions = ({
 
 	const renderReactionPicker = () => {
 		return (
-			<div className='absolute left-0 md:translate-x-[-50%] max-w-[300px] md:max-w-[500px] top-full md:left-[50%] z-[10] overflow-x-auto flex gap-3 items-center p-3 rounded-3xl bg-black'>
+			<div
+				className={cn(
+					'absolute md:translate-x-[-50%] max-w-[300px] md:max-w-[500px] top-full md:left-[50%] z-[10] overflow-x-auto flex gap-3 items-center p-3 rounded-3xl bg-black',
+					{
+						'left-[-65px] translate-x-0': sender === 'self',
+						'left-[-185px] translate-x-0': sender === 'other',
+					},
+				)}
+			>
 				{REACTIONS.map((emoji) => (
 					<span
 						className={cn(
