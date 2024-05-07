@@ -31,6 +31,10 @@ const messageSchema = new Schema(
 			of: [Schema.Types.ObjectId],
 			ref: 'User',
 		},
+		replyTo: {
+			type: Schema.Types.ObjectId,
+			ref: 'Message',
+		},
 	},
 	{
 		timestamps: true,

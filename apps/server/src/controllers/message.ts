@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import Message from '../models/message';
 import { RequestWithChat } from '../types';
+import { messagePopulationFields } from '../utils/message';
 
 export const getChatMessagesController = async (req: RequestWithChat, res: Response) => {
 	try {
@@ -21,7 +22,8 @@ export const getChatMessagesController = async (req: RequestWithChat, res: Respo
 				.limit(limit)
 				.lean()
 				.populate('sender', '-password')
-				.populate('seenBy', '-password'),
+				.populate('seenBy', '-password')
+				.populate(messagePopulationFields.replyTo),
 		]);
 
 		res.status(200).json({ ok: true, payload: { messages: messages.reverse(), total } });
@@ -43,10 +45,14 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 			throw new Error('Chat not found');
 		}
 
-		const { type, content } = req?.body;
+		const { type, content, replyTo } = req?.body;
 
 		const { _id: chatId } = req?.chat;
 		const { _id: userId } = req?.user;
+
+		if (replyTo && chatId?.toString() !== replyTo?.chatId) {
+			throw new Error('Trying to access another chat message may not work');
+		}
 
 		let newMessage = new Message({
 			chatId,
@@ -63,13 +69,17 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 				sad: [],
 				angry: [],
 			},
+			replyTo: replyTo ? replyTo._id : null,
 		});
 
 		await newMessage.save();
 
-		await newMessage.populate('sender', '-password');
-
-		await req.chat.updateOne({ lastMessage: newMessage._id });
+		await Promise.allSettled([
+			(
+				await newMessage.populate('sender', '-password')
+			).populate(messagePopulationFields.replyTo),
+			req.chat.updateOne({ lastMessage: newMessage._id }),
+		]);
 
 		res.status(200).json({ ok: true, payload: { message: newMessage } });
 	} catch (error: any) {
