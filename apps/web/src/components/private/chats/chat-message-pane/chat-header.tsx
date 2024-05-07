@@ -7,6 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import {
 	getChatAvatar,
 	getGroupChatOnlineUserCount,
@@ -17,7 +18,6 @@ import { User } from '@/types/auth';
 import { Chat } from '@/types/chat';
 import { ComponentPropsWithoutRef, useEffect, useState } from 'react';
 import GroupChat from '../group-chat/group-chat';
-import useAuthInfo from '@/hooks/auth/useAuthInfo';
 
 export const MenuIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 	<svg
@@ -137,27 +137,33 @@ const ChatHeader = ({ chatId, setChat, onlineUsers, onBackNavigation }: ChatHead
 							{renderSecondaryText()}
 						</div>
 					</div>
-					{chat?.admin && user?._id === chat?.admin && (
+					{chat?.admin && (
 						<DropdownMenu open={isMenuOpen} onOpenChange={handleOpenChange}>
 							<DropdownMenuTrigger className='focus-visible:outline-none h-max w-max self-center px-2.5 py-2 rounded-full data-[state=open]:bg-gradient-dark transition-all'>
 								<MenuIcon className='h-5 w-5' />
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className='mx-5 bg-gradient-dark text-white border-none'>
-								{chat?.admin && user?._id === chat?.admin && (
+								{chat?.admin && (
 									<GroupChat
-										mode='edit'
+										mode={user?._id === chat?.admin ? 'edit' : 'view'}
 										chatId={chatId}
 										defaultName={chat?.name}
 										defaultMembers={chat?.members as any}
-										onClose={() => setIsPopupOpen(false)}
+										onClose={() => {
+											setIsPopupOpen(false);
+											setIsMenuOpen(false);
+										}}
 										renderButton={({ onClick }) => (
 											<DropdownMenuItem
 												onClick={() => {
-													onClick();
 													setIsPopupOpen(true);
+													setIsMenuOpen(true);
+													onClick();
 												}}
 											>
-												Edit Group
+												{user?._id === chat?.admin
+													? 'Edit Group'
+													: 'View Group'}
 											</DropdownMenuItem>
 										)}
 									/>

@@ -28,7 +28,7 @@ type CreateGroupFormData = {
 };
 
 type GroupChatProps = {
-	mode?: 'create' | 'edit';
+	mode?: 'create' | 'edit' | 'view';
 	defaultMembers?: User[];
 	defaultName?: string;
 	renderButton?: ({ onClick }: { onClick: () => void }) => React.ReactNode;
@@ -108,7 +108,7 @@ const GroupChat = ({
 						variant: 'destructive',
 					});
 				}
-			} else {
+			} else if (mode === 'create') {
 				const res = (await createGroupChat(data.name, memberIds)) as any;
 				if (res?.chat) {
 					addToChats(res.chat);
@@ -138,8 +138,16 @@ const GroupChat = ({
 		}
 	};
 
+	const dialogTitle =
+		mode === 'create' ? 'Create Group' : mode === 'view' ? 'Group Details' : 'Edit Group';
+
+	const handleOpenChange = (open: boolean) => {
+		!open && onClose?.();
+		setOpen(open);
+	};
+
 	return (
-		<Dialog open={open}>
+		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogTrigger asChild>
 				{renderButton ? (
 					renderButton({ onClick: () => setOpen(true) })
@@ -158,8 +166,10 @@ const GroupChat = ({
 			</DialogTrigger>
 			<DialogContent className='w-[85vw] sm:max-w-md bg-black text-white border-white  h-[70vh] overflow-y-auto flex flex-col'>
 				<DialogHeader>
-					<DialogTitle>{mode === 'create' ? 'Create' : 'Edit'} Group</DialogTitle>
-					<DialogDescription>Chat with your people with groups.</DialogDescription>
+					<DialogTitle>{dialogTitle}</DialogTitle>
+					{mode !== 'view' && (
+						<DialogDescription>Chat with your people with groups.</DialogDescription>
+					)}
 				</DialogHeader>
 				<form className='flex-1 flex flex-col' onSubmit={handleSubmit(onSubmit)}>
 					<div className='flex flex-col gap-3 flex-1'>
@@ -174,6 +184,7 @@ const GroupChat = ({
 								{...register('name', {
 									required: 'Group name is required',
 								})}
+								disabled={mode === 'view'}
 							/>
 							{errors?.name && (
 								<p className='text-red-600 text-xs mt-2'>{errors.name?.message}</p>
@@ -184,6 +195,7 @@ const GroupChat = ({
 							currentUser={user}
 							selectedUsers={selectedUsers}
 							setSelectedUsers={setSelectedUsers}
+							viewOnly={mode === 'view'}
 						/>
 						{errors?.members && (
 							<p className=' text-red-600 text-xs m-0 flex-grow-[2]'>
@@ -205,13 +217,15 @@ const GroupChat = ({
 									Close
 								</Button>
 							</DialogClose>
-							<Button type='submit' variant={'secondary'} disabled={loading}>
-								{mode === 'create'
-									? !loading
-										? 'Create'
-										: 'Creating...'
-									: 'Update Group'}
-							</Button>
+							{mode !== 'view' && (
+								<Button type='submit' variant={'secondary'} disabled={loading}>
+									{mode === 'create'
+										? !loading
+											? 'Create'
+											: 'Creating...'
+										: 'Update Group'}
+								</Button>
+							)}
 						</DialogFooter>
 					</div>
 				</form>

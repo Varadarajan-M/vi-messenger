@@ -9,10 +9,12 @@ const AddMembers = ({
 	selectedUsers,
 	setSelectedUsers,
 	currentUser,
+	viewOnly = false,
 }: {
 	selectedUsers: any[];
 	setSelectedUsers: React.Dispatch<React.SetStateAction<any[]>>;
 	currentUser: User | null;
+	viewOnly?: boolean;
 }) => {
 	// TODO: 👇🏻 refactor this into a custom hook after it is implemented fully
 
@@ -46,21 +48,23 @@ const AddMembers = ({
 
 	return (
 		<div className='flex flex-col gap-2 flex-1'>
-			<Search
-				className='border border-purple-950 focus-within:border-blue-300'
-				placeholder='Start typing to add members...'
-				loading={loading}
-				onChange={onSearch}
-				showIcon={false}
-				renderSuggestions={({ setIsOpen }) => (
-					<SearchSuggestions
-						suggestions={searchResults}
-						onItemClick={(user: any) => {
-							onSuggestionClick(user, setIsOpen);
-						}}
-					/>
-				)}
-			/>
+			{!viewOnly && (
+				<Search
+					className='border border-purple-950 focus-within:border-blue-300'
+					placeholder='Start typing to add members...'
+					loading={loading}
+					onChange={onSearch}
+					showIcon={false}
+					renderSuggestions={({ setIsOpen }) => (
+						<SearchSuggestions
+							suggestions={searchResults}
+							onItemClick={(user: any) => {
+								onSuggestionClick(user, setIsOpen);
+							}}
+						/>
+					)}
+				/>
+			)}
 			<div className='min-w-full max-h-[60%] min-h-48 bg-dark-grey bg-opacity-50 rounded-lg overflow-y-auto'>
 				{selectedUsers.length > 0 && (
 					<h5 className='text-gray-400 font-semibold p-2'>Group Members</h5>
@@ -69,7 +73,7 @@ const AddMembers = ({
 					<UserSearchResult
 						key={index}
 						item={user}
-						onClick={() => onSelectedItemClick(user)}
+						onClick={() => !viewOnly && onSelectedItemClick(user)}
 					/>
 				))}
 			</div>

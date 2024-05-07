@@ -51,9 +51,10 @@ export const useChatsStore = create<ChatStore>((set, get) => ({
 			res.chat && set({ chats: [res.chat, ...get().chats] });
 		} else {
 			set({
-				chats: get().chats.map((chat) =>
-					chat?._id === id ? { ...chat, ...update } : chat,
-				),
+				chats: [
+					{ ...existingChat, ...update },
+					...(get()?.chats?.filter((chat) => chat?._id !== id) ?? []),
+				],
 			});
 		}
 	},
