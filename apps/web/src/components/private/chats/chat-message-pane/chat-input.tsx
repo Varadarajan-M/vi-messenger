@@ -11,8 +11,16 @@ import { useSocket } from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useMediaQuery from '@/hooks/common/useMediaQuery';
 import useSendMessage from '@/hooks/messages/useSendMessage';
-import { ComponentPropsWithoutRef, Fragment, useCallback, useRef, useState } from 'react';
+import {
+	ComponentPropsWithoutRef,
+	Fragment,
+	useCallback,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from 'react';
 
+import { Message } from '@/types/message';
 import Picker, { EmojiClickData, EmojiStyle, Theme } from 'emoji-picker-react';
 import { MouseDownEvent } from 'emoji-picker-react/dist/config/config';
 
@@ -155,9 +163,13 @@ const EmojiPicker = ({
 const ChatInput = ({
 	chatId,
 	onSendMessage: sendMessageCb,
+	replyingTo,
+	messageInputRef,
 }: {
 	chatId: string;
 	onSendMessage: () => void;
+	replyingTo: Message | null;
+	messageInputRef?: any;
 }) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const emittedOnce = useRef(false);
@@ -189,7 +201,7 @@ const ChatInput = ({
 			const value = inputRef.current?.value;
 			inputRef.current.value = '';
 			inputRef.current.focus();
-			await onSendMessage(chatId, 'text', value);
+			await onSendMessage(chatId, 'text', value, replyingTo);
 			sendMessageCb?.();
 			stopTyping();
 			setEmojiOpen(false);
@@ -208,6 +220,14 @@ const ChatInput = ({
 			inputRef.current.value += data.emoji;
 		}
 	};
+
+	useImperativeHandle(messageInputRef, () => {
+		return {
+			focus: () => {
+				inputRef.current?.focus();
+			},
+		};
+	});
 
 	return (
 		<div className='flex gap-2 h-16  items-stretch mb-3'>

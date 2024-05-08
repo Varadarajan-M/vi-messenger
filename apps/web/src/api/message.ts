@@ -11,9 +11,18 @@ export const getChatMessages = async (chatId: string, skip?: number, limit?: num
 	}
 };
 
-export const sendMessage = async (chatId: string, type: string, content: Message['content']) => {
+export const sendMessage = async (
+	chatId: string,
+	type: string,
+	content: Message['content'],
+	replyTo: Message | null = null,
+) => {
 	try {
-		const res = await api.post(`/message/${chatId}`, { type, content });
+		const res = await api.post(`/message/${chatId}`, {
+			type,
+			content,
+			...(replyTo && { replyTo }),
+		});
 		return res;
 	} catch (err) {
 		console.log(err);

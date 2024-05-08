@@ -20,6 +20,7 @@ export interface Message {
 	reactions?: {
 		[key in MessageReaction]: string[];
 	};
+	replyTo?: Omit<Message, 'replyTo' | 'reactions' | 'seenBy'> | null;
 }
 
 export type MessageReaction = keyof typeof REACTION_NAME_MAP;

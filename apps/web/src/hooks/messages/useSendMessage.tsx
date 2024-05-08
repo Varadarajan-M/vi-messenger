@@ -16,7 +16,12 @@ const useSendMessage = () => {
 	const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
 
 	const onSendMessage = useCallback(
-		async (chatId: string, type: string, content: Message['content']) => {
+		async (
+			chatId: string,
+			type: string,
+			content: Message['content'],
+			replyTo: Message | null = null,
+		) => {
 			if (typeof content === 'string') {
 				content = content?.trim();
 			}
@@ -43,9 +48,10 @@ const useSendMessage = () => {
 				content: msg.content,
 				createdAt: new Date().toString(),
 				updatedAt: new Date().toString(),
+				replyTo: replyTo || null,
 			});
 
-			const res = (await sendMessage(chatId, msg.type, msg.content)) as {
+			const res = (await sendMessage(chatId, msg.type, msg.content, replyTo)) as {
 				message: Message;
 			};
 

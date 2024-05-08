@@ -50,7 +50,7 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 				<video
 					ref={elementRef as MutableRefObject<HTMLVideoElement>}
 					className='aspect-video rounded-md object-cover'
-					src={""}
+					src={''}
 					controls
 				/>
 			</a>
@@ -69,9 +69,35 @@ export const MessageRenderer = ({ type, content }: RendererProps) => {
 		);
 	}
 
-	if (type === 'image' || (type === 'video' && typeof content === 'object')) {
+	if ((type === 'image' || type === 'video') && typeof content === 'object') {
 		return <MediaRenderer type={type} content={content} />;
 	}
 
 	return null;
+};
+
+export const MessageReplyRenderer = ({ type, content }: RendererProps) => {
+	if (type === 'text' && typeof content === 'string') {
+		return (
+			<p className='text-lg font-medium text-white max-w-[90%] break-words text-ellipsis ellipsis-1'>
+				{content?.substring(0, 100) ?? ''}
+			</p>
+		);
+	}
+
+	if ((type === 'image' || type === 'video') && typeof content === 'object') {
+		return (
+			<div className='flex items-center -mt-2 gap-4 justify-between'>
+				<p className='text-lg font-medium text-white max-w-[90%] break-words text-ellipsis ellipsis-1'>
+					Media 📎
+				</p>
+				<img
+					src={content?.preview ?? ''}
+					alt=''
+					className='w-12 h-12 aspect-square rounded-md object-cover'
+					loading='lazy'
+				/>
+			</div>
+		);
+	}
 };

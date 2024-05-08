@@ -16,12 +16,13 @@ import ChatAvatar from '../../chat-listing-pane/chat-avatar';
 import { MenuIcon } from '../chat-header';
 import DeleteMessageDialog from './delete-message';
 import EditMessageDialog from './edit-message';
-import { EyeIcon } from './icons';
+import { EyeIcon, ReplyIcon } from './icons';
 import MessageReactions from './message-reactions';
 import MessageReactionDisplay from './reactions-display';
-import { MessageRenderer } from './renderer';
+import { MessageRenderer, MessageReplyRenderer } from './renderer';
 
 import placeholderImg from '@/assets/placeholder.webp';
+import { getMessageSenderText } from '@/lib/chat';
 
 type MessageProps = {
 	showAvatar: boolean;
@@ -32,6 +33,7 @@ type MessageProps = {
 	onDelete: (messageId: string, chatId: string) => void;
 	onEdit: (messageId: string, chatId: string, message: string) => void;
 	onReact: (messageId: string, reaction: MessageReaction) => void;
+	onReply: (replyTo: Message | null) => void;
 };
 
 export const MessageOptionMenu = ({
@@ -99,6 +101,46 @@ export const MessageOptionMenu = ({
 	);
 };
 
+const MessageReply = ({ message }: Pick<MessageProps, 'message'>) => {
+	if (!message?.replyTo?.content) return null;
+
+	const messageSender = getMessageSenderText(message?.replyTo?.sender as any);
+
+	const handleReplyClick = () => {
+		const sourceMsg = document.getElementById(message?.replyTo?._id as string)!;
+		if (sourceMsg) {
+			const messageBubble = sourceMsg?.childNodes?.[1] as HTMLElement;
+			Promise.resolve(sourceMsg.scrollIntoView({ behavior: 'smooth', block: 'center' })).then(
+				() => {
+					messageBubble && messageBubble?.classList.add('highlight');
+					setTimeout(() => {
+						messageBubble && messageBubble?.classList.remove('highlight');
+					}, 3000);
+				},
+			);
+		}
+	};
+
+	return (
+		<div
+			onClick={handleReplyClick}
+			className={cn(
+				'flex flex-col bg-dark-grey bg-opacity-30 items-start justify-center gap-0.3 mb-1 p-2 h-20 w-full  min-h-20 min-w-full rounded-lg border-l-8 shadow-lg overflow-hidden',
+				{
+					'border-l-cyan-700': messageSender === 'You',
+					'border-l-purple-600': messageSender !== 'You',
+				},
+			)}
+		>
+			<p className='text-md font-semibold text-gray-400'>{messageSender}</p>
+			<MessageReplyRenderer
+				type={message?.replyTo?.type}
+				content={message?.replyTo?.content}
+			/>
+		</div>
+	);
+};
+
 const Message = ({
 	showAvatar,
 	showUsername,
@@ -108,6 +150,7 @@ const Message = ({
 	onDelete,
 	onEdit,
 	onReact,
+	onReply,
 }: MessageProps) => {
 	const { user } = useAuthInfo();
 	const isMediumScreen = useMediaQuery('( max-width: 1024px )');
@@ -130,18 +173,18 @@ const Message = ({
 
 	const classes = {
 		msgBubble: cn(
-			'relative bg-dark-grey rounded-2xl pt-3 pr-3 pb-2 pl-3.5 flex flex-col gap-0.5 min-w-28',
+			'dark-b relative rounded-2xl pt-3 pr-3 pb-2 pl-3.5 flex flex-col gap-0.5 min-w-36 max-w-[75%]',
 			{
 				'message-bubble message-bubble__other rounded-bl-none':
 					showAvatar && sender === 'other',
 				'message-bubble message-bubble__self rounded-br-none':
 					showAvatar && sender === 'self',
 				'p-[10px]': !showAvatar && !showUsername,
-				'order-1': sender === 'self',
+				'order-2': sender === 'self',
 			},
 		),
 		avatar: cn('self-end min-w-12', {
-			'order-2': sender === 'self',
+			'order-3': sender === 'self',
 			hidden: isSmallScreen && !chat?.admin,
 		}),
 		msgContainer: cn('relative flex gap-3.5 max-w-[75%] items-center group w-full', {
@@ -149,9 +192,19 @@ const Message = ({
 			'self-end justify-end': sender === 'self',
 			'max-w-full': isMediumScreen,
 		}),
-		reactionBtn: cn('bg-gray-500 bg-opacity-30 p-1.5 rounded-full', {
-			'order-0': sender === 'self',
-		}),
+		reactionBtn: cn(
+			'bg-gray-500  bg-opacity-30 p-1.5 rounded-full transition-all cursor-pointer',
+			{
+				'order-1': sender === 'self',
+			},
+		),
+
+		replyBtn: cn(
+			'bg-gray-500  bg-opacity-30 p-1.5 rounded-full hover:scale-125 transition-all cursor-pointer',
+			{
+				'order-0': sender === 'self',
+			},
+		),
 	};
 
 	return (
@@ -185,6 +238,8 @@ const Message = ({
 					</p>
 				)}
 
+				<MessageReply message={message} />
+
 				<MessageRenderer type={message?.type} content={message?.content} />
 
 				<div className='flex items-center justify-between'>
@@ -207,6 +262,7 @@ const Message = ({
 				onReact={onReact}
 				className={classes.reactionBtn}
 			/>
+			<ReplyIcon onClick={() => onReply(message)} className={classes.replyBtn} />
 		</div>
 	);
 };

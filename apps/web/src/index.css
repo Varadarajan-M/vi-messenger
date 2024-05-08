@@ -144,3 +144,16 @@ html,
 .message-bubble__self::before {
 	right: -9px;
 }
+
+.dark-b {
+	background-color: #0b0708;
+	border: 0.1px solid #231b1d;
+	box-shadow: 2px 3px -2px #c60063a6;
+}
+
+.highlight {
+	transition: 0.2s ease-in-out;
+	background: linear-gradient(45deg, #190217, #0a0d22);
+	border: 2px solid #292929;
+	@apply animate-shake duration-700 delay-1000;
+}

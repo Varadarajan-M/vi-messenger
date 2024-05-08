@@ -54,3 +54,19 @@ export const DeleteIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
 		></path>
 	</svg>
 );
+
+export const ReplyIcon = (props: ComponentPropsWithoutRef<'svg'>) => (
+	<svg
+		xmlns='http://www.w3.org/2000/svg'
+		xmlSpace='preserve'
+		width={28}
+		height={28}
+		fill='lightgray'
+		style={{
+			enableBackground: 'new 0 0 16 16',
+		}}
+		{...props}
+	>
+		<path d='M7 5V3c0-.515-.435-1-1-1-.516 0-.742.344-1 .586L.578 7C.227 7.359 0 7.547 0 8s.227.641.578 1L5 13.414c.258.242.484.586 1 .586.565 0 1-.485 1-1v-2h2c1.9.075 4.368.524 5 2.227.203.546.625.773 1 .773.563 0 1-.438 1-1 0-5.917-3.916-8-9-8z' />
+	</svg>
+);

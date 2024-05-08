@@ -7,9 +7,12 @@ import useEditMessage from '@/hooks/messages/useEditMessage';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
 import useReactToMessage from '@/hooks/messages/useReactToMessage';
 import useUnreadMessagesDisplay from '@/hooks/messages/useUnreadMessagesDisplay';
+import { getMessageSenderText } from '@/lib/chat';
 import { getDate } from '@/lib/datetime';
+import { cn } from '@/lib/utils';
 import { Chat } from '@/types/chat';
-import { ArrowDownIcon } from '@radix-ui/react-icons';
+import type { Message as MessageType } from '@/types/message';
+import { ArrowDownIcon, CrossCircledIcon } from '@radix-ui/react-icons';
 import {
 	Fragment,
 	forwardRef,
@@ -21,6 +24,7 @@ import {
 } from 'react';
 import ChatInput from './chat-input';
 import Message from './message/chat-message';
+import { MessageReplyRenderer } from './message/renderer';
 
 type ChatMessageContainerProps = {
 	chat: Chat;
@@ -37,13 +41,59 @@ const TypingIndicator = ({ chatId }: { chatId: string }) => {
 	) : null;
 };
 
+const ReplyingToMessagePreview = ({
+	message,
+	onClose,
+}: {
+	message: MessageType | null;
+	onClose: () => void;
+}) => {
+	if (!message) return null;
+
+	const messageSender = getMessageSenderText(message?.sender as any);
+	return (
+		<div className='absolute bottom-[110px] left-0 w-full z-[9999] bg-black'>
+			<div
+				className={cn(
+					'flex flex-col z-[9999] relative bg-dark-grey bg-opacity-30 justify-center gap-0.3 mt-3 mx-4 p-2 h-20   min-h-20 rounded-lg border-l-8 shadow-lg overflow-hidden',
+					{
+						'border-l-cyan-700': messageSender === 'You',
+						'border-l-purple-600': messageSender !== 'You',
+					},
+				)}
+			>
+				<div className='max-w-[95%]'>
+					<p className='text-md font-semibold text-gray-400'>{messageSender}</p>
+					<MessageReplyRenderer
+						type={message?.type as any}
+						content={message?.content as any}
+					/>
+					<CrossCircledIcon
+						onClick={onClose}
+						className='w-8 h-8 absolute top-2 right-2 text-gray-500 bg-gray-900 rounded-full p-1 cursor-pointer'
+					/>
+				</div>
+			</div>
+		</div>
+	);
+};
+
 const ChatMessageContainer = ({ chat, chatId }: ChatMessageContainerProps) => {
 	const lastMessageRef = useRef<any>(null);
+	const chatInputRef = useRef<any>(null);
+
+	const [replyTo, setReplyTo] = useState<MessageType | null>(null);
 
 	const onSendMessage = useCallback(() => {
 		if (lastMessageRef?.current) {
 			lastMessageRef?.current?.scrollToNewMessage();
 		}
+		setReplyTo(null);
+	}, []);
+
+	const onReplyTo = useCallback((message: MessageType | null) => {
+		setReplyTo(message);
+		chatInputRef?.current?.focus();
 	}, []);
 
 	const socket = useSocket();
@@ -64,23 +114,40 @@ const ChatMessageContainer = ({ chat, chatId }: ChatMessageContainerProps) => {
 				className='p-4 max-h-[90%] h-[80%] overflow-y-auto'
 				id='scrollable-messages-container'
 			>
-				<Messages key={chatId} chat={chat} chatId={chatId} ref={lastMessageRef} />
+				<Messages
+					key={chatId}
+					chat={chat}
+					chatId={chatId}
+					ref={lastMessageRef}
+					onReply={onReplyTo}
+				/>
 			</div>
 
 			<TypingIndicator chatId={chat?._id?.toString()} />
 
+			{replyTo && (
+				<ReplyingToMessagePreview message={replyTo} onClose={() => setReplyTo(null)} />
+			)}
+
 			<div className='sticky bottom-0 top-full p-3 w-full'>
-				<ChatInput chatId={chat?._id?.toString()} onSendMessage={onSendMessage} />
+				<ChatInput
+					chatId={chat?._id?.toString()}
+					onSendMessage={onSendMessage}
+					replyingTo={replyTo}
+					messageInputRef={chatInputRef}
+				/>
 			</div>
 		</section>
 	);
 };
 
-type MessagesProps = ChatMessageContainerProps;
+type MessagesProps = ChatMessageContainerProps & {
+	onReply: (replyTo: MessageType | null) => void;
+};
 
 const ChatDateSeparator = ({ date }: { date: string }) => {
 	return (
-		<span className='rounded-3xl mx-auto justify-self-center bg-gray-800  text-gray-300 w-[max-content] underline font-medium px-4 py-2'>
+		<span className='rounded-3xl mx-auto justify-self-center dark-b text-gray-300 w-[max-content] underline font-medium px-4 py-2'>
 			{date}
 		</span>
 	);
@@ -126,7 +193,7 @@ const ScrollToBottom = ({ onClick }: { onClick: () => void }) => {
 	);
 };
 
-const Messages = forwardRef(({ chat, chatId }: MessagesProps, ref: any) => {
+const Messages = forwardRef(({ chat, chatId, onReply }: MessagesProps, ref: any) => {
 	const [page, setPage] = useState(1);
 	const skip = (page - 1) * 10;
 	const { user } = useAuthInfo();
@@ -218,6 +285,7 @@ const Messages = forwardRef(({ chat, chatId }: MessagesProps, ref: any) => {
 						onDelete={onDeleteMessage}
 						onEdit={onEditMessage}
 						onReact={onReactToMessage}
+						onReply={onReply}
 					/>
 				</Fragment>
 			))}
