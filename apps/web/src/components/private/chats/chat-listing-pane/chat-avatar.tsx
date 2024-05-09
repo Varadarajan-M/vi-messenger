@@ -1,3 +1,4 @@
+import LazyImage from '@/components/ui/lazy-image';
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
 import { memo } from 'react';
@@ -27,7 +28,7 @@ const ChatAvatar = ({ img, variant, size = 'md', onClick, className }: ChatAvata
 
 	return (
 		<div className={cn(avatarVariants({ variant, size }), className)} onClick={onClick}>
-			<img src={img} alt='chat avatar' className='w-full h-full object-cover' />
+			<LazyImage src={img} alt='chat avatar' className='w-full h-full object-cover' />
 		</div>
 	);
 };

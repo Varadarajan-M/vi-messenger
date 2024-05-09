@@ -21,6 +21,7 @@ async function cacheAssets(cache) {
 self.addEventListener('install', (event) => {
 	// console.log('Service worker install event!');
 	event.waitUntil(caches.open(staticCacheName).then(cacheAssets));
+	event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event) => {
@@ -37,10 +38,21 @@ self.addEventListener('activate', (event) => {
 			);
 		}),
 	);
+	event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', (event) => {
-	const resourcesToCache = ['api.dicebear.com', 'res.cloudinary.com', '.css'];
+	const resourcesToCache = [
+		'api.dicebear.com',
+		'res.cloudinary.com',
+		'.css',
+		'.jpg',
+		'.png',
+		'.jpeg',
+		'.webp',
+		'.svg',
+		'.mp4',
+	];
 	const appUrl = `https://vi-messenger.onrender.com/api`;
 	const wsUrl = `https://vi-messenger.onrender.com/socket.io`;
 

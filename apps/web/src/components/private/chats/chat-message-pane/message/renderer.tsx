@@ -1,6 +1,6 @@
-import placeholder from '@/assets/placeholder.webp';
+import LazyImage from '@/components/ui/lazy-image';
+import LazyVideo from '@/components/ui/lazy-video';
 import { Message } from '@/types/message';
-import { MutableRefObject, useEffect, useRef } from 'react';
 
 type RendererProps = {
 	type: string;
@@ -8,35 +8,12 @@ type RendererProps = {
 };
 
 const MediaRenderer = ({ type, content }: RendererProps) => {
-	const elementRef = useRef<HTMLVideoElement | HTMLImageElement>(null);
-
-	useEffect(() => {
-		const target = elementRef?.current;
-		const observer = new IntersectionObserver((entries) => {
-			const [first] = entries;
-			// @ts-expect-error content
-			if (first?.isIntersecting && first?.target?.getAttribute('src') !== content?.url) {
-				// @ts-expect-error content
-				first?.target?.setAttribute('src', content?.url);
-			}
-		});
-		if (target) {
-			observer.observe(target);
-		}
-		return () => {
-			observer.disconnect();
-		};
-
-		// @ts-expect-error content
-	}, [content?.preview, content?.url, elementRef]);
-
 	if (type === 'image' && typeof content === 'object') {
 		return (
 			<a href={content?.download} className='mb-3' download>
-				<img
-					ref={elementRef as MutableRefObject<HTMLImageElement>}
+				<LazyImage
 					className='w-64 h-64 aspect-square rounded-md object-cover'
-					src={placeholder}
+					src={content?.url}
 					alt='chat image'
 					loading='lazy'
 				/>
@@ -47,10 +24,9 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 	if (type === 'video' && typeof content === 'object') {
 		return (
 			<a href={content?.download} className='mb-3' download>
-				<video
-					ref={elementRef as MutableRefObject<HTMLVideoElement>}
+				<LazyVideo
 					className='aspect-video rounded-md object-cover'
-					src={''}
+					src={content?.url}
 					controls
 				/>
 			</a>
@@ -91,7 +67,7 @@ export const MessageReplyRenderer = ({ type, content }: RendererProps) => {
 				<p className='text-lg font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
 					Media 📎
 				</p>
-				<img
+				<LazyImage
 					src={content?.preview ?? ''}
 					alt=''
 					className='w-12 h-12 aspect-square rounded-md object-cover'

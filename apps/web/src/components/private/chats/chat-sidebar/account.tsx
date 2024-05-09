@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import LazyImage from '@/components/ui/lazy-image';
 import { toast } from '@/components/ui/use-toast';
 import useAuth from '@/hooks/auth/useAuth';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
@@ -220,7 +221,7 @@ export const ProfilePicture = () => {
 	return (
 		<div className='w-full  flex flex-col gap-6 items-center'>
 			<div className='w-52 h-52 relative rounded-full group cursor-pointer border-lime-300 border-[4px] '>
-				<img
+				<LazyImage
 					src={user?.picture}
 					alt='profile avatar'
 					className='rounded-full w-full h-full object-cover'
