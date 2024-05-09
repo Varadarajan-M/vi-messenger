@@ -1,5 +1,5 @@
-const staticCacheName = 'chat-app-static-v1';
-const dynamicCacheName = 'chat-app-dynamic-v1';
+const staticCacheName = 'chat-app-static-v2';
+const dynamicCacheName = 'chat-app-dynamic-v2';
 
 const localAssetsToCache = [
 	'https://upload-widget.cloudinary.com/global/all.js',

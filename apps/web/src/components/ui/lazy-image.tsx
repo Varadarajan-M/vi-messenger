@@ -1,4 +1,5 @@
 import { ComponentPropsWithoutRef, useEffect, useRef } from 'react';
+import placeholder from '@/assets/placeholder.webp';
 
 const LazyImage = (props: ComponentPropsWithoutRef<'img'>) => {
 	const elementRef = useRef<HTMLImageElement>(null);
@@ -19,7 +20,7 @@ const LazyImage = (props: ComponentPropsWithoutRef<'img'>) => {
 		};
 	}, [elementRef, props?.src]);
 
-	return <img {...props} src={''} ref={elementRef} />;
+	return <img {...props} src={placeholder} ref={elementRef} />;
 };
 
 export default LazyImage;
