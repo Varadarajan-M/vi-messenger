@@ -167,7 +167,7 @@ const ChatInput = ({
 	messageInputRef,
 }: {
 	chatId: string;
-	onSendMessage: () => void;
+	onSendMessage: (message?: Message) => void;
 	replyingTo: Message | null;
 	messageInputRef?: any;
 }) => {
@@ -201,8 +201,7 @@ const ChatInput = ({
 			const value = inputRef.current?.value;
 			inputRef.current.value = '';
 			inputRef.current.focus();
-			await onSendMessage(chatId, 'text', value, replyingTo);
-			sendMessageCb?.();
+			await onSendMessage(chatId, 'text', value, replyingTo, sendMessageCb);
 			stopTyping();
 			setEmojiOpen(false);
 		}

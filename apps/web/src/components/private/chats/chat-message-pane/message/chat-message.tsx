@@ -173,7 +173,7 @@ const Message = ({
 
 	const classes = {
 		msgBubble: cn(
-			'dark-b relative rounded-2xl pt-3 pr-3 pb-2 pl-3.5 flex flex-col gap-0.5 min-w-36 max-w-[75%]',
+			'dark-b relative rounded-2xl pt-3 pr-3 pb-2 pl-3.5 flex flex-col min-w-28 max-w-[70%] break-all',
 			{
 				'message-bubble message-bubble__other rounded-bl-none':
 					showAvatar && sender === 'other',
@@ -183,24 +183,26 @@ const Message = ({
 				'order-2': sender === 'self',
 			},
 		),
-		avatar: cn('self-end min-w-12', {
-			'order-3': sender === 'self',
-			hidden: isSmallScreen && !chat?.admin,
+		avatar: cn('self-end', {
+			'order-3 ml-2': sender === 'self',
+			'mr-3': sender === 'other' && !isMediumScreen,
+			'min-w-12': !isSmallScreen,
+			hidden: isSmallScreen,
 		}),
-		msgContainer: cn('relative flex gap-3.5 max-w-[75%] items-center group w-full', {
+		msgContainer: cn('relative flex max-w-[75%] items-center group w-full', {
 			'self-start justify-start': sender === 'other',
 			'self-end justify-end': sender === 'self',
 			'max-w-full': isMediumScreen,
 		}),
 		reactionBtn: cn(
-			'bg-gray-500  bg-opacity-30 p-1.5 rounded-full transition-all cursor-pointer',
+			'bg-gray-500  bg-opacity-30 p-1.5 mx-1 rounded-full transition-all cursor-pointer',
 			{
 				'order-1': sender === 'self',
 			},
 		),
 
 		replyBtn: cn(
-			'bg-gray-500  bg-opacity-30 p-1.5 rounded-full hover:scale-125 transition-all cursor-pointer',
+			'bg-gray-500  bg-opacity-30 p-1.5 mx-1 rounded-full hover:scale-125 transition-all cursor-pointer',
 			{
 				'order-0': sender === 'self',
 			},
@@ -218,7 +220,7 @@ const Message = ({
 							placeholderImg
 						}
 						variant='block'
-						size='md'
+						size={isMediumScreen ? 'sm' : 'md'}
 					/>
 				)}
 			</div>
@@ -232,7 +234,7 @@ const Message = ({
 						onDelete={onDelete}
 					/>
 				)}
-				{showUsername && (
+				{(showUsername || (isSmallScreen && sender === 'other')) && (
 					<p className='text-md font-semibold text-gray-400 capitalize'>
 						{message?.sender?.username ?? 'User'}
 					</p>

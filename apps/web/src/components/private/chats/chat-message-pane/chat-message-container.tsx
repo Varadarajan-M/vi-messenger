@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useSocket } from '@/contexts/SocketContext';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
-import useTypingStatus from '@/hooks/chat/useTypingStatus';
 import useDeleteMessage from '@/hooks/messages/useDeleteMessage';
 import useEditMessage from '@/hooks/messages/useEditMessage';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
@@ -29,16 +28,6 @@ import { MessageReplyRenderer } from './message/renderer';
 type ChatMessageContainerProps = {
 	chat: Chat;
 	chatId: string;
-};
-
-const TypingIndicator = ({ chatId }: { chatId: string }) => {
-	const { typingState, message } = useTypingStatus(chatId as string);
-
-	return typingState?.[chatId] ? (
-		<p className='m-0 mt-1 text-gray-300 rounded-lg bg-transparent underline text-opacity-90 font-medium w-full h-6 pl-4 animate-pulse'>
-			{message}
-		</p>
-	) : null;
 };
 
 const ReplyingToMessagePreview = ({
@@ -81,15 +70,21 @@ const ReplyingToMessagePreview = ({
 const ChatMessageContainer = ({ chat, chatId }: ChatMessageContainerProps) => {
 	const lastMessageRef = useRef<any>(null);
 	const chatInputRef = useRef<any>(null);
-
+	const { user } = useAuthInfo();
 	const [replyTo, setReplyTo] = useState<MessageType | null>(null);
 
-	const onSendMessage = useCallback(() => {
-		if (lastMessageRef?.current) {
-			lastMessageRef?.current?.scrollToNewMessage();
-		}
-		setReplyTo(null);
-	}, []);
+	const onSendMessage = useCallback(
+		(message?: MessageType) => {
+			if (lastMessageRef?.current) {
+				lastMessageRef?.current?.scrollToNewMessage();
+			}
+			// this fixes the issue where you would reply to some message the selection gets reset on receiving a new message
+			if (message?.sender?._id === user?._id) {
+				setReplyTo(null);
+			}
+		},
+		[user?._id],
+	);
 
 	const onReplyTo = useCallback((message: MessageType | null) => {
 		setReplyTo(message);
@@ -122,8 +117,6 @@ const ChatMessageContainer = ({ chat, chatId }: ChatMessageContainerProps) => {
 					onReply={onReplyTo}
 				/>
 			</div>
-
-			<TypingIndicator chatId={chat?._id?.toString()} />
 
 			{replyTo && (
 				<ReplyingToMessagePreview message={replyTo} onClose={() => setReplyTo(null)} />

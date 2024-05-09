@@ -39,7 +39,7 @@ const useTypingStatus = (chatId: string = '') => {
 					if (remainingCount > 0)
 						msg = `${user1}, ${user2} and ${remainingCount} more are typing...`;
 					else {
-						msg = `${user1}, ${user2} are typing...`;
+						msg = `${user1} and ${user2} are typing...`;
 					}
 				}
 			}

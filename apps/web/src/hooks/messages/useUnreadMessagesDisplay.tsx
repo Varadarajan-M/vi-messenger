@@ -31,6 +31,12 @@ const useUnreadMessagesDisplay = (chatId: string) => {
 		};
 	}, [chatId, setChatUnReadMessageList, socket, unReadMessages, messages]);
 
+	useEffect(() => {
+		return () => {
+			setChatUnReadMessageList(chatId, []);
+		};
+	}, [chatId, setChatUnReadMessageList]);
+
 	return { msgDisplayRef, unReadMessages };
 };
 

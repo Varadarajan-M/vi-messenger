@@ -30,7 +30,7 @@ const ChatSearchSuggestions = ({
 	);
 
 	return (
-		<Card className='flex flex-col absolute top-full left-0 my-1 border-none shadow-xl w-max min-w-full max-w-80 rounded-lg bg-black outline-none max-h-[50vh] min-h-40 overflow-auto'>
+		<Card className='flex flex-col absolute top-full left-0 z-10 my-1 border-none shadow-xl w-max min-w-full max-w-80 rounded-lg bg-black outline-none max-h-[50vh] min-h-40 overflow-auto'>
 			<div className='p-5'>
 				<h5 className='text-gray-400 font-semibold text-sm mb-3'>Users</h5>
 				<ul className='flex flex-col gap-3'>

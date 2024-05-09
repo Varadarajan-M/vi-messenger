@@ -21,6 +21,7 @@ const useSendMessage = () => {
 			type: string,
 			content: Message['content'],
 			replyTo: Message | null = null,
+			cb?: (message?: Message) => void,
 		) => {
 			if (typeof content === 'string') {
 				content = content?.trim();
@@ -33,7 +34,7 @@ const useSendMessage = () => {
 				content,
 			};
 
-			addMessage({
+			const newMsg = {
 				_id: newMsgId,
 				chatId,
 				sender: {
@@ -49,7 +50,11 @@ const useSendMessage = () => {
 				createdAt: new Date().toString(),
 				updatedAt: new Date().toString(),
 				replyTo: replyTo || null,
-			});
+			};
+
+			addMessage(newMsg);
+
+			cb?.(newMsg);
 
 			const res = (await sendMessage(chatId, msg.type, msg.content, replyTo)) as {
 				message: Message;

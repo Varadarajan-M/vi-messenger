@@ -8,6 +8,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
+import useTypingStatus from '@/hooks/chat/useTypingStatus';
 import {
 	getChatAvatar,
 	getGroupChatOnlineUserCount,
@@ -87,14 +88,29 @@ const GroupInfoText = ({ members, online }: { members: number; online: number })
 	</p>
 );
 
+const TypingIndicator = ({ message }: { message: string }) => {
+	return (
+		<p className='-mt-1 ml-[2px] flex gap-1 items-center text-gray-300 text-opacity-90 text-sm w-full animate-pulse text-ellipsis ellipsis-1'>
+			<span className='rounded-full h-2 w-2 bg-yellow-200 min-h-2 min-w-2'></span>
+			<span>{message ?? 'typing...'}</span>
+		</p>
+	);
+};
+
 const ChatHeader = ({ chatId, setChat, onlineUsers, onBackNavigation }: ChatHeaderProps) => {
 	const { chat, loading } = useFetchSingleChat(chatId);
+	const { typingState, message } = useTypingStatus(chatId as string);
+
 	const { user } = useAuthInfo();
 	useEffect(() => {
 		setChat(chat);
 	}, [chat, setChat]);
 
 	const renderSecondaryText = () => {
+		if (typingState?.[chatId] && message) {
+			return <TypingIndicator message={chat?.admin ? message : 'typing...'} />;
+		}
+
 		if (chat?.admin) {
 			const members = chat?.members?.length;
 			const online = getGroupChatOnlineUserCount(onlineUsers, chat?.members as User[]);
