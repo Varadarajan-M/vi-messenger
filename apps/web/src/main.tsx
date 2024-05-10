@@ -13,4 +13,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 	</BrowserRouter>,
 );
 
-import.meta.env.PROD && registerSW();
+registerSW();

@@ -1,6 +1,8 @@
 const staticCacheName = 'chat-app-static-v2';
 const dynamicCacheName = 'chat-app-dynamic-v2';
 
+const offlineCacheName = 'chat-app-offline-v2';
+
 const localAssetsToCache = [
 	'https://upload-widget.cloudinary.com/global/all.js',
 	'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap',
@@ -12,15 +14,33 @@ const localAssetsToCache = [
 	'https://fonts.gstatic.com/s/archivo/v19/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLydOxI.woff2',
 ];
 
+const offlinAssetsToCache = [
+	'/',
+	'/u/login',
+	'/u/register',
+	'/app',
+	'/index.html',
+	'/assets/index-8sauPqNY.css',
+	'/assets/index-xRsAFY-3.js',
+	'/assets/manifest-n25BX2ko.json',
+];
+
 async function cacheAssets(cache) {
 	// console.log('caching static assets...');
 	await cache.addAll(localAssetsToCache);
 	// console.log('caching complete!');
 }
 
+async function cacheOfflineAssets(cache) {
+	// console.log('caching offline assets...');
+	await cache.addAll(offlinAssetsToCache);
+	// console.log('caching complete!');
+}
+
 self.addEventListener('install', (event) => {
 	// console.log('Service worker install event!');
 	event.waitUntil(caches.open(staticCacheName).then(cacheAssets));
+	event.waitUntil(caches.open(offlineCacheName).then(cacheOfflineAssets));
 	event.waitUntil(self.skipWaiting());
 });
 
@@ -32,7 +52,9 @@ self.addEventListener('activate', (event) => {
 				cacheNames
 					.filter(
 						(cacheName) =>
-							cacheName !== staticCacheName && cacheName !== dynamicCacheName,
+							cacheName !== staticCacheName &&
+							cacheName !== dynamicCacheName &&
+							cacheName !== offlineCacheName,
 					)
 					.map((cacheName) => caches.delete(cacheName)),
 			);
@@ -45,7 +67,6 @@ self.addEventListener('fetch', (event) => {
 	const resourcesToCache = [
 		'api.dicebear.com',
 		'res.cloudinary.com',
-		'.css',
 		'.jpg',
 		'.png',
 		'.jpeg',
@@ -58,6 +79,7 @@ self.addEventListener('fetch', (event) => {
 
 	if (
 		event.request.url.includes('/u/login') ||
+		event.request.url.includes('/u/register') ||
 		event.request.url.includes(appUrl) ||
 		event.request.url.includes(wsUrl) ||
 		event.request.url.includes('wss://')
