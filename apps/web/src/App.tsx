@@ -5,6 +5,7 @@ import ProtectedRoute from '@/components/auth/protected-route';
 import { Toaster } from './components/ui/toaster';
 
 import Notifier from './components/Notifier';
+import PWAInstall from './components/PWAInstall';
 import AppPage from './pages/app';
 import AuthPage from './pages/auth';
 
@@ -20,6 +21,7 @@ function App() {
 			</Routes>
 			<Notifier />
 			<Toaster />
+			<PWAInstall />
 		</Fragment>
 	);
 }
