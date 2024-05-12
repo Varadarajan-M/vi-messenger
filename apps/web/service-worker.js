@@ -1,7 +1,6 @@
-const staticCacheName = 'chat-app-static-v4';
-const dynamicCacheName = 'chat-app-dynamic-v4';
-
-const offlineCacheName = 'chat-app-offline-v4';
+const staticCacheName = 'chat-app-static-v5';
+const dynamicCacheName = 'chat-app-dynamic-v5';
+const offlineCacheName = 'chat-app-offline-v5';
 
 const localAssetsToCache = [
 	'https://upload-widget.cloudinary.com/global/all.js',
@@ -14,16 +13,7 @@ const localAssetsToCache = [
 	'https://fonts.gstatic.com/s/archivo/v19/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLydOxI.woff2',
 ];
 
-const offlinAssetsToCache = [
-	'/',
-	'/u/login',
-	'/u/register',
-	'/app',
-	'/index.html',
-	'/assets/index-1Tvhp0aA.css',
-	'/assets/index-A9sozLK1.js',
-	'/assets/manifest-myD7h9EG.json',
-];
+const offlinAssetsToCache = ['/', '/u/login', '/u/register', '/app', '/index.html'];
 
 async function cacheAssets(cache) {
 	// console.log('caching static assets...');
@@ -74,6 +64,9 @@ self.addEventListener('fetch', (event) => {
 		'.svg',
 		'.mp4',
 	];
+
+	const fileResourcesToCache = ['.js', '.css', '.json'];
+
 	const appUrl = `https://vi-messenger.onrender.com/api`;
 	const wsUrl = `https://vi-messenger.onrender.com/socket.io`;
 
@@ -92,8 +85,13 @@ self.addEventListener('fetch', (event) => {
 				cachedResponse ||
 				fetch(event.request)
 					.then(async (res) => {
-						const cache = await caches.open(dynamicCacheName);
 						if (resourcesToCache.some((r) => event.request.url.includes(r))) {
+							const cache = await caches.open(dynamicCacheName);
+							await cache.put(event.request, res.clone());
+						} else if (
+							fileResourcesToCache.some((r) => event.request.url.includes(r))
+						) {
+							const cache = await caches.open(offlineCacheName);
 							await cache.put(event.request, res.clone());
 						}
 						return res;
