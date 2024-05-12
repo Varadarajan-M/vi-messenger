@@ -1,7 +1,7 @@
-const staticCacheName = 'chat-app-static-v3';
-const dynamicCacheName = 'chat-app-dynamic-v3';
+const staticCacheName = 'chat-app-static-v4';
+const dynamicCacheName = 'chat-app-dynamic-v4';
 
-const offlineCacheName = 'chat-app-offline-v3';
+const offlineCacheName = 'chat-app-offline-v4';
 
 const localAssetsToCache = [
 	'https://upload-widget.cloudinary.com/global/all.js',
@@ -20,8 +20,8 @@ const offlinAssetsToCache = [
 	'/u/register',
 	'/app',
 	'/index.html',
-	'/assets/index-56xaNFhf.css',
-	'/assets/index-x2tJuMZb.js',
+	'/assets/index-1Tvhp0aA.css',
+	'/assets/index-A9sozLK1.js',
 	'/assets/manifest-myD7h9EG.json',
 ];
 

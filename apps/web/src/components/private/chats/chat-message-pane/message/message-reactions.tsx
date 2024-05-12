@@ -2,7 +2,7 @@ import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import { REACTIONS } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { Message, MessageReaction } from '@/types/message';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { EmojiIcon } from '../chat-input';
 
 const MessageReactions = ({
@@ -18,6 +18,13 @@ const MessageReactions = ({
 }) => {
 	const [open, setOpen] = useState(false);
 	const { user } = useAuthInfo();
+	const ref = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (open) {
+			ref.current?.focus();
+		}
+	}, [open]);
 
 	const classes = cn('relative', className);
 
@@ -32,13 +39,16 @@ const MessageReactions = ({
 	const renderReactionPicker = () => {
 		return (
 			<div
+				tabIndex={0}
 				className={cn(
-					'absolute md:translate-x-[-50%] max-w-[300px] md:max-w-[500px] top-full md:left-[50%] z-[10] overflow-x-auto flex gap-3 items-center p-3 rounded-3xl bg-black',
+					'absolute md:translate-x-[-50%] max-w-[300px] md:max-w-[500px] top-full md:left-[50%] z-[10] overflow-x-auto flex gap-3 items-center p-3 rounded-3xl focus:outline-none bg-black',
 					{
 						'left-[-65px] translate-x-0': sender === 'self',
 						'left-[-185px] translate-x-0': sender === 'other',
 					},
 				)}
+				ref={ref}
+				onBlur={() => setTimeout(() => setOpen(false), 200)}
 			>
 				{REACTIONS.map((emoji) => (
 					<span

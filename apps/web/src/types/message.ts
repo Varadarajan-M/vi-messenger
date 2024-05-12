@@ -7,6 +7,8 @@ export interface Message {
 				url: string;
 				download: string;
 				preview?: string;
+				fileName?: string;
+				fileSize?: string;
 				// eslint-disable-next-line no-mixed-spaces-and-tabs
 		  }
 		| string;
