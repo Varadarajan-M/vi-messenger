@@ -17,7 +17,7 @@ export const messageValidator = (req: Request, res: Response, next: NextFunction
 			isValid = content?.length > 0;
 		}
 
-		if (type === 'image' || type === 'video' || type === 'gif') {
+		if (type === 'image' || type === 'video' || type === 'gif' || type === 'file') {
 			isValid = content?.url?.length > 0;
 		}
 

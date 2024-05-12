@@ -13,13 +13,14 @@ import useMediaQuery from '@/hooks/common/useMediaQuery';
 import useSendMessage from '@/hooks/messages/useSendMessage';
 import {
 	ComponentPropsWithoutRef,
-	Fragment,
 	useCallback,
+	useEffect,
 	useImperativeHandle,
 	useRef,
 	useState,
 } from 'react';
 
+import { formatFileSize, isValidFileFormat } from '@/lib/utils';
 import { Message } from '@/types/message';
 import Picker, { EmojiClickData, EmojiStyle, Theme } from 'emoji-picker-react';
 import { MouseDownEvent } from 'emoji-picker-react/dist/config/config';
@@ -84,19 +85,24 @@ const AttachmentUpload = ({ chatId }: { chatId: string }) => {
 	const { onSendMessage } = useSendMessage();
 
 	const handleFileupload = async (res: any) => {
-		const type = res?.resource_type;
+		const format = res?.path.split('.')?.[1] ?? '';
+		const type = isValidFileFormat(format) ? 'file' : res?.resource_type;
+		const fileName = `${res?.original_filename}.${format}`;
+		const fileSize = formatFileSize(res?.bytes);
 		const url: string = res?.secure_url ?? '';
 		const downloadableUrl = url.replace('upload/', 'upload/fl_attachment/') ?? '';
 		const content = {
 			url,
 			download: downloadableUrl,
 			preview: res?.thumbnail_url ?? '',
+			fileName,
+			fileSize,
 		};
 		await onSendMessage(chatId, type, content);
 	};
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger
 				title='Upload'
 				className='focus:outline-none data-[state=open]:bg-dark-grey p-2 rounded-full'
@@ -109,12 +115,12 @@ const AttachmentUpload = ({ chatId }: { chatId: string }) => {
 			>
 				<Fileuploader onUploadSuccess={handleFileupload} onUploadError={console.log}>
 					{({ openWidget }) => (
-						<DropdownMenuItem onClick={openWidget}>
-							Upload Images/Videos
+						<DropdownMenuItem className='p-4 md:p-1' onClick={openWidget}>
+							Upload Files
 						</DropdownMenuItem>
 					)}
 				</Fileuploader>
-				<DropdownMenuItem>Upload GIFs</DropdownMenuItem>
+				<DropdownMenuItem className='p-4 md:p-1'>Upload GIFs</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
@@ -130,8 +136,22 @@ const EmojiPicker = ({
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
 	const isSmallScreen = useMediaQuery('( max-width: 400px )');
+	const emojiRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		function handleClickOutside(event: any) {
+			if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+				setOpen(false);
+			}
+		}
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [emojiRef, open, setOpen]);
+
 	return (
-		<Fragment>
+		<div className='relative flex items-center justify-center' ref={emojiRef}>
 			<EmojiIcon
 				className='h-6 w-10 self-center mr-2 relative z-10'
 				onClick={() => setOpen(!open)}
@@ -143,7 +163,7 @@ const EmojiPicker = ({
 					style={{
 						position: 'absolute',
 						right: 0,
-						bottom: '80%',
+						bottom: '100%',
 						background: 'black',
 						zIndex: 99999999,
 						width: isSmallScreen ? window.innerWidth - 50 : 300,
@@ -156,7 +176,7 @@ const EmojiPicker = ({
 					}}
 				/>
 			)}
-		</Fragment>
+		</div>
 	);
 };
 

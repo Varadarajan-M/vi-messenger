@@ -72,16 +72,20 @@ export const MessageOptionMenu = ({
 	};
 
 	return (
-		<DropdownMenu open={open} onOpenChange={handleDropdownMenu}>
-			<DropdownMenuTrigger className=' absolute top-2.5 right-0 focus-visible:outline-none h-max w-max self-center px-2 py-1.5 rounded-full data-[state=open]:bg-black data-[state=open]:bg-opacity-20 transition-all'>
+		<DropdownMenu open={open} onOpenChange={handleDropdownMenu} modal={false}>
+			<DropdownMenuTrigger className=' absolute top-2.5 right-0.5 focus-visible:outline-none h-max w-max self-center px-1.5 py-1.5 rounded-full data-[state=open]:bg-zinc-500 data-[state=open]:bg-opacity-40 transition-all'>
 				<MenuIcon className='h-4 w-4' />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				// sideOffset={}
-				className='mx-5 bg-gradient-dark text-white border-none'
+				className='mx-5 bg-gradient-dark text-white border-none '
 			>
 				<EditMessageDialog message={message} onEdit={onEdit} onClose={onDialogClose}>
-					<DropdownMenuItem disabled={!canEditMessage()} onClick={onDialogOpen}>
+					<DropdownMenuItem
+						className='p-4 md:p-1'
+						disabled={!canEditMessage()}
+						onClick={onDialogOpen}
+					>
 						{' '}
 						Edit
 					</DropdownMenuItem>
@@ -92,7 +96,11 @@ export const MessageOptionMenu = ({
 					onDelete={onDelete}
 					onClose={onDialogClose}
 				>
-					<DropdownMenuItem disabled={!canDeleteMessage()} onClick={onDialogOpen}>
+					<DropdownMenuItem
+						className='p-4 md:p-1'
+						disabled={!canDeleteMessage()}
+						onClick={onDialogOpen}
+					>
 						Delete
 					</DropdownMenuItem>
 				</DeleteMessageDialog>
@@ -125,7 +133,7 @@ const MessageReply = ({ message }: Pick<MessageProps, 'message'>) => {
 		<div
 			onClick={handleReplyClick}
 			className={cn(
-				'flex flex-col bg-dark-grey bg-opacity-30 items-start justify-center gap-0.3 mb-1 p-2 h-20 w-full  min-h-20 min-w-full rounded-lg border-l-8 shadow-lg overflow-hidden',
+				'flex flex-col cursor-pointer bg-dark-grey bg-opacity-30 items-start justify-center gap-0.3 mb-1 p-2 h-20 w-full  min-h-20 min-w-full rounded-lg border-l-8 shadow-lg overflow-hidden',
 				{
 					'border-l-cyan-700': messageSender === 'You',
 					'border-l-purple-600': messageSender !== 'You',

@@ -4,7 +4,7 @@ const messageSchema = new Schema(
 	{
 		type: {
 			type: String,
-			enum: ['text', 'image', 'gif', 'video'],
+			enum: ['text', 'image', 'gif', 'video', 'file'],
 			required: true,
 		},
 		content: {

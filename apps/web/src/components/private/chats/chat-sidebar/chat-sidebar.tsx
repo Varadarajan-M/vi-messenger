@@ -99,7 +99,7 @@ const UserProfileMenu = () => {
 						<ChatAvatar
 							img={
 								user?.picture ??
-								getTextAvatar(user?.username ?? user?.email ?? "") ??
+								getTextAvatar(user?.username ?? user?.email ?? '') ??
 								placeholderImg
 							}
 							variant='rounded'
@@ -109,8 +109,12 @@ const UserProfileMenu = () => {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className='bg-gradient-dark text-white border-purple-900'>
-					<DropdownMenuItem onClick={onProfileMenuClick}>Profile</DropdownMenuItem>
-					<DropdownMenuItem onClick={resetUser}>Logout</DropdownMenuItem>
+					<DropdownMenuItem className='p-4 md:p-1' onClick={onProfileMenuClick}>
+						Profile
+					</DropdownMenuItem>
+					<DropdownMenuItem className='p-4 md:p-1' onClick={resetUser}>
+						Logout
+					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 			<ProfileDrawer open={showProfile} setOpen={setShowProfile} />

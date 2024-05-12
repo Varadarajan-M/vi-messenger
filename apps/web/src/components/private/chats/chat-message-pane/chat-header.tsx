@@ -171,6 +171,7 @@ const ChatHeader = ({ chatId, setChat, onlineUsers, onBackNavigation }: ChatHead
 										}}
 										renderButton={({ onClick }) => (
 											<DropdownMenuItem
+												className='p-4 md:p-1'
 												onClick={() => {
 													setIsPopupOpen(true);
 													setIsMenuOpen(true);
