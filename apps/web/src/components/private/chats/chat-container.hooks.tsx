@@ -4,10 +4,11 @@ import useActiveChat from '@/hooks/chat/useActiveChat';
 import { Message } from '@/types/message';
 import { useChatsStore, useMessageStore } from '@/zustand/store';
 import { useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const inChatNotification =
 	'https://res.cloudinary.com/dsyrltebn/video/upload/v1714323570/dkbexwp7498pl4avxkpy.mp3';
-	
+
 const windowNotification =
 	'https://res.cloudinary.com/dsyrltebn/video/upload/v1714323571/ay2yeiivobanuqbnfkzg.wav';
 
@@ -16,24 +17,37 @@ let audioElement: HTMLAudioElement;
 export const useChatUpdate = () => {
 	const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
 	const addToUnreadMessageList = useMessageStore((state) => state.addToUnReadMessageList);
-
+	const chats = useChatsStore((state) => state.chats);
+	const [params, setParams] = useSearchParams();
 	const { chat } = useActiveChat();
 
 	useEffect(() => {
 		audioElement = new Audio();
 	}, []);
 
+	const checkAndUpdateChatFilter = useCallback(
+		(chatId: string) => {
+			const activeWindow = params.get('window') ?? 'all-chats';
+			const currentChatType = chats?.find((c) => c?._id === chatId)?.admin ? 'groups' : 'dms';
+			if (activeWindow !== currentChatType && activeWindow !== 'all-chats') {
+				params.set('window', 'all-chats');
+				setParams(params?.toString());
+			}
+		},
+		[chats, params, setParams],
+	);
+
 	const onChatUpdate = useCallback(
 		(message: Message) => {
 			findByIdAndUpdateChat(message?.chatId, { lastMessage: message });
-
+			checkAndUpdateChatFilter(message?.chatId);
 			if (chat !== message?.chatId) {
 				audioElement.src = windowNotification;
 				audioElement.play();
 				addToUnreadMessageList(message?.chatId, message?._id);
 			}
 		},
-		[addToUnreadMessageList, chat, findByIdAndUpdateChat],
+		[addToUnreadMessageList, chat, checkAndUpdateChatFilter, findByIdAndUpdateChat],
 	);
 
 	return onChatUpdate;

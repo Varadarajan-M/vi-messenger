@@ -3,12 +3,15 @@ import { useEffect } from 'react';
 import Loader from '@/components/ui/loader';
 import useActiveChat from '@/hooks/chat/useActiveChat';
 import useFetchChatsAndUnReadMsgs from '@/hooks/chat/useFetchChatsAndUnReadMsgs';
+import useFilteredChats from '@/hooks/chat/useFilteredChats';
 import { scrollToChat } from '@/lib/chat';
 import ChatPreview from './chat-preview';
 
 const ChatList = () => {
 	const { chat: chatId } = useActiveChat();
 	const { chats, chatLoading, unReadMessages } = useFetchChatsAndUnReadMsgs();
+
+	const filteredChats = useFilteredChats(chats);
 
 	useEffect(() => {
 		scrollToChat(chatId);
@@ -21,11 +24,11 @@ const ChatList = () => {
 					<Loader size='40px' />
 				</div>
 			)}
-			{chats?.length === 0 && !chatLoading && (
+			{filteredChats?.length === 0 && !chatLoading && (
 				<p className='text-gray-400 text-center my-auto'>No Chats</p>
 			)}
 			{!chatLoading &&
-				chats?.map((chat) => (
+				filteredChats?.map((chat) => (
 					<ChatPreview
 						key={chat?._id}
 						chat={chat as any}

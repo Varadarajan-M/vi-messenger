@@ -15,28 +15,29 @@ import ChatAvatar from '../chat-listing-pane/chat-avatar';
 import ProfileDrawer from './profile-drawer';
 
 import placeholderImg from '@/assets/placeholder.webp';
+import { MixerHorizontalIcon } from '@radix-ui/react-icons';
+
+const MENU_ITEMS = [
+	{
+		key: 'all-chats',
+		label: 'All Chats',
+		icon: '',
+	},
+	{
+		key: 'groups',
+		label: 'Groups',
+		icon: '',
+	},
+	{
+		key: 'dms',
+		label: 'DMs',
+		icon: '',
+	},
+];
 
 const SidebarMenu = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const window = searchParams.get('window') ?? 'all-chats';
-
-	const MENU_ITEMS = [
-		{
-			key: 'all-chats',
-			label: 'All Chats',
-			icon: '',
-		},
-		{
-			key: 'groups',
-			label: 'Groups',
-			icon: '',
-		},
-		{
-			key: 'dms',
-			label: 'DMs',
-			icon: '',
-		},
-	];
 
 	const isMenuActive = (key: string) => key === window;
 
@@ -52,7 +53,7 @@ const SidebarMenu = () => {
 	};
 
 	return (
-		<ul className='flex flex-col items-center justify-center gap-4'>
+		<ul className='flex flex-col items-center justify-center gap-4 mt-6'>
 			{MENU_ITEMS.map((item) => (
 				<li
 					className={`text-ellipsis text-center text-sm flex flex-col items-center hover:cursor-pointer after:block after:w-0 after:h-0.5 after:bg-gray-400 after:transition-[width] after:duration-200 after:ease-in ${
@@ -73,7 +74,7 @@ const SidebarMenu = () => {
 	);
 };
 
-const BrandName = () => <h3 className='font-extrabold text-white text-3xl mb-10'>VI</h3>;
+const BrandName = () => <h3 className='font-extrabold text-white text-3xl '>VI</h3>;
 
 const UserProfileMenu = () => {
 	const [showProfile, setShowProfile] = useState(false);
@@ -134,11 +135,55 @@ const ChatSidebar = () => {
 
 export default ChatSidebar;
 
+const MobileFilterChats = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const window = searchParams.get('window') ?? 'all-chats';
+	const [open, setOpen] = useState(false);
+	const isMenuActive = (key: string) => key === window;
+
+	const handleMenuItemClick = (key: string) => {
+		searchParams.set('window', key);
+		setSearchParams(searchParams.toString());
+	};
+	return (
+		<DropdownMenu onOpenChange={setOpen} open={open}>
+			<DropdownMenuTrigger asChild>
+				<MixerHorizontalIcon
+					className={cn(
+						'w-9 h-9 rounded-full cursor-pointer p-2.5 text-zinc-300 hover:bg-dark-grey',
+						{
+							'border-2 border-gray-800 bg-black': !open,
+							'bg-dark-grey border-2 border-gray-800': open,
+						},
+					)}
+				/>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent className='bg-gradient-dark text-white border-purple-900'>
+				{MENU_ITEMS.map((item) => (
+					<DropdownMenuItem
+						key={item.key}
+						onClick={() => handleMenuItemClick(item.key)}
+						className={cn('p-4 md:p-1', {
+							'text-gray-400': isMenuActive(item.key),
+							'text-white hover:text-gray-200': !isMenuActive(item.key),
+						})}
+					>
+						{item.label}
+					</DropdownMenuItem>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+};
+
 export const MobileSidebarContent = () => {
 	return (
-		<div className='flex items-center justify-between gap-4'>
+		<div className='flex items-center justify-between gap-4 mb-8'>
 			<BrandName />
-			<UserProfileMenu />
+			<div className='flex items-center '>
+				<MobileFilterChats />
+				<UserProfileMenu />
+			</div>
 		</div>
 	);
 };

@@ -29,6 +29,7 @@ For an in-depth technical analysis, check out the LinkedIn post [here](https://w
 - Message replies.
 - In addition to image/video sharing, added file sharing capabilities - Supported formats - `pdf`, `mp3`, `docx`, `xlsx`, `pptx`, `txt`, `zip`.
 - Media Previews in full screen.
+- Filter chats
 
 ## Key Features - v1
 
