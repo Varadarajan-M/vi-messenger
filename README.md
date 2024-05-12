@@ -24,7 +24,13 @@ For an in-depth technical analysis, check out the LinkedIn post [here](https://w
 5. Start the client with `npm run dev -w apps\web`.
 6. Access the application at [http://localhost:3000](http://localhost:3000).
 
-## Application Features
+## What's new?
+- Progressive Web Application(PWA) capabilites.
+- Message replies.
+- In addition to image/video sharing, added file sharing capabilities - Supported formats - `pdf`, `mp3`, `docx`, `xlsx`, `pptx`, `txt`, `zip`.
+- Media Previews in full screen.
+
+## Key Features - v1
 
 - Personal chats.
 - Group chat creation and management.
@@ -37,7 +43,6 @@ For an in-depth technical analysis, check out the LinkedIn post [here](https://w
 - In-chat and external notification sounds.
 - Paginated message history for seamless user experience.
 - Real-time message reactions and summaries.
-- Message Replies.
 - Message Seen status for personal and group chats.
 - User profile customization with high-quality profile pictures.
 - Ability to update account info and delete account on demand.
