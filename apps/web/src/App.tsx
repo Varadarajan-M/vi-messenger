@@ -4,6 +4,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from '@/components/auth/protected-route';
 import { Toaster } from './components/ui/toaster';
 
+import Notifier from './components/Notifier';
+import PWAInstall from './components/PWAInstall';
 import AppPage from './pages/app';
 import AuthPage from './pages/auth';
 
@@ -17,7 +19,9 @@ function App() {
 				</Route>
 				<Route path='*' element={<Navigate to='/u/login' replace />} />
 			</Routes>
-			<Toaster  />
+			<Notifier />
+			<Toaster />
+			<PWAInstall />
 		</Fragment>
 	);
 }

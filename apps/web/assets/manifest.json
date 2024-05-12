@@ -1,0 +1,56 @@
+{
+	"short_name": "VI Messenger",
+	"name": "VI Messenger",
+	"description": "Chat with your friends/family in real time using VI Messenger",
+	"icons": [
+		{
+			"src": "favicon.ico",
+			"sizes": "48x48",
+			"type": "image/x-icon"
+		},
+
+		{
+			"src": "logo192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "maskable_icon_x192.png",
+			"type": "image/png",
+			"sizes": "192x192",
+			"purpose": "maskable"
+		},
+		{
+			"src": "logo512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		},
+		{
+			"src": "maskable_icon_x512.png",
+			"type": "image/png",
+			"sizes": "512x512",
+			"purpose": "maskable"
+		}
+	],
+	"screenshots": [
+		{
+			"src": "screenshot.png",
+			"type": "image/png",
+			"sizes": "1920x1080",
+			"form_factor": "wide",
+			"label": "Screenshot"
+		},
+		{
+			"src": "screenshot_mobile.png",
+			"type": "image/png",
+			"sizes": "400x754",
+			"form_factor": "narrow",
+			"label": "Screenshot Mobile"
+		}
+	],
+	"orientation": "portrait",
+	"start_url": "../index.html",
+	"display": "standalone",
+	"theme_color": "#000000",
+	"background_color": "#000000"
+}
