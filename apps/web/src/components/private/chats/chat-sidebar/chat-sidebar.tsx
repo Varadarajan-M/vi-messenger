@@ -53,13 +53,13 @@ const SidebarMenu = () => {
 	};
 
 	return (
-		<ul className='flex flex-col items-center justify-center gap-4 mt-6'>
+		<ul className='flex flex-col items-center justify-center gap-4 mt-6 mb-6'>
 			{MENU_ITEMS.map((item) => (
 				<li
 					className={`text-ellipsis text-center text-sm flex flex-col items-center hover:cursor-pointer after:block after:w-0 after:h-0.5 after:bg-gray-400 after:transition-[width] after:duration-200 after:ease-in ${
 						isMenuActive(item.key)
-							? 'text-gray-400 after:w-full'
-							: 'text-white hover:text-gray-200'
+							? 'text-purple-400 after:w-full font-semibold'
+							: 'text-white hover:text-purple-400'
 					} focus-visible:outline-none focus-visible:font-semibold`}
 					data-menuid={item.key}
 					key={item.label}
@@ -123,11 +123,37 @@ const UserProfileMenu = () => {
 	);
 };
 
+const AIChatTrigger = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const handleClick = () => {
+		searchParams.set('window', 'ai-chat');
+		searchParams.set('chat', 'vim-ai');
+		setSearchParams(searchParams.toString());
+	};
+
+	const isAiChatActive =
+		searchParams.get('window') === 'ai-chat' && searchParams.get('chat') === 'vim-ai';
+	return (
+		<span
+			role='button'
+			onClick={handleClick}
+			className={`animate-pulse text-slate-300 font-semibold text-md mx-4 md:mx-0 text-center cursor-pointer hover:scale-105 transition-all after:block after:w-0 after:h-0.5 after:bg-gray-400 after:transition-[width] after:duration-200 after:ease-in ${
+				isAiChatActive
+					? 'text-purple-400 after:w-full animate-none font-bold'
+					: 'text-slate-300 hover:text-purple-400'
+			}`}
+		>
+			<span>AI ✨</span>
+		</span>
+	);
+};
+
 const ChatSidebar = () => {
 	return (
 		<aside className='hidden tablet:flex tablet:flex-col md:items-center h-100 bg-black p-5   min-w-24'>
 			<BrandName />
 			<SidebarMenu />
+			<AIChatTrigger />
 			<UserProfileMenu />
 		</aside>
 	);
@@ -150,7 +176,7 @@ const MobileFilterChats = () => {
 			<DropdownMenuTrigger asChild>
 				<MixerHorizontalIcon
 					className={cn(
-						'w-9 h-9 rounded-full cursor-pointer p-2.5 text-zinc-300 hover:bg-dark-grey',
+						'w-9 h-9 rounded-full cursor-pointer p-2.5 md:ml-3 text-zinc-300 hover:bg-dark-grey',
 						{
 							'border-2 border-gray-800 bg-black': !open,
 							'bg-dark-grey border-2 border-gray-800': open,
@@ -181,6 +207,7 @@ export const MobileSidebarContent = () => {
 		<div className='flex items-center justify-between gap-4 mb-8'>
 			<BrandName />
 			<div className='flex items-center '>
+				<AIChatTrigger />
 				<MobileFilterChats />
 				<UserProfileMenu />
 			</div>
