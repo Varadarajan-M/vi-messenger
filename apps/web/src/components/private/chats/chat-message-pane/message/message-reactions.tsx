@@ -44,7 +44,7 @@ const MessageReactions = ({
 					'absolute md:translate-x-[-50%] max-w-[300px] md:max-w-[500px] top-full md:left-[50%] z-[10] overflow-x-auto flex gap-3 items-center p-3 rounded-3xl focus:outline-none bg-black',
 					{
 						'left-[-65px] translate-x-0': sender === 'self',
-						'left-[-185px] translate-x-0': sender === 'other',
+						'left-[-150px] translate-x-0': sender === 'other',
 					},
 				)}
 				ref={ref}

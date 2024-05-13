@@ -41,7 +41,7 @@ const ReplyingToMessagePreview = ({
 
 	const messageSender = getMessageSenderText(message?.sender as any);
 	return (
-		<div className='absolute bottom-[110px] left-0 w-full z-[9999] bg-black'>
+		<div className='absolute bottom-[10px] left-0 w-full z-[9999] bg-black'>
 			<div
 				className={cn(
 					'flex flex-col z-[9999] relative bg-dark-grey bg-opacity-30 justify-center gap-0.3 mt-3 mx-4 p-2 h-20   min-h-20 rounded-lg border-l-8 shadow-lg overflow-hidden',
@@ -104,25 +104,34 @@ const ChatMessageContainer = ({ chat, chatId }: ChatMessageContainerProps) => {
 	}, [onSendMessage, socket]);
 
 	return (
-		<section className='flex-1 bg-gradient-dark w-full rounded-lg relative overflow-y-hidden overflow-x-hidden  pb-2'>
-			<div
-				className='p-4 max-h-[90%] h-[80%] overflow-y-auto'
-				id='scrollable-messages-container'
+		<>
+			<section
+				className={cn(
+					'flex-1 bg-gradient-dark w-full rounded-lg relative overflow-y-hidden overflow-x-hidden',
+					{
+						'pb-24': replyTo,
+						'pb-6': !replyTo,
+					},
+				)}
 			>
-				<Messages
-					key={chatId}
-					chat={chat}
-					chatId={chatId}
-					ref={lastMessageRef}
-					onReply={onReplyTo}
-				/>
-			</div>
+				<div
+					className='p-4 max-h-[98%] h-[98%] overflow-y-auto'
+					id='scrollable-messages-container'
+				>
+					<Messages
+						key={chatId}
+						chat={chat}
+						chatId={chatId}
+						ref={lastMessageRef}
+						onReply={onReplyTo}
+					/>
+				</div>
 
-			{replyTo && (
-				<ReplyingToMessagePreview message={replyTo} onClose={() => setReplyTo(null)} />
-			)}
-
-			<div className='sticky bottom-0 top-full p-3 w-full'>
+				{replyTo && (
+					<ReplyingToMessagePreview message={replyTo} onClose={() => setReplyTo(null)} />
+				)}
+			</section>
+			<div className='sticky bottom-0 top-full py-3 w-full'>
 				<ChatInput
 					chatId={chat?._id?.toString()}
 					onSendMessage={onSendMessage}
@@ -130,7 +139,7 @@ const ChatMessageContainer = ({ chat, chatId }: ChatMessageContainerProps) => {
 					messageInputRef={chatInputRef}
 				/>
 			</div>
-		</section>
+		</>
 	);
 };
 
@@ -179,7 +188,7 @@ const ScrollToBottom = ({ onClick }: { onClick: () => void }) => {
 		<div
 			title='Scroll to bottom'
 			onClick={onClick}
-			className='ml-auto absolute bottom-[120px] bg-black right-5 border-[2px] grid place-content-center rounded-full border-purple-900 hover:border-red-500 w-[42px] h-[42px] hover:scale-125 transition-all duration-300 text-white'
+			className='ml-auto absolute bottom-[20px] bg-black right-5 border-[2px] grid place-content-center rounded-full border-purple-900 hover:border-red-500 w-[42px] h-[42px] hover:scale-125 transition-all duration-300 text-white'
 		>
 			<ArrowDownIcon className='w-5 h-5' />
 		</div>
