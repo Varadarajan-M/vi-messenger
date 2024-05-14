@@ -2,6 +2,7 @@ import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import { Children } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import AiChatMessages from './ai-chat-messages';
 
 const ContainerLayout = ({ children }: { children: React.ReactNode }) => {
 	const [messages, input] = Children.toArray(children);
@@ -9,7 +10,7 @@ const ContainerLayout = ({ children }: { children: React.ReactNode }) => {
 		<>
 			<section className='flex-1 bg-gradient-dark w-full rounded-lg relative overflow-y-hidden overflow-x-hidden  pb-2'>
 				<div
-					className='p-4 max-h-[90%] h-[80%] overflow-y-auto'
+					className='p-4 max-h-[98%] h-[98%] overflow-y-auto'
 					id='scrollable-messages-container'
 				>
 					{messages}
@@ -23,7 +24,7 @@ const ContainerLayout = ({ children }: { children: React.ReactNode }) => {
 const AIMessageContainer = () => {
 	return (
 		<ContainerLayout>
-			<p className='text-white text-center'>conversation messages</p>
+			<AiChatMessages />
 			<AIMessageInput />
 		</ContainerLayout>
 	);
