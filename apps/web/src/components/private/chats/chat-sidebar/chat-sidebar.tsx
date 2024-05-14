@@ -137,10 +137,10 @@ const AIChatTrigger = () => {
 		<span
 			role='button'
 			onClick={handleClick}
-			className={`animate-pulse text-slate-300 font-semibold text-md mx-4 md:mx-0 text-center cursor-pointer hover:scale-105 transition-all after:block after:w-0 after:h-0.5 after:bg-gray-400 after:transition-[width] after:duration-200 after:ease-in ${
+			className={`font-semibold text-md mx-4 md:mx-0 text-center cursor-pointer hover:scale-105 transition-all after:block after:w-0 after:h-0.5 after:bg-gray-400 after:transition-[width] after:duration-200 after:ease-in ${
 				isAiChatActive
 					? 'text-purple-400 after:w-full animate-none font-bold'
-					: 'text-slate-300 hover:text-purple-400'
+					: 'text-slate-300 hover:text-purple-400 animate-pulse'
 			}`}
 		>
 			<span>AI ✨</span>

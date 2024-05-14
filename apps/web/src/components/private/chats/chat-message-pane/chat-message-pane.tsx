@@ -11,7 +11,7 @@ import { useOnlineUsers } from '@/zustand/store';
 import ChatEmptyPane from './chat-empty-pane';
 import ChatHeader from './chat-header';
 import ChatMessageContainer from './chat-message-container';
-import AIMessageContainer from '@/components/ai-chat/ai-message-container';
+import AIMessageContainer from '@/components/ai-chat/ai-chat-container';
 
 const ChatMessagePane = () => {
 	const isOnline = useOnlineStatus();
