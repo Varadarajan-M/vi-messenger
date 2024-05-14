@@ -1,5 +1,10 @@
 import mongoose, { InferSchemaType, model } from 'mongoose';
 
+export enum Roles {
+	USER = 'user',
+	VIM_AI = 'vim-ai',
+}
+
 const userSchema = new mongoose.Schema(
 	{
 		username: {
@@ -22,6 +27,11 @@ const userSchema = new mongoose.Schema(
 		},
 		lastSeen: {
 			type: String,
+		},
+		role: {
+			type: String,
+			enum: Roles,
+			default: Roles.USER,
 		},
 	},
 	{
