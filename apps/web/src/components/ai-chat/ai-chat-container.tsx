@@ -1,6 +1,5 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useSendMessage from '@/hooks/messages/useSendMessage';
-import { convertToMarkdown } from '@/lib/dom';
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import { Children, useRef } from 'react';
 import { Button } from '../ui/button';
@@ -42,12 +41,8 @@ const AIMessageInput = () => {
 			const value = inputRef.current?.value;
 			inputRef.current.value = '';
 
-			const markdown = convertToMarkdown(value);
-
-			console.log(markdown);
-
 			inputRef.current.focus();
-			await onSendMessage(user?.ai as string, 'text', markdown);
+			await onSendMessage(user?.ai as string, 'text', value);
 		}
 	};
 

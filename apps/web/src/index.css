@@ -163,3 +163,7 @@ html,
 	border-radius: 0.3rem;
 	margin-block: 1rem;
 }
+
+pre {
+	@apply whitespace-pre-line md:whitespace-pre-wrap;
+}

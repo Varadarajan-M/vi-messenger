@@ -1,8 +1,9 @@
 import { getTimeFromDate } from '@/lib/datetime';
 import { cn } from '@/lib/utils';
 import { Message } from '@/types/message';
-import MarkdownRenderer from './markdown-renderer';
+import { CheckIcon, CopyIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
+import MarkdownRenderer from './markdown-renderer';
 
 const AIChatMessage = ({ sender, message }: { sender: string; message: Message }) => {
 	const [text, setText] = useState('Copy');
@@ -41,10 +42,15 @@ const AIChatMessage = ({ sender, message }: { sender: string; message: Message }
 					{sender === 'user' ? 'You🤹🏻' : 'VIM AI✨'}
 				</span>
 				<span
-					className='text-white text-xs hover:text-lime-300 py-1.5 px-4 bg-gray-900 cursor-pointer rounded-md -mt-1'
+					className='text-white flex items-center gap-1 text-xs hover:text-lime-300 py-1.5 px-4 bg-gray-900 cursor-pointer rounded-md -mt-1'
 					onClick={onCopy}
 				>
-					{text}
+					<span>{text}</span>
+					{text === 'Copy' ? (
+						<CopyIcon className='w-3 h-3' />
+					) : (
+						<CheckIcon className='w-4 h-4' />
+					)}
 				</span>
 			</div>
 
