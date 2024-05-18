@@ -25,9 +25,7 @@ const userSchema = new mongoose.Schema(
 		picture: {
 			type: String,
 		},
-		lastSeen: {
-			type: String,
-		},
+
 		role: {
 			type: String,
 			enum: Roles,

@@ -1,5 +1,8 @@
+import useAuthInfo from '@/hooks/auth/useAuthInfo';
+import useSendMessage from '@/hooks/messages/useSendMessage';
+import { convertToMarkdown } from '@/lib/dom';
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
-import { Children } from 'react';
+import { Children, useRef } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import AiChatMessages from './ai-chat-messages';
@@ -31,6 +34,29 @@ const AIMessageContainer = () => {
 };
 
 const AIMessageInput = () => {
+	const inputRef = useRef<HTMLInputElement>(null);
+	const { onSendMessage } = useSendMessage();
+	const { user } = useAuthInfo();
+	const handleClick = async () => {
+		if (inputRef.current?.value?.trim()?.length) {
+			const value = inputRef.current?.value;
+			inputRef.current.value = '';
+
+			const markdown = convertToMarkdown(value);
+
+			console.log(markdown);
+
+			inputRef.current.focus();
+			await onSendMessage(user?.ai as string, 'text', markdown);
+		}
+	};
+
+	const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			handleClick();
+		}
+	};
 	return (
 		<div className='flex gap-2 h-20 items-stretch mb-3 '>
 			<div
@@ -41,6 +67,8 @@ const AIMessageInput = () => {
 				className='basis-[95%] flex py-1 pl-4 bg-dark-grey bg-opacity-70  gap-2 relative transition-colors duration-500 rounded-xl shadow-md border border-transparent focus-visible:border-purple-900 focus-visible:outline-none focus-within:border-purple-900'
 			>
 				<Input
+					ref={inputRef}
+					onKeyDown={handleKeydown}
 					placeholder='Type a message...'
 					aria-label='Type a message'
 					aria-required='true'
@@ -49,6 +77,7 @@ const AIMessageInput = () => {
 			</div>
 			<Button
 				type='submit'
+				onClick={handleClick}
 				title='Send Message'
 				aria-label='Send Message'
 				role='button'

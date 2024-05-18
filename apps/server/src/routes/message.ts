@@ -1,6 +1,7 @@
 import express from 'express';
 
 import {
+	chatWithAIController,
 	createMessageController,
 	deleteMessageController,
 	getChatMessagesController,
@@ -17,6 +18,8 @@ router
 	.route('/:id')
 	.get(authorize, checkMembership, getChatMessagesController)
 	.post(authorize, checkMembership, createMessageController);
+
+router.route('/:id/ai').post(authorize, checkMembership, chatWithAIController);
 
 router
 	.route('/:id/:mid')

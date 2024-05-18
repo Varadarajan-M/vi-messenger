@@ -30,6 +30,19 @@ export const sendMessage = async (
 	}
 };
 
+export const sendMessageToAI = async (chatId: string, type: string, content: string) => {
+	const res = await api.post(
+		`/message/${chatId}/ai`,
+		{
+			type,
+			content,
+		},
+		{ responseType: 'stream' },
+	);
+	console.log('response', res);
+	return res;
+};
+
 export const editMessage = async (messageId: string, chatId: string, message: string) => {
 	try {
 		const res = await api.patch(`/message/${chatId}/${messageId}`, { message });

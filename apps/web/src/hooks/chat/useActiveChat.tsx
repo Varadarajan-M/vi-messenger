@@ -1,14 +1,15 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import useAuthInfo from '../auth/useAuthInfo';
 import useActiveWindow from './useActiveWindow';
 
 const useActiveChat = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const chat = searchParams.get('chat') ?? '';
-
+	const { user } = useAuthInfo();
 	const { activeWindow } = useActiveWindow();
 
-	const isAiChatActive = activeWindow === 'ai-chat';
+	const isAiChatActive = activeWindow === 'ai-chat' && user?.ai === chat;
 
 	const setChat = useCallback(
 		(value: string) => {

@@ -10,4 +10,5 @@ export interface User {
 	email: string;
 	picture: string;
 	token: string;
+	ai?: string;
 }

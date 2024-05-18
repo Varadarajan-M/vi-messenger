@@ -125,14 +125,19 @@ const UserProfileMenu = () => {
 
 const AIChatTrigger = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { user } = useAuthInfo();
+
+	if (!user?.ai) return null;
+
+	const isAiChatActive =
+		searchParams.get('window') === 'ai-chat' && searchParams.get('chat') === user?.ai;
+
 	const handleClick = () => {
 		searchParams.set('window', 'ai-chat');
-		searchParams.set('chat', 'vim-ai');
+		searchParams.set('chat', user?.ai?.toString()?.trim() ?? '');
 		setSearchParams(searchParams.toString());
 	};
 
-	const isAiChatActive =
-		searchParams.get('window') === 'ai-chat' && searchParams.get('chat') === 'vim-ai';
 	return (
 		<span
 			role='button'

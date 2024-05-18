@@ -1,4 +1,4 @@
-import { sendMessage } from '@/api/message';
+import { sendMessageToAI } from '@/api/message';
 import { useSocket } from '@/contexts/SocketContext';
 import { Message } from '@/types/message';
 import { useChatsStore, useMessageStore } from '@/zustand/store';
@@ -20,9 +20,7 @@ const useSendMessage = () => {
 			chatId: string,
 			type: string,
 			content: Message['content'],
-			replyTo: Message | null = null,
 			cb?: (message?: Message) => void,
-			isAIChat: boolean = false,
 		) => {
 			if (typeof content === 'string') {
 				content = content?.trim();
@@ -50,42 +48,25 @@ const useSendMessage = () => {
 				content: msg.content,
 				createdAt: new Date().toString(),
 				updatedAt: new Date().toString(),
-				replyTo: replyTo || null,
 			};
 
 			addMessage(newMsg);
 
 			cb?.(newMsg);
 
-			
-			const res = (await sendMessage(chatId, msg.type, msg.content, replyTo)) as {
+			const res = (await sendMessageToAI(chatId, msg.type, msg.content)) as {
 				message: Message;
 			};
 
-			if (res?.message) {
-				findByIdAndUpdate(newMsgId, res.message);
+			// if (res?.message) {
+			// 	findByIdAndUpdate(newMsgId, res.message);
 
-				// TODO remove this step for ai chat
-				findByIdAndUpdateChat(chatId, { lastMessage: res.message });
-
-				socket?.emit('new_message', {
-					roomId: chatId,
-					message: res.message,
-				});
-			} else {
-				findByIdAndRemove(newMsgId);
-			}
+			// 	// TODO remove this step for ai chat
+			// } else {
+			// 	findByIdAndRemove(newMsgId);
+			// }
 		},
-		[
-			addMessage,
-			findByIdAndRemove,
-			findByIdAndUpdate,
-			findByIdAndUpdateChat,
-			socket,
-			user?._id,
-			user?.email,
-			user?.username,
-		],
+		[addMessage, user?._id, user?.email, user?.username],
 	);
 
 	return { onSendMessage };

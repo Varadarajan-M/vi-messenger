@@ -147,7 +147,7 @@ type MessagesProps = ChatMessageContainerProps & {
 	onReply: (replyTo: MessageType | null) => void;
 };
 
-const ChatDateSeparator = ({ date }: { date: string }) => {
+export const ChatDateSeparator = ({ date }: { date: string }) => {
 	return (
 		<span className='rounded-3xl mx-auto justify-self-center dark-b text-gray-300 w-[max-content] underline font-medium px-4 py-2'>
 			{date}
@@ -155,7 +155,7 @@ const ChatDateSeparator = ({ date }: { date: string }) => {
 	);
 };
 
-const ShowPreviousMessages = ({ onClick }: { onClick: () => void }) => {
+export const ShowPreviousMessages = ({ onClick }: { onClick: () => void }) => {
 	return (
 		<Button
 			onClick={onClick}
@@ -167,7 +167,7 @@ const ShowPreviousMessages = ({ onClick }: { onClick: () => void }) => {
 	);
 };
 
-const PreviousMessageLoader = () => {
+export const PreviousMessageLoader = () => {
 	return (
 		<div className='w-full flex items-center justify-center animate-pulse text-white font-medium'>
 			Loading previous messages...
@@ -175,15 +175,15 @@ const PreviousMessageLoader = () => {
 	);
 };
 
-const InitialMessageLoader = () => {
+export const InitialMessageLoader = () => {
 	return (
-		<div className='w-full flex items-center justify-center animate-pulse text-white font-medium'>
+		<div className='w-full h-full flex items-center justify-center animate-pulse text-white font-medium'>
 			Loading chat messages ...
 		</div>
 	);
 };
 
-const ScrollToBottom = ({ onClick }: { onClick: () => void }) => {
+export const ScrollToBottom = ({ onClick }: { onClick: () => void }) => {
 	return (
 		<div
 			title='Scroll to bottom'
@@ -191,6 +191,17 @@ const ScrollToBottom = ({ onClick }: { onClick: () => void }) => {
 			className='ml-auto absolute bottom-[20px] bg-black right-5 border-[2px] grid place-content-center rounded-full border-purple-900 hover:border-red-500 w-[42px] h-[42px] hover:scale-125 transition-all duration-300 text-white'
 		>
 			<ArrowDownIcon className='w-5 h-5' />
+		</div>
+	);
+};
+
+export const EmptyMessagePanel = () => {
+	return (
+		<div className='flex flex-col items-center justify-center m-0 p-4 h-full'>
+			<h3 className='font-extrabold text-white text-2xl'>No messages yet.</h3>
+			<p className='text-center text-gray-400 font-medium -mt-2 p-4'>
+				Maybe start a new conversation?
+			</p>
 		</div>
 	);
 };
@@ -264,6 +275,7 @@ const Messages = forwardRef(({ chat, chatId, onReply }: MessagesProps, ref: any)
 				<ShowPreviousMessages onClick={handleShowPreviousMessages} />
 			)}
 			{loading && messages.length > 0 && <PreviousMessageLoader />}
+			{!loading && messages.length === 0 && <EmptyMessagePanel />}
 			{messages?.map((message, index) => (
 				<Fragment key={message._id}>
 					{unReadMessages?.[0] === message?._id && (
@@ -291,8 +303,7 @@ const Messages = forwardRef(({ chat, chatId, onReply }: MessagesProps, ref: any)
 					/>
 				</Fragment>
 			))}
-			{<ScrollToBottom onClick={scrollToNewMessage} />}
-
+			{!loading && messages.length > 0 && <ScrollToBottom onClick={scrollToNewMessage} />}
 			{!loading && <div ref={lastMessageRef} />}
 		</div>
 	);

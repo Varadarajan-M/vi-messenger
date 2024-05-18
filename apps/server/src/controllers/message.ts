@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { getChatCompletion } from '../lib/openai';
 import Message from '../models/message';
 import { RequestWithChat } from '../types';
 import { messagePopulationFields } from '../utils/message';
@@ -90,6 +91,85 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 				: error?.message || 'Failed to get messages';
 
 		res.json({ ok: false, error: msg });
+	}
+};
+
+export const chatWithAIController = async (req: RequestWithChat, res: Response) => {
+	try {
+		if (!req?.chat) {
+			res.status(403);
+			throw new Error('Chat not found');
+		}
+
+		const { content } = req?.body;
+
+		if (!content) {
+			res.status(422);
+			throw new Error('Content is required');
+		}
+
+		const newMessage = await new Message({
+			type: 'text',
+			content,
+			chatId: req?.chat?._id,
+			sender: req?.user?._id,
+		}).save();
+
+		res.setHeader('Content-Type', 'text/event-stream');
+		res.setHeader('Cache-Control', 'no-cache');
+		res.setHeader('Connection', 'keep-alive');
+
+		if (!newMessage?._id) {
+			res.status(400);
+			throw new Error('Failed to create message');
+		}
+
+		const stream = await getChatCompletion(content);
+
+		// send initial message
+		res.write(
+			`data: ${JSON.stringify({ ok: true, type: 'user_message', message: newMessage })}\n\n`,
+		);
+
+		let chunks = '';
+
+		for await (const chunk of stream) {
+			let chunkContent = chunk.choices[0]?.delta?.content || '';
+			chunks += chunkContent;
+
+			// Send each chunk of the AI response
+			res.write(
+				`data: ${JSON.stringify({ type: 'ai_message_chunk', content: chunkContent })}\n\n`,
+			);
+		}
+
+		const aiChat = req?.chat;
+
+		const vimAiId = aiChat?.members.find(
+			(member) => member.toString() !== req?.user?._id.toString(),
+		);
+
+		const aiMessage = await new Message({
+			type: 'text',
+			content: chunks,
+			chatId: req?.chat?._id,
+			sender: vimAiId,
+			replyTo: newMessage._id,
+		}).save();
+
+		// Send the final AI message
+
+		res.write(`data: ${JSON.stringify({ type: 'ai_message', message: aiMessage })}\n\n`);
+		res.end();
+	} catch (error: any) {
+		if (!res.statusCode) res.status(500);
+		const msg =
+			res?.statusCode === 500
+				? 'Internal server error'
+				: error?.message || 'Failed to create chat completions';
+
+		res.write(`data: ${JSON.stringify({ ok: false, error: msg })}\n\n`);
+		res.end();
 	}
 };
 

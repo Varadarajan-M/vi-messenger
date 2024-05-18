@@ -1,6 +1,7 @@
-import { Fragment, useState } from 'react';
 import OfflineIndicator from '@/components/OfflineIndicator';
+import AIMessageContainer from '@/components/ai-chat/ai-chat-container';
 import AIChatHeader from '@/components/ai-chat/ai-chat-header';
+import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useActiveChat from '@/hooks/chat/useActiveChat';
 import useActiveWindow from '@/hooks/chat/useActiveWindow';
 import useMediaQuery from '@/hooks/common/useMediaQuery';
@@ -8,10 +9,10 @@ import useOnlineStatus from '@/hooks/common/useOnlineStatus';
 import { cn } from '@/lib/utils';
 import { Chat } from '@/types/chat';
 import { useOnlineUsers } from '@/zustand/store';
+import { Fragment, useState } from 'react';
 import ChatEmptyPane from './chat-empty-pane';
 import ChatHeader from './chat-header';
 import ChatMessageContainer from './chat-message-container';
-import AIMessageContainer from '@/components/ai-chat/ai-chat-container';
 
 const ChatMessagePane = () => {
 	const isOnline = useOnlineStatus();
@@ -19,10 +20,10 @@ const ChatMessagePane = () => {
 	const [chat, setChat] = useState<Chat>({} as Chat);
 	const onlineUsers = useOnlineUsers((state) => state.onlineUsers);
 	const isSmallScreen = useMediaQuery('( max-width: 900px )');
-
+	const { user } = useAuthInfo();
 	const { activeWindow } = useActiveWindow();
 
-	const isAiChat = activeWindow === 'ai-chat';
+	const isAiChat = activeWindow === 'ai-chat' || user?.ai === chatId;
 
 	const classNames = cn('h-full flex-1 bg-black flex flex-col', {
 		hidden: isSmallScreen && !chatId,

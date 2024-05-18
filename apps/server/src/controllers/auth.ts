@@ -4,6 +4,7 @@ import { sign } from 'jsonwebtoken';
 
 import User, { Roles } from '../models/user';
 
+import { findOrCreateAIChatForUser } from '../utils/chat';
 import logger from '../utils/logger';
 
 export const registerController = async (req: Request, res: Response) => {
@@ -66,6 +67,8 @@ export const loginController = async (req: Request, res: Response) => {
 			throw new Error('Invalid credentials');
 		}
 
+		const chatWithAi = await findOrCreateAIChatForUser(matchingUser?._id?.toString());
+
 		const token = sign(
 			{
 				_id: matchingUser?._id,
@@ -88,6 +91,7 @@ export const loginController = async (req: Request, res: Response) => {
 				picture: matchingUser?.picture,
 				token,
 				role: Roles.USER,
+				ai: (chatWithAi && chatWithAi?._id) || null,
 			},
 		});
 	} catch (error: any) {
