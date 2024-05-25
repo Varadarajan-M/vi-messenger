@@ -1,7 +1,9 @@
 import { Response } from 'express';
-import { getChatCompletion } from '../lib/openai';
+import { ChatCompletionMessage } from 'groq-sdk/resources/chat/completions';
+import { getChatCompletion } from '../lib/groq';
 import Message from '../models/message';
 import { RequestWithChat } from '../types';
+import Logger from '../utils/logger';
 import { messagePopulationFields } from '../utils/message';
 
 export const getChatMessagesController = async (req: RequestWithChat, res: Response) => {
@@ -95,6 +97,9 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 };
 
 export const chatWithAIController = async (req: RequestWithChat, res: Response) => {
+	res.setHeader('Content-Type', 'text/event-stream');
+	res.setHeader('Connection', 'keep-alive');
+
 	try {
 		if (!req?.chat) {
 			res.status(403);
@@ -115,16 +120,24 @@ export const chatWithAIController = async (req: RequestWithChat, res: Response) 
 			sender: req?.user?._id,
 		}).save();
 
-		res.setHeader('Content-Type', 'text/event-stream');
-		res.setHeader('Cache-Control', 'no-cache');
-		res.setHeader('Connection', 'keep-alive');
-
 		if (!newMessage?._id) {
 			res.status(400);
 			throw new Error('Failed to create message');
 		}
 
-		const stream = await getChatCompletion(content);
+		const conversation = await Message.find({
+			chatId: req?.chat?._id,
+		})?.lean();
+
+		const chatHistory = conversation?.map((message) => ({
+			role: message?.sender?.toString() === req?.user?._id.toString() ? 'user' : 'assistant',
+			content:
+				typeof message?.content === 'object'
+					? JSON.stringify(message?.content)
+					: message?.content,
+		})) as ChatCompletionMessage[];
+
+		const stream = await getChatCompletion(chatHistory);
 
 		// send initial message
 		res.write(
@@ -132,10 +145,13 @@ export const chatWithAIController = async (req: RequestWithChat, res: Response) 
 		);
 
 		let chunks = '';
+		let totalTokenUsage = 0;
 
 		for await (const chunk of stream) {
 			let chunkContent = chunk.choices[0]?.delta?.content || '';
 			chunks += chunkContent;
+
+			totalTokenUsage = chunk?.x_groq?.usage?.total_tokens || 0;
 
 			// Send each chunk of the AI response
 			res.write(
@@ -158,8 +174,12 @@ export const chatWithAIController = async (req: RequestWithChat, res: Response) 
 		}).save();
 
 		// Send the final AI message
-
 		res.write(`data: ${JSON.stringify({ type: 'ai_message', message: aiMessage })}\n\n`);
+
+		Logger.info(
+			`Chat with VIM AI! User:- ${req?.user?.username}, Total token usage:- ${totalTokenUsage}`,
+		);
+
 		res.end();
 	} catch (error: any) {
 		if (!res.statusCode) res.status(500);
