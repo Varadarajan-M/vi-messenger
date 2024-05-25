@@ -1,15 +1,24 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useActiveChat from '@/hooks/chat/useActiveChat';
+import useDebouncedValue from '@/hooks/common/useDebounceValue';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
-import { useCallback, useState } from 'react';
+import {
+	forwardRef,
+	memo,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from 'react';
 import {
 	EmptyMessagePanel,
 	InitialMessageLoader,
 	ShowPreviousMessages,
 } from '../private/chats/chat-message-pane/chat-message-container';
-import AIChatMessage from './ai-chat-message';
+import AIChatMessage, { StreamedMessage } from './ai-chat-message';
 
-const AiChatMessages = () => {
+const MessagesSection = memo(() => {
 	const { chat: chatId } = useActiveChat();
 	const { user } = useAuthInfo();
 	const [page, setPage] = useState(1);
@@ -29,7 +38,7 @@ const AiChatMessages = () => {
 	}, [skip, totalCount]);
 
 	return (
-		<div className='flex flex-col gap-8 h-full py-16'>
+		<>
 			{canShowPreviousMessages && (
 				<ShowPreviousMessages onClick={handleShowPreviousMessages} />
 			)}
@@ -37,13 +46,41 @@ const AiChatMessages = () => {
 			{!loading && messages.length === 0 && <EmptyMessagePanel />}
 			{messages?.map((message) => (
 				<AIChatMessage
-					key={message._id}
+					key={message?._id}
 					message={message}
 					sender={getSender(message?.sender?._id)}
 				/>
 			))}
-		</div>
+		</>
 	);
-};
+});
+
+const AiChatMessages = forwardRef(
+	({ streamingMessage }: { streamingMessage: string | null }, ref) => {
+		const lastMessageRef = useRef<HTMLDivElement>(null);
+
+		const debouncedStream = useDebouncedValue(streamingMessage?.toString() || '', 100);
+
+		useEffect(() => {
+			if (debouncedStream !== null) {
+				console.log('scrolling');
+				lastMessageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		}, [debouncedStream]);
+
+		useImperativeHandle(ref, () => ({
+			scrollIntoView: () => {
+				lastMessageRef?.current?.scrollIntoView({ behavior: 'instant' });
+			},
+		}));
+		return (
+			<div className='flex flex-col gap-8 h-full py-16'>
+				<MessagesSection />
+				{streamingMessage !== null && <StreamedMessage message={streamingMessage} />}
+				<div ref={lastMessageRef} className=' min-h-2 min-w-full' />
+			</div>
+		);
+	},
+);
 
 export default AiChatMessages;

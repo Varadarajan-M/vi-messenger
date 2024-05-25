@@ -99,6 +99,7 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 export const chatWithAIController = async (req: RequestWithChat, res: Response) => {
 	res.setHeader('Content-Type', 'text/event-stream');
 	res.setHeader('Connection', 'keep-alive');
+	res.setHeader('Cache-Control', 'no-cache');
 
 	try {
 		if (!req?.chat) {
@@ -113,12 +114,14 @@ export const chatWithAIController = async (req: RequestWithChat, res: Response) 
 			throw new Error('Content is required');
 		}
 
-		const newMessage = await new Message({
-			type: 'text',
-			content,
-			chatId: req?.chat?._id,
-			sender: req?.user?._id,
-		}).save();
+		const newMessage = await (
+			await new Message({
+				type: 'text',
+				content,
+				chatId: req?.chat?._id,
+				sender: req?.user?._id,
+			}).save()
+		).populate('sender', '-password');
 
 		if (!newMessage?._id) {
 			res.status(400);
@@ -141,8 +144,10 @@ export const chatWithAIController = async (req: RequestWithChat, res: Response) 
 
 		// send initial message
 		res.write(
-			`data: ${JSON.stringify({ ok: true, type: 'user_message', message: newMessage })}\n\n`,
+			`data: ${JSON.stringify({ ok: true, type: 'user_message', data: newMessage })}\n\n`,
 		);
+
+		res.flush();
 
 		let chunks = '';
 		let totalTokenUsage = 0;
@@ -154,9 +159,17 @@ export const chatWithAIController = async (req: RequestWithChat, res: Response) 
 			totalTokenUsage = chunk?.x_groq?.usage?.total_tokens || 0;
 
 			// Send each chunk of the AI response
+
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
 			res.write(
-				`data: ${JSON.stringify({ type: 'ai_message_chunk', content: chunkContent })}\n\n`,
+				`data: ${JSON.stringify({
+					ok: true,
+					type: 'ai_message_chunk',
+					data: chunkContent,
+				})}\n\n`,
 			);
+			res.flush();
 		}
 
 		const aiChat = req?.chat;
@@ -165,22 +178,26 @@ export const chatWithAIController = async (req: RequestWithChat, res: Response) 
 			(member) => member.toString() !== req?.user?._id.toString(),
 		);
 
-		const aiMessage = await new Message({
-			type: 'text',
-			content: chunks,
-			chatId: req?.chat?._id,
-			sender: vimAiId,
-			replyTo: newMessage._id,
-		}).save();
+		const aiMessage = await (
+			await new Message({
+				type: 'text',
+				content: chunks,
+				chatId: req?.chat?._id,
+				sender: vimAiId,
+				replyTo: newMessage._id,
+			}).save()
+		).populate('sender', '-password');
 
 		// Send the final AI message
-		res.write(`data: ${JSON.stringify({ type: 'ai_message', message: aiMessage })}\n\n`);
+		res.write(`data: ${JSON.stringify({ ok: true, type: 'ai_message', data: aiMessage })}\n\n`);
+
+		res.flush();
+
+		res.end();
 
 		Logger.info(
 			`Chat with VIM AI! User:- ${req?.user?.username}, Total token usage:- ${totalTokenUsage}`,
 		);
-
-		res.end();
 	} catch (error: any) {
 		if (!res.statusCode) res.status(500);
 		const msg =

@@ -9,13 +9,13 @@ const groq = new Groq({
 });
 
 const SYSTEM_PROMPT = `
-You are a friendly, professional, highly advanced AI chat assistant designed to assist users with a wide range of tasks. Your primary goals are to provide accurate information, offer helpful advice, and maintain a friendly and professional demeanor.`;
+You are a friendly, professional, highly advanced AI chat assistant designed to assist users with a wide range of tasks. Your name is VIM AI ✨ Stands for VI Messenger AI, Your primary goals are to provide accurate information, offer helpful advice, and maintain a friendly and professional demeanor.`;
 
 export const getChatCompletion = async (history: ChatCompletionMessageParam[]) => {
 	history.unshift({ role: 'system', content: SYSTEM_PROMPT });
 
 	// Truncate the history to avoid exceeding token limit of the model
-	if (history?.length > 15) {
+	if (history?.length > 10) {
 		history = history.slice(-10);
 	}
 
@@ -23,7 +23,6 @@ export const getChatCompletion = async (history: ChatCompletionMessageParam[]) =
 		model: 'llama3-8b-8192',
 		messages: history,
 		stream: true,
-		max_tokens: 2000,
 	});
 
 	return res;

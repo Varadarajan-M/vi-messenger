@@ -1,5 +1,6 @@
 import { safeParseHTML } from '@/lib/dom';
 import { cn } from '@/lib/utils';
+import { memo } from 'react';
 
 const MarkdownRenderer = ({ content, className }: { content: string; className?: string }) => {
 	const parsedHtml = safeParseHTML(content);
@@ -13,4 +14,4 @@ const MarkdownRenderer = ({ content, className }: { content: string; className?:
 	return <div className={classes} dangerouslySetInnerHTML={{ __html: parsedHtml }} />;
 };
 
-export default MarkdownRenderer;
+export default memo(MarkdownRenderer);

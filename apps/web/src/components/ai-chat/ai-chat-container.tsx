@@ -1,7 +1,7 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
-import useSendMessage from '@/hooks/messages/useSendMessage';
+import useSendMessageToAI from '@/hooks/messages/useSendMessageToAI';
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
-import { Children, useRef } from 'react';
+import { Children, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import AiChatMessages from './ai-chat-messages';
@@ -24,25 +24,58 @@ const ContainerLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AIMessageContainer = () => {
+	const [streamingMessage, setStreamingMessage] = useState<string | null>(null);
+	const handleStreaming = (message: string) => {
+		setStreamingMessage((prev) => (prev ? `${prev + message}` : message));
+	};
+
+	const ref = useRef<any>(null);
+
+	const onSendMessage = () => {
+		if (ref.current) {
+			ref?.current?.scrollIntoView();
+		}
+	};
+
 	return (
 		<ContainerLayout>
-			<AiChatMessages />
-			<AIMessageInput />
+			<AiChatMessages streamingMessage={streamingMessage} ref={ref} />
+
+			<AIMessageInput
+				onSendMessage={onSendMessage}
+				onMessageStream={handleStreaming}
+				onStreamEnd={() => setStreamingMessage(null)}
+			/>
 		</ContainerLayout>
 	);
 };
 
-const AIMessageInput = () => {
+const AIMessageInput = ({
+	onMessageStream,
+	onStreamEnd,
+	onSendMessage: onSendMessageCb,
+}: {
+	onMessageStream: any;
+	onStreamEnd: any;
+	onSendMessage: any;
+}) => {
 	const inputRef = useRef<HTMLInputElement>(null);
-	const { onSendMessage } = useSendMessage();
+	const { onSendMessage } = useSendMessageToAI();
 	const { user } = useAuthInfo();
 	const handleClick = async () => {
 		if (inputRef.current?.value?.trim()?.length) {
 			const value = inputRef.current?.value;
+			await onSendMessageCb?.();
 			inputRef.current.value = '';
-
 			inputRef.current.focus();
-			await onSendMessage(user?.ai as string, 'text', value);
+			await onSendMessage(
+				user?.ai as string,
+				'text',
+				value,
+				onMessageStream,
+				console.log,
+				onStreamEnd,
+			);
 		}
 	};
 

@@ -1,9 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-
-
-
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
@@ -33,3 +30,36 @@ export const formatFileSize = (fileSizeBytes: number): string => {
 		return `${(fileSizeBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 	}
 };
+
+export async function fetchStream(
+	url: string,
+	options: any,
+	callbacks: {
+		onMessage: (data: string) => void;
+		onEnd: () => void;
+	},
+) {
+	const response = await fetch(url, options);
+
+	if (!response?.body) {
+		throw new Error('Response body is empty');
+	}
+
+	const reader = response.body.getReader();
+	const decoder = new TextDecoder();
+
+	// eslint-disable-next-line no-constant-condition
+	while (true) {
+		const { done, value } = await reader.read();
+
+		if (done) {
+			console.log('Stream complete');
+			callbacks?.onEnd?.();
+			break;
+		}
+
+		const chunkText = decoder.decode(value, { stream: true });
+		callbacks?.onMessage?.(chunkText);
+		// Process the chunkText as needed
+	}
+}

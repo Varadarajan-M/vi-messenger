@@ -1,25 +1,28 @@
-import { sendMessageToAI } from '@/api/message';
-import { useSocket } from '@/contexts/SocketContext';
+import { BASE_URL } from '@/lib/axios';
+import { fetchStream } from '@/lib/utils';
 import { Message } from '@/types/message';
-import { useChatsStore, useMessageStore } from '@/zustand/store';
+import { useMessageStore } from '@/zustand/store';
 import { useCallback } from 'react';
 import useAuthInfo from '../auth/useAuthInfo';
 
 const useSendMessage = () => {
 	const { user } = useAuthInfo();
-	const socket = useSocket();
+	// const socket = useSocket();
 
 	const addMessage = useMessageStore((state) => state.addMessage);
 	const findByIdAndUpdate = useMessageStore((state) => state.findByIdAndUpdate);
-	const findByIdAndRemove = useMessageStore((state) => state.findByIdAndRemove);
+	// const findByIdAndRemove = useMessageStore((state) => state.findByIdAndRemove);
 
-	const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
+	// const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
 
 	const onSendMessage = useCallback(
 		async (
 			chatId: string,
 			type: string,
 			content: Message['content'],
+			onStream: (data: string) => void,
+			onError: (error: string) => void,
+			onStreamEnd: () => void,
 			cb?: (message?: Message) => void,
 		) => {
 			if (typeof content === 'string') {
@@ -54,19 +57,52 @@ const useSendMessage = () => {
 
 			cb?.(newMsg);
 
-			const res = (await sendMessageToAI(chatId, msg.type, msg.content)) as {
-				message: Message;
-			};
+			let lastMsg: any,
+				userMsg: any,
+				streamingMsg = '';
 
-			// if (res?.message) {
-			// 	findByIdAndUpdate(newMsgId, res.message);
+			await fetchStream(
+				`${BASE_URL}/message/${chatId}/ai`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${user?.token}`,
+					},
+					body: JSON.stringify(msg),
+				},
+				{
+					onMessage(data) {
+						const res = data?.split('data: ')?.[1];
+						const json = JSON.parse(res!);
+						if (!json?.ok) return onError?.(json?.error ?? 'Unknown error');
 
-			// 	// TODO remove this step for ai chat
-			// } else {
-			// 	findByIdAndRemove(newMsgId);
-			// }
+						if (json?.type === 'user_message') {
+							userMsg = json?.data;
+							findByIdAndUpdate(newMsgId, userMsg);
+						}
+
+						if (json?.type === 'ai_message_chunk') {
+							const len = json?.data?.length;
+							streamingMsg += json?.data;
+							if (len > 8) {
+								onStream(streamingMsg);
+								streamingMsg = '';
+							}
+						}
+
+						if (json?.type === 'ai_message') {
+							lastMsg = json?.data;
+						}
+					},
+					onEnd() {
+						onStreamEnd();
+						addMessage(lastMsg);
+					},
+				},
+			);
 		},
-		[addMessage, user?._id, user?.email, user?.username],
+		[addMessage, findByIdAndUpdate, user?._id, user?.email, user?.token, user?.username],
 	);
 
 	return { onSendMessage };
