@@ -1,9 +1,9 @@
 import { safeParseHTML } from '@/lib/dom';
 import { cn } from '@/lib/utils';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
 const MarkdownRenderer = ({ content, className }: { content: string; className?: string }) => {
-	const parsedHtml = safeParseHTML(content);
+	const parsedHtml = useMemo(() => safeParseHTML(content), [content]);
 
 	if (!parsedHtml) {
 		return null;

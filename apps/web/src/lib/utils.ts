@@ -45,21 +45,17 @@ export async function fetchStream(
 		throw new Error('Response body is empty');
 	}
 
-	const reader = response.body.getReader();
-	const decoder = new TextDecoder();
+	const reader = response.body?.pipeThrough(new TextDecoderStream())?.getReader();
 
 	// eslint-disable-next-line no-constant-condition
 	while (true) {
 		const { done, value } = await reader.read();
 
 		if (done) {
-			console.log('Stream complete');
 			callbacks?.onEnd?.();
 			break;
 		}
 
-		const chunkText = decoder.decode(value, { stream: true });
-		callbacks?.onMessage?.(chunkText);
-		// Process the chunkText as needed
+		callbacks?.onMessage?.(value);
 	}
 }

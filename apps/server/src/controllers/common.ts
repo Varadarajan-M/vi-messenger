@@ -32,6 +32,7 @@ export const searchController = async (req: RequestWithUser, res: Response) => {
 							$regex: new RegExp(q, 'i'),
 							$not: { $eq: req?.user?.username },
 						},
+						role: { $ne: Roles.VIM_AI },
 					},
 				],
 			})

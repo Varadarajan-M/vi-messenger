@@ -2,6 +2,7 @@ import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useActiveChat from '@/hooks/chat/useActiveChat';
 import useDebouncedValue from '@/hooks/common/useDebounceValue';
 import useFetchMessages from '@/hooks/messages/useFetchMessages';
+import { useMessageStore } from '@/zustand/store';
 import {
 	forwardRef,
 	memo,
@@ -14,6 +15,7 @@ import {
 import {
 	EmptyMessagePanel,
 	InitialMessageLoader,
+	ScrollToBottom,
 	ShowPreviousMessages,
 } from '../private/chats/chat-message-pane/chat-message-container';
 import AIChatMessage, { StreamedMessage } from './ai-chat-message';
@@ -37,6 +39,12 @@ const MessagesSection = memo(() => {
 		if (skip < totalCount) setPage((p) => p + 1);
 	}, [skip, totalCount]);
 
+	const handleScrollToBottom = useCallback(() => {
+		const container = document.getElementById('scrollable-messages-container')! as any;
+		const lastElement = container?.lastChild?.lastChild;
+		lastElement?.scrollIntoView({ behavior: 'smooth' });
+	}, []);
+
 	return (
 		<>
 			{canShowPreviousMessages && (
@@ -44,29 +52,48 @@ const MessagesSection = memo(() => {
 			)}
 			{loading && messages.length === 0 && <InitialMessageLoader />}
 			{!loading && messages.length === 0 && <EmptyMessagePanel />}
-			{messages?.map((message) => (
+			{messages?.map((message, i) => (
 				<AIChatMessage
-					key={message?._id}
+					key={message?._id ?? `message-${i}`}
 					message={message}
 					sender={getSender(message?.sender?._id)}
 				/>
 			))}
+			{!loading && messages.length > 0 && <ScrollToBottom onClick={handleScrollToBottom} />}
 		</>
 	);
 });
 
 const AiChatMessages = forwardRef(
-	({ streamingMessage }: { streamingMessage: string | null }, ref) => {
+	({ streamingMessage, loading }: { streamingMessage: string | null; loading }, ref) => {
 		const lastMessageRef = useRef<HTMLDivElement>(null);
 
 		const debouncedStream = useDebouncedValue(streamingMessage?.toString() || '', 100);
 
+		const isInitial = useRef(true);
+
+		const messages = useMessageStore((state) => state.messages);
+
+		const container = document.getElementById('scrollable-messages-container')! as any;
+
 		useEffect(() => {
-			if (debouncedStream !== null) {
-				console.log('scrolling');
-				lastMessageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			if (debouncedStream?.toString()?.length > 0) {
+				lastMessageRef?.current?.scrollIntoView({ behavior: 'instant' });
 			}
 		}, [debouncedStream]);
+
+		useEffect(() => {
+			if (messages.length > 0 && isInitial.current && container?.scrollHeight > 0) {
+				container && (container.scrollTop = container.scrollHeight);
+				isInitial.current = false;
+			}
+		}, [container, messages]);
+
+		useEffect(() => {
+			if (messages.length > 0 && !isInitial.current && container?.scrollHeight > 0) {
+				container && (container.scrollTop = container.scrollHeight);
+			}
+		}, [container, messages]);
 
 		useImperativeHandle(ref, () => ({
 			scrollIntoView: () => {
@@ -76,8 +103,10 @@ const AiChatMessages = forwardRef(
 		return (
 			<div className='flex flex-col gap-8 h-full py-16'>
 				<MessagesSection />
-				{streamingMessage !== null && <StreamedMessage message={streamingMessage} />}
-				<div ref={lastMessageRef} className=' min-h-2 min-w-full' />
+
+				<StreamedMessage message={debouncedStream as string} loading={loading} />
+
+				<div ref={lastMessageRef} className='min-h-6 min-w-full ' />
 			</div>
 		);
 	},

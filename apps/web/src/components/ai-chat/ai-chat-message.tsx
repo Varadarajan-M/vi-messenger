@@ -55,8 +55,13 @@ const AIChatMessage = ({ sender, message }: { sender: string; message: Message }
 			</div>
 
 			<MarkdownRenderer
-				content={typeof message?.content === 'string' ? message?.content : 'Media'}
+				content={
+					typeof message?.content === 'string'
+						? message?.content
+						: 'Error while streaming message, this should automatically reload, if not please refresh the page.'
+				}
 			/>
+
 			<time className='text-xs text-gray-500 font-medium ml-auto'>
 				{getTimeFromDate(message?.createdAt)}
 			</time>
@@ -64,7 +69,11 @@ const AIChatMessage = ({ sender, message }: { sender: string; message: Message }
 	);
 };
 
-const Stream = ({ message }: { message: string }) => {
+const Stream = ({ message, loading }: { message: string; loading: boolean }) => {
+	if (!loading && !message) {
+		return null;
+	}
+
 	return (
 		<div
 			className={cn(
@@ -73,11 +82,15 @@ const Stream = ({ message }: { message: string }) => {
 		>
 			<div className='flex justify-between items-center gap-2 my-2'>
 				<span className='text-sm self-start w-max text-purple-300 font-medium mb-1 hover:text-lime-300 cursor-pointer'>
-					'VIM AI✨'
+					VIM AI✨
 				</span>
 			</div>
 
-			<MarkdownRenderer content={message} />
+			{loading ? (
+				<div className='text-white animate-pulse mb-3 text-md'>AI is thinking...💭</div>
+			) : (
+				<MarkdownRenderer content={message} />
+			)}
 		</div>
 	);
 };

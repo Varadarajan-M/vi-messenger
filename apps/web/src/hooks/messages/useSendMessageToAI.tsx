@@ -7,13 +7,10 @@ import useAuthInfo from '../auth/useAuthInfo';
 
 const useSendMessage = () => {
 	const { user } = useAuthInfo();
-	// const socket = useSocket();
 
 	const addMessage = useMessageStore((state) => state.addMessage);
 	const findByIdAndUpdate = useMessageStore((state) => state.findByIdAndUpdate);
-	// const findByIdAndRemove = useMessageStore((state) => state.findByIdAndRemove);
-
-	// const findByIdAndUpdateChat = useChatsStore((state) => state.findByIdAndUpdate);
+	const fetchMessages = useMessageStore((state) => state.fetchMessages);
 
 	const onSendMessage = useCallback(
 		async (
@@ -73,26 +70,41 @@ const useSendMessage = () => {
 				},
 				{
 					onMessage(data) {
-						const res = data?.split('data: ')?.[1];
-						const json = JSON.parse(res!);
-						if (!json?.ok) return onError?.(json?.error ?? 'Unknown error');
+						try {
+							const res = data?.split('data: ')?.[1];
 
-						if (json?.type === 'user_message') {
-							userMsg = json?.data;
-							findByIdAndUpdate(newMsgId, userMsg);
-						}
+							if (!res) return;
 
-						if (json?.type === 'ai_message_chunk') {
-							const len = json?.data?.length;
-							streamingMsg += json?.data;
-							if (len > 8) {
-								onStream(streamingMsg);
-								streamingMsg = '';
+							const json = JSON.parse(res!);
+							if (!json?.ok) return onError?.(json?.error ?? 'Unknown error');
+
+							if (json?.type === 'user_message') {
+								userMsg = json?.data;
+								findByIdAndUpdate(newMsgId, userMsg);
 							}
-						}
 
-						if (json?.type === 'ai_message') {
-							lastMsg = json?.data;
+							let partialChunk = '';
+
+							if (json?.type === 'ai_message_chunk') {
+								partialChunk += json?.data;
+
+								const len = partialChunk?.length;
+
+								streamingMsg += json?.data;
+								if (len > 8) {
+									onStream(streamingMsg);
+									streamingMsg = '';
+									partialChunk = '';
+								}
+							}
+
+							if (json?.type === 'ai_message') {
+								lastMsg = json?.data;
+							}
+						} catch (error) {
+
+							fetchMessages(chatId, 0, 10);
+							onStreamEnd();
 						}
 					},
 					onEnd() {
@@ -102,7 +114,15 @@ const useSendMessage = () => {
 				},
 			);
 		},
-		[addMessage, findByIdAndUpdate, user?._id, user?.email, user?.token, user?.username],
+		[
+			addMessage,
+			fetchMessages,
+			findByIdAndUpdate,
+			user?._id,
+			user?.email,
+			user?.token,
+			user?.username,
+		],
 	);
 
 	return { onSendMessage };

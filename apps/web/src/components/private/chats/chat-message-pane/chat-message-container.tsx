@@ -184,11 +184,19 @@ export const InitialMessageLoader = () => {
 };
 
 export const ScrollToBottom = ({ onClick }: { onClick: () => void }) => {
+	const [hovering, setHovering] = useState(false);
 	return (
 		<div
 			title='Scroll to bottom'
 			onClick={onClick}
-			className='ml-auto absolute bottom-[20px] bg-black right-5 border-[2px] grid place-content-center rounded-full border-purple-900 hover:border-red-500 w-[42px] h-[42px] hover:scale-125 transition-all duration-300 text-white'
+			onMouseEnter={() => setHovering(true)}
+			onMouseLeave={() => setHovering(false)}
+			onTouchStart={() => setHovering(true)}
+			onTouchEnd={() => setHovering(false)}
+			className={cn(
+				'ml-auto absolute bottom-[20px] bg-black right-5 border-[2px] grid place-content-center rounded-full border-purple-900 w-[42px] h-[42px]  transition-all duration-300 text-white',
+				{ 'border-red-500 scale-125': hovering },
+			)}
 		>
 			<ArrowDownIcon className='w-5 h-5' />
 		</div>
@@ -254,7 +262,7 @@ const Messages = forwardRef(({ chat, chatId, onReply }: MessagesProps, ref: any)
 	// This effect is used for starting the chat at the bottom of the messages container
 	useEffect(() => {
 		if (isInitial.current && messages.length > 0 && unReadMessages?.length === 0) {
-			const container = document.getElementById('scrollable-messages-container')!;
+			const container = document.getElementById('scrollable-messages-container')! as any;
 			container && (container.scrollTop = container.scrollHeight);
 			isInitial.current = false;
 		}

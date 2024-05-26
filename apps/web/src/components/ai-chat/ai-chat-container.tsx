@@ -1,9 +1,8 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useSendMessageToAI from '@/hooks/messages/useSendMessageToAI';
+import { cn } from '@/lib/utils';
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import { Children, useRef, useState } from 'react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
 import AiChatMessages from './ai-chat-messages';
 
 const ContainerLayout = ({ children }: { children: React.ReactNode }) => {
@@ -25,26 +24,28 @@ const ContainerLayout = ({ children }: { children: React.ReactNode }) => {
 
 const AIMessageContainer = () => {
 	const [streamingMessage, setStreamingMessage] = useState<string | null>(null);
+	const [loading, setLoading] = useState(false);
 	const handleStreaming = (message: string) => {
+		setLoading(false);
 		setStreamingMessage((prev) => (prev ? `${prev + message}` : message));
 	};
 
-	const ref = useRef<any>(null);
+	const handleStreamEnd = () => {
+		setStreamingMessage(null);
+	};
 
-	const onSendMessage = () => {
-		if (ref.current) {
-			ref?.current?.scrollIntoView();
-		}
+	const handleSendMessage = () => {
+		setLoading(true);
 	};
 
 	return (
 		<ContainerLayout>
-			<AiChatMessages streamingMessage={streamingMessage} ref={ref} />
+			<AiChatMessages streamingMessage={streamingMessage} loading={loading} />
 
 			<AIMessageInput
-				onSendMessage={onSendMessage}
 				onMessageStream={handleStreaming}
-				onStreamEnd={() => setStreamingMessage(null)}
+				onStreamEnd={handleStreamEnd}
+				onSendMessage={handleSendMessage}
 			/>
 		</ContainerLayout>
 	);
@@ -57,16 +58,18 @@ const AIMessageInput = ({
 }: {
 	onMessageStream: any;
 	onStreamEnd: any;
-	onSendMessage: any;
+	onSendMessage?: any;
 }) => {
-	const inputRef = useRef<HTMLInputElement>(null);
+	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const { onSendMessage } = useSendMessageToAI();
 	const { user } = useAuthInfo();
+	const [height, setHeight] = useState(65);
 	const handleClick = async () => {
 		if (inputRef.current?.value?.trim()?.length) {
 			const value = inputRef.current?.value;
 			await onSendMessageCb?.();
 			inputRef.current.value = '';
+			setHeight(65);
 			inputRef.current.focus();
 			await onSendMessage(
 				user?.ai as string,
@@ -79,40 +82,44 @@ const AIMessageInput = ({
 		}
 	};
 
-	const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
+	const handleKeydown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			handleClick();
 		}
+
+		if (e.key === 'Enter' && e.shiftKey) {
+			setHeight((h) => (h < 140 ? h + 10 : 140));
+		}
 	};
 	return (
-		<div className='flex gap-2 h-20 items-stretch mb-3 '>
+		<div className='flex gap-2 h-max items-stretch mb-3 relative'>
 			<div
 				tabIndex={0}
 				role='textbox'
 				aria-label='Type a message'
 				aria-required='true'
-				className='basis-[95%] flex py-1 pl-4 bg-dark-grey bg-opacity-70  gap-2 relative transition-colors duration-500 rounded-xl shadow-md border border-transparent focus-visible:border-purple-900 focus-visible:outline-none focus-within:border-purple-900'
+				className='w-full flex py-1 pl-4 pr-16 bg-dark-grey bg-opacity-70  gap-2 relative transition-colors duration-500 rounded-2xl shadow-md border border-transparent focus-visible:border-purple-900 focus-visible:outline-none focus-within:border-purple-950'
 			>
-				<Input
+				<textarea
 					ref={inputRef}
 					onKeyDown={handleKeydown}
-					placeholder='Type a message...'
+					placeholder='💬 Message VIM AI Pssstt... Markdown is supported here! ✨'
 					aria-label='Type a message'
 					aria-required='true'
-					className='text-gray-300 self-center text-2xl placeholder:text-gray-400 border-none -ml-3  focus:focus-visible:border-none focus:focus-visible:outline-none focus:focus-visible:ring-0'
+					className='text-sm pt-2 pb-3 text-gray-300 self-center md:text-lg placeholder:opacity-70 bg-transparent w-full resize-none border-none -ml-1  focus:focus-visible:border-none focus:focus-visible:outline-none focus:focus-visible:ring-0 placeholder:mt-3'
+					style={{ height: height }}
 				/>
+				<span
+					title='Send Message'
+					onClick={handleClick}
+					className={cn(
+						'ml-auto absolute bottom-3 right-5 bg-black border-[2px] grid place-content-center rounded-full hover:border-purple-950 border-gray-800 w-[42px] h-[42px]  transition-all duration-300 text-white cursor-pointer hover:scale-125',
+					)}
+				>
+					<PaperPlaneIcon className='w-4 h-4' />
+				</span>
 			</div>
-			<Button
-				type='submit'
-				onClick={handleClick}
-				title='Send Message'
-				aria-label='Send Message'
-				role='button'
-				className='self-center h-full min-w-20 bg-gradient-dark border border-purple-900 hover:scale-105'
-			>
-				<PaperPlaneIcon className='h-7 w-6 self-center' />
-			</Button>
 		</div>
 	);
 };
