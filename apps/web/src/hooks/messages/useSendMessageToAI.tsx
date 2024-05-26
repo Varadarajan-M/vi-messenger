@@ -102,14 +102,13 @@ const useSendMessage = () => {
 								lastMsg = json?.data;
 							}
 						} catch (error) {
-
 							fetchMessages(chatId, 0, 10);
 							onStreamEnd();
 						}
 					},
 					onEnd() {
 						onStreamEnd();
-						addMessage(lastMsg);
+						lastMsg?._id ? addMessage(lastMsg) : fetchMessages(chatId, 0, 10);
 					},
 				},
 			);

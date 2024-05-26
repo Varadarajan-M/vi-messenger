@@ -17,6 +17,7 @@ import {
 	InitialMessageLoader,
 	ScrollToBottom,
 	ShowPreviousMessages,
+	PreviousMessageLoader,
 } from '../private/chats/chat-message-pane/chat-message-container';
 import AIChatMessage, { StreamedMessage } from './ai-chat-message';
 
@@ -47,6 +48,7 @@ const MessagesSection = memo(() => {
 
 	return (
 		<>
+			{loading && messages.length > 0 && <PreviousMessageLoader />}
 			{canShowPreviousMessages && (
 				<ShowPreviousMessages onClick={handleShowPreviousMessages} />
 			)}
