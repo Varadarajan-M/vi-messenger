@@ -1,5 +1,6 @@
 import useAuthInfo from '@/hooks/auth/useAuthInfo';
 import useSendMessageToAI from '@/hooks/messages/useSendMessageToAI';
+import useMediaQuery from '@/hooks/common/useMediaQuery';
 import { cn } from '@/lib/utils';
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import { Children, useRef, useState } from 'react';
@@ -63,6 +64,8 @@ const AIMessageInput = ({
 	const { onSendMessage } = useSendMessageToAI();
 	const { user } = useAuthInfo();
 	const [height, setHeight] = useState(65);
+    const isSmallScreen = useMediaQuery('( max-width: 900px )');
+
 	const handleClick = async () => {
 		if (inputRef.current?.value?.trim()?.length) {
 			const value = inputRef.current?.value;
@@ -82,6 +85,11 @@ const AIMessageInput = ({
 	};
 
 	const handleKeydown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (isSmallScreen && e.key === 'Enter') {
+					setHeight((h) => (h < 140 ? h + 10 : 140));
+					return;
+		}
+		
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			handleClick();
