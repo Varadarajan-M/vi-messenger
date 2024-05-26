@@ -15,8 +15,8 @@ const classMap = {
 	// code: 'px-2 sm:px-4 py-1 sm:py-2 rounded font-mono',
 	// pre: 'text-gray-300 p-2 sm:p-4 rounded my-2 overflow-auto max-w-full whitespace-pre-wrap',
 	table: 'w-full mt-2 mb-3 text-gray-300 border-collapse dark-b',
-	th: 'dark-b mt-2 mb-3 text-white font-semibold py-2 px-1 sm:px-4 border border-gray-600 text-left',
-	td: 'dark-b mt-2 mb-3 text-white py-2 px-1 sm:px-4 border border-gray-600 text-left',
+	th: 'dark-b mt-2 mb-3 text-white font-semibold py-2 px-1 sm:px-4 border border-gray-600 text-left text-sm sm:text-md',
+	td: 'dark-b mt-2 mb-3 text-white py-2 px-1 sm:px-4 border border-gray-600 text-left text-xs sm:text-sm',
 	img: 'mx-auto mt-2 mb-3 my-4',
 	hr: 'border-gray-600 my-8',
 };

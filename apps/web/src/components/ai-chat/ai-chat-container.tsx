@@ -41,7 +41,6 @@ const AIMessageContainer = () => {
 	return (
 		<ContainerLayout>
 			<AiChatMessages streamingMessage={streamingMessage} loading={loading} />
-
 			<AIMessageInput
 				onMessageStream={handleStreaming}
 				onStreamEnd={handleStreamEnd}
@@ -104,7 +103,7 @@ const AIMessageInput = ({
 				<textarea
 					ref={inputRef}
 					onKeyDown={handleKeydown}
-					placeholder='💬 Message VIM AI Pssstt... Markdown is supported here! ✨'
+					placeholder='💬 Ask me anything ✨ #Markdown is supported here!🚀'
 					aria-label='Type a message'
 					aria-required='true'
 					className='text-sm pt-2 pb-3 text-gray-300 self-center md:text-lg placeholder:opacity-70 bg-transparent w-full resize-none border-none -ml-1  focus:focus-visible:border-none focus:focus-visible:outline-none focus:focus-visible:ring-0 placeholder:mt-3'

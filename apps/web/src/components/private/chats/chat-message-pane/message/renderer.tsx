@@ -108,7 +108,7 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 export const MessageRenderer = ({ type, content }: RendererProps) => {
 	if (type === 'text' && typeof content === 'string') {
 		return (
-			<p className='text-lg font-medium text-white max-w-[90%] break-words'>
+			<p className='text-sm sm:text-base font-medium text-white max-w-[90%] break-words'>
 				{content ?? ''}
 			</p>
 		);
@@ -133,7 +133,7 @@ export const MessageRenderer = ({ type, content }: RendererProps) => {
 export const MessageReplyRenderer = ({ type, content }: RendererProps) => {
 	if (type === 'text' && typeof content === 'string') {
 		return (
-			<p className='text-lg font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
+			<p className='text-sm sm:text-base font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
 				{content?.substring(0, 100) ?? ''}
 			</p>
 		);
@@ -142,7 +142,7 @@ export const MessageReplyRenderer = ({ type, content }: RendererProps) => {
 	if ((type === 'image' || type === 'video') && typeof content === 'object') {
 		return (
 			<div className='flex items-center -mt-2 gap-4 justify-between'>
-				<p className='text-lg font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
+				<p className='text-sm sm:text-base  font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
 					Media 📎
 				</p>
 				<LazyImage

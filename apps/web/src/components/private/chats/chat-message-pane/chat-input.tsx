@@ -174,6 +174,7 @@ const EmojiPicker = ({
 					onEmojiClick={(data, e) => {
 						onEmojiSelect(data, e);
 					}}
+					autoFocusSearch={false}
 				/>
 			)}
 		</div>
@@ -268,7 +269,7 @@ const ChatInput = ({
 					placeholder='Type a message...'
 					aria-label='Type a message'
 					aria-required='true'
-					className='text-gray-300 self-center text-2xl placeholder:text-gray-400 border-none basis-[94%] -ml-3 focus:focus-visible:border-none focus:focus-visible:outline-none focus:focus-visible:ring-0'
+					className='text-gray-300 self-center text-base sm:text-xl placeholder:text-gray-400 border-none basis-[94%] -ml-3 focus:focus-visible:border-none focus:focus-visible:outline-none focus:focus-visible:ring-0'
 				/>
 
 				<EmojiPicker open={emojiOpen} setOpen={setEmojiOpen} onEmojiSelect={onEmojiClick} />
@@ -279,9 +280,9 @@ const ChatInput = ({
 				title='Send Message'
 				aria-label='Send Message'
 				role='button'
-				className='self-center h-full min-w-20 bg-gradient-dark border border-purple-900 hover:scale-105'
+				className='self-center h-full min-w-16 sm:min-w-20 bg-gradient-dark border border-purple-900 hover:scale-105'
 			>
-				<SendIcon className='h-7 w-6 self-center' />
+				<SendIcon className='h-5 sm:h-7 w-5 sm:w-6 self-center' />
 			</Button>
 		</div>
 	);

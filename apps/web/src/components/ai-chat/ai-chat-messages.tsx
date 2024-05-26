@@ -15,9 +15,9 @@ import {
 import {
 	EmptyMessagePanel,
 	InitialMessageLoader,
+	PreviousMessageLoader,
 	ScrollToBottom,
 	ShowPreviousMessages,
-	PreviousMessageLoader,
 } from '../private/chats/chat-message-pane/chat-message-container';
 import AIChatMessage, { StreamedMessage } from './ai-chat-message';
 
@@ -108,7 +108,10 @@ const AiChatMessages = forwardRef(
 
 				<StreamedMessage message={debouncedStream as string} loading={loading} />
 
-				<div ref={lastMessageRef} className='min-h-6 min-w-full ' />
+				<div
+					ref={lastMessageRef}
+					className='min-h-6 min-w-full text-xs text-gray-400'
+				></div>
 			</div>
 		);
 	},

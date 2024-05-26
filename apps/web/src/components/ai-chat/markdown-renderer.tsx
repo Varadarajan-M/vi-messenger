@@ -9,7 +9,7 @@ const MarkdownRenderer = ({ content, className }: { content: string; className?:
 		return null;
 	}
 
-	const classes = cn('font-medium text-gray-300 text-md', className);
+	const classes = cn('font-medium text-gray-300 text-sm sm:text-md', className);
 
 	return <div className={classes} dangerouslySetInnerHTML={{ __html: parsedHtml }} />;
 };
