@@ -16,7 +16,7 @@ const useSetAndPopulateActiveChat = () => {
 				addToChats(activeChat);
 			}
 			searchParams.set('chat', activeChat?._id?.toString());
-			const activeWindow = searchParams.get('window');
+			const activeWindow = searchParams.get('window') ?? 'all-chats';
 			searchParams.set('window', activeWindow === 'ai-chat' ? 'all-chats' : activeWindow);
 			setSearchParams(searchParams.toString());
 		},

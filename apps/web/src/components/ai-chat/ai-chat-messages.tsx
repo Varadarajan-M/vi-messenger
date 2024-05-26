@@ -65,7 +65,7 @@ const MessagesSection = memo(() => {
 });
 
 const AiChatMessages = forwardRef(
-	({ streamingMessage, loading }: { streamingMessage: string | null; loading }, ref) => {
+	({ streamingMessage, loading }: { streamingMessage: string | null; loading: boolean }, ref) => {
 		const lastMessageRef = useRef<HTMLDivElement>(null);
 
 		const debouncedStream = useDebouncedValue(streamingMessage?.toString() || '', 100);

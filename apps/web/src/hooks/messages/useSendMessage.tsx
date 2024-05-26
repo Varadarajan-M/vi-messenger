@@ -22,7 +22,6 @@ const useSendMessage = () => {
 			content: Message['content'],
 			replyTo: Message | null = null,
 			cb?: (message?: Message) => void,
-			isAIChat: boolean = false,
 		) => {
 			if (typeof content === 'string') {
 				content = content?.trim();
@@ -57,7 +56,6 @@ const useSendMessage = () => {
 
 			cb?.(newMsg);
 
-			
 			const res = (await sendMessage(chatId, msg.type, msg.content, replyTo)) as {
 				message: Message;
 			};
