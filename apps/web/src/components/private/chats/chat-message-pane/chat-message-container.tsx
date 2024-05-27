@@ -185,10 +185,16 @@ export const InitialMessageLoader = () => {
 
 export const ScrollToBottom = ({ onClick }: { onClick: () => void }) => {
 	const [hovering, setHovering] = useState(false);
+
+	const handleClick = () => {
+		setHovering(false);
+		onClick?.()
+	}
+
 	return (
 		<div
 			title='Scroll to bottom'
-			onClick={onClick}
+			onClick={handleClick}
 			onMouseEnter={() => setHovering(true)}
 			onMouseLeave={() => setHovering(false)}
 			onTouchStart={() => setHovering(true)}

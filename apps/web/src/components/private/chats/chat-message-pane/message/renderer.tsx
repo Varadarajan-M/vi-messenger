@@ -60,7 +60,7 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 						<DialogContent className='sm:max-w-md rounded-sm w-max bg-black text-white border-none overflow-y-auto flex flex-col'>
 							<LazyImage
 								className={
-									'max-h-[80lvh] max-w-[80lvw] aspect-square rounded-md object-cover'
+									'max-h-[80lvh] max-w-[80lvw] rounded-md object-cover'
 								}
 								src={content?.url}
 								alt='chat image'
