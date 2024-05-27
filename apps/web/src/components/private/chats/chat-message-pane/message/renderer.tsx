@@ -60,7 +60,7 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 						<DialogContent className='sm:max-w-md rounded-sm w-max bg-black text-white border-none overflow-y-auto flex flex-col'>
 							<LazyImage
 								className={
-									'max-h-[80lvh] max-w-[80lvw] aspect-square rounded-md object-cover'
+									'max-h-[80lvh] max-w-[80lvw] rounded-md object-cover'
 								}
 								src={content?.url}
 								alt='chat image'
@@ -108,7 +108,7 @@ const MediaRenderer = ({ type, content }: RendererProps) => {
 export const MessageRenderer = ({ type, content }: RendererProps) => {
 	if (type === 'text' && typeof content === 'string') {
 		return (
-			<p className='text-lg font-medium text-white max-w-[90%] break-words'>
+			<p className='text-sm sm:text-base font-medium text-white max-w-[90%] break-words'>
 				{content ?? ''}
 			</p>
 		);
@@ -133,7 +133,7 @@ export const MessageRenderer = ({ type, content }: RendererProps) => {
 export const MessageReplyRenderer = ({ type, content }: RendererProps) => {
 	if (type === 'text' && typeof content === 'string') {
 		return (
-			<p className='text-lg font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
+			<p className='text-sm sm:text-base font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
 				{content?.substring(0, 100) ?? ''}
 			</p>
 		);
@@ -142,7 +142,7 @@ export const MessageReplyRenderer = ({ type, content }: RendererProps) => {
 	if ((type === 'image' || type === 'video') && typeof content === 'object') {
 		return (
 			<div className='flex items-center -mt-2 gap-4 justify-between'>
-				<p className='text-lg font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
+				<p className='text-sm sm:text-base  font-medium text-white max-w-[90%] break-all text-ellipsis ellipsis-1'>
 					Media 📎
 				</p>
 				<LazyImage

@@ -243,7 +243,7 @@ const Message = ({
 					/>
 				)}
 				{(showUsername || (isSmallScreen && sender === 'other')) && (
-					<p className='text-md font-semibold text-gray-400 capitalize'>
+					<p className='text-md font-semibold text-gray-400 capitalize mb-0.5'>
 						{message?.sender?.username ?? 'User'}
 					</p>
 				)}

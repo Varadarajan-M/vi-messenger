@@ -106,7 +106,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 	findByIdAndUpdate(id: string, update: Partial<Message>) {
 		set({
 			messages: get().messages.map((message) =>
-				message._id === id ? { ...message, ...update } : message,
+				message?._id === id ? { ...message, ...update } : message,
 			),
 		});
 	},

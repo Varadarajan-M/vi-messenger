@@ -21,7 +21,7 @@ function App() {
 			</Routes>
 			<Notifier />
 			<Toaster />
-			<PWAInstall />
+			{import.meta.env.PROD && <PWAInstall />}
 		</Fragment>
 	);
 }

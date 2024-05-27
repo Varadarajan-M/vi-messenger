@@ -157,3 +157,13 @@ html,
 	border: 2px solid #292929;
 	@apply animate-shake duration-700 delay-1000;
 }
+
+.hljs {
+	background-color: #0e0f11 !important;
+	border-radius: 0.3rem;
+	margin-block: 1rem;
+}
+
+pre {
+	@apply whitespace-pre-line md:whitespace-pre-wrap;
+}

@@ -1,3 +1,4 @@
+import compression from 'compression';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -5,7 +6,6 @@ import http from 'http';
 import morgan from 'morgan';
 import path from 'path';
 import SocketIO from 'socket.io';
-import compression from 'compression';
 
 import routes from './routes';
 

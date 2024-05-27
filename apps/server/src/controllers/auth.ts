@@ -2,8 +2,9 @@ import { compare, hash } from 'bcrypt';
 import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 
-import User from '../models/user';
+import User, { Roles } from '../models/user';
 
+import { findOrCreateAIChatForUser } from '../utils/chat';
 import logger from '../utils/logger';
 
 export const registerController = async (req: Request, res: Response) => {
@@ -52,6 +53,13 @@ export const loginController = async (req: Request, res: Response) => {
 
 		const isPasswordMatched = await compare(password, matchingUser?.password!);
 
+		if (matchingUser?.role === Roles.VIM_AI) {
+			res.status(400);
+			logger.log(
+				`AI USER Login attempt: - u: ${matchingUser?.username} e: ${matchingUser?.email}`,
+			);
+			throw new Error("This user doesn't have a valid scope to login");
+		}
 		if (!isPasswordMatched) {
 			res.status(401);
 
@@ -59,11 +67,14 @@ export const loginController = async (req: Request, res: Response) => {
 			throw new Error('Invalid credentials');
 		}
 
+		const chatWithAi = await findOrCreateAIChatForUser(matchingUser?._id?.toString());
+
 		const token = sign(
 			{
 				_id: matchingUser?._id,
 				email: matchingUser?.email,
 				username: matchingUser?.username,
+				role: Roles.USER,
 			},
 			process.env.JWT_SECRET!,
 		);
@@ -79,6 +90,8 @@ export const loginController = async (req: Request, res: Response) => {
 				username: matchingUser?.username,
 				picture: matchingUser?.picture,
 				token,
+				role: Roles.USER,
+				ai: (chatWithAi && chatWithAi?._id) || null,
 			},
 		});
 	} catch (error: any) {

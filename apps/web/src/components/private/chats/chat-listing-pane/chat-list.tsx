@@ -25,7 +25,14 @@ const ChatList = () => {
 				</div>
 			)}
 			{filteredChats?.length === 0 && !chatLoading && (
-				<p className='text-gray-400 text-center my-auto'>No Chats</p>
+				<div className='text-center text-white px-4 py-8 my-auto'>
+					<span className='text-xl font-bold'>No chats found!</span>
+					<br />
+					<span className='text-center text-gray-400 font-medium -mt-1'>
+						The search bar is your friend - use it to find interesting people and start
+						chatting.
+					</span>
+				</div>
 			)}
 			{!chatLoading &&
 				filteredChats?.map((chat) => (

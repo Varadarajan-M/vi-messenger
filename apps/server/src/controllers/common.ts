@@ -1,7 +1,7 @@
 import { Response } from 'express';
 
 import Chat from '../models/chat';
-import User from '../models/user';
+import User, { Roles } from '../models/user';
 
 import { RequestWithUser } from '../types';
 
@@ -25,12 +25,14 @@ export const searchController = async (req: RequestWithUser, res: Response) => {
 							$regex: new RegExp(q, 'i'),
 							$not: { $eq: req?.user?.email },
 						},
+						role: { $ne: Roles.VIM_AI },
 					},
 					{
 						username: {
 							$regex: new RegExp(q, 'i'),
 							$not: { $eq: req?.user?.username },
 						},
+						role: { $ne: Roles.VIM_AI },
 					},
 				],
 			})

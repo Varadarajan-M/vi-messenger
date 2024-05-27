@@ -1,6 +1,9 @@
 import { Response } from 'express';
+import { ChatCompletionMessage } from 'groq-sdk/resources/chat/completions';
+import { getChatCompletion } from '../lib/groq';
 import Message from '../models/message';
 import { RequestWithChat } from '../types';
+import Logger from '../utils/logger';
 import { messagePopulationFields } from '../utils/message';
 
 export const getChatMessagesController = async (req: RequestWithChat, res: Response) => {
@@ -90,6 +93,120 @@ export const createMessageController = async (req: RequestWithChat, res: Respons
 				: error?.message || 'Failed to get messages';
 
 		res.json({ ok: false, error: msg });
+	}
+};
+
+export const chatWithAIController = async (req: RequestWithChat, res: Response) => {
+	res.setHeader('Content-Type', 'text/event-stream');
+	res.setHeader('Connection', 'keep-alive');
+	res.setHeader('Cache-Control', 'no-cache');
+
+	try {
+		if (!req?.chat) {
+			res.status(403);
+			throw new Error('Chat not found');
+		}
+
+		const { content } = req?.body;
+
+		if (!content) {
+			res.status(422);
+			throw new Error('Content is required');
+		}
+
+		const newMessage = await (
+			await new Message({
+				type: 'text',
+				content,
+				chatId: req?.chat?._id,
+				sender: req?.user?._id,
+			}).save()
+		).populate('sender', '-password');
+
+		if (!newMessage?._id) {
+			res.status(400);
+			throw new Error('Failed to create message');
+		}
+
+		const conversation = await Message.find({
+			chatId: req?.chat?._id,
+		})?.lean();
+
+		const chatHistory = conversation?.map((message) => ({
+			role: message?.sender?.toString() === req?.user?._id.toString() ? 'user' : 'assistant',
+			content:
+				typeof message?.content === 'object'
+					? JSON.stringify(message?.content)
+					: message?.content,
+		})) as ChatCompletionMessage[];
+
+		const stream = await getChatCompletion(chatHistory);
+
+		// send initial message
+		res.write(
+			`data: ${JSON.stringify({ ok: true, type: 'user_message', data: newMessage })}\n\n`,
+		);
+
+		res.flush();
+
+		let chunks = '';
+		let totalTokenUsage = 0;
+
+		for await (const chunk of stream) {
+			let chunkContent = chunk.choices[0]?.delta?.content || '';
+			chunks += chunkContent;
+
+			totalTokenUsage = chunk?.x_groq?.usage?.total_tokens || 0;
+
+			// Send each chunk of the AI response
+
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			res.write(
+				`data: ${JSON.stringify({
+					ok: true,
+					type: 'ai_message_chunk',
+					data: chunkContent,
+				})}\n\n`,
+			);
+			res.flush();
+		}
+
+		const aiChat = req?.chat;
+
+		const vimAiId = aiChat?.members.find(
+			(member) => member.toString() !== req?.user?._id.toString(),
+		);
+
+		const aiMessage = await (
+			await new Message({
+				type: 'text',
+				content: chunks,
+				chatId: req?.chat?._id,
+				sender: vimAiId,
+				replyTo: newMessage._id,
+			}).save()
+		).populate('sender', '-password');
+
+		// Send the final AI message
+		res.write(`data: ${JSON.stringify({ ok: true, type: 'ai_message', data: aiMessage })}\n\n`);
+
+		res.flush();
+
+		res.end();
+
+		Logger.info(
+			`Chat with VIM AI! User:- ${req?.user?.username}, Total token usage:- ${totalTokenUsage}`,
+		);
+	} catch (error: any) {
+		if (!res.statusCode) res.status(500);
+		const msg =
+			res?.statusCode === 500
+				? 'Internal server error'
+				: error?.message || 'Failed to create chat completions';
+
+		res.write(`data: ${JSON.stringify({ ok: false, error: msg })}\n\n`);
+		res.end();
 	}
 };
 

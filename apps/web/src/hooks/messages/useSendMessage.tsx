@@ -62,6 +62,8 @@ const useSendMessage = () => {
 
 			if (res?.message) {
 				findByIdAndUpdate(newMsgId, res.message);
+
+				// TODO remove this step for ai chat
 				findByIdAndUpdateChat(chatId, { lastMessage: res.message });
 
 				socket?.emit('new_message', {

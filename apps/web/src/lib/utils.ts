@@ -30,3 +30,32 @@ export const formatFileSize = (fileSizeBytes: number): string => {
 		return `${(fileSizeBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 	}
 };
+
+export async function fetchStream(
+	url: string,
+	options: any,
+	callbacks: {
+		onMessage: (data: string) => void;
+		onEnd: () => void;
+	},
+) {
+	const response = await fetch(url, options);
+
+	if (!response?.body) {
+		throw new Error('Response body is empty');
+	}
+
+	const reader = response.body?.pipeThrough(new TextDecoderStream())?.getReader();
+
+	// eslint-disable-next-line no-constant-condition
+	while (true) {
+		const { done, value } = await reader.read();
+
+		if (done) {
+			callbacks?.onEnd?.();
+			break;
+		}
+
+		callbacks?.onMessage?.(value);
+	}
+}
