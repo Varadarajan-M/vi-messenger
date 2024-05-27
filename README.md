@@ -24,8 +24,8 @@ For an in-depth technical analysis, check out the LinkedIn post [here](https://w
 5. Start the client with `npm run dev -w apps\web`.
 6. Access the application at [http://localhost:3000](http://localhost:3000).
 
-## What's new?
-- AI Chat -  Generates rich text responses with LLAMA-2 and streams it, supports code highlighting, copying etc...
+## What's new in v2?
+- AI Chat -  Generates rich text responses with LLAMA-3 and streams it, supports code highlighting, copying etc...
 - Progressive Web Application(PWA) capabilites.
 - Message replies.
 - In addition to image/video sharing, added file sharing capabilities - Supported formats - `pdf`, `mp3`, `docx`, `xlsx`, `pptx`, `txt`, `zip`.
